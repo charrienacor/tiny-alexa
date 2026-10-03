@@ -67,7 +67,7 @@ cycling through every scene. Add `&debug` to show the CRNN latency chip.
 
 ```bash
 cd rpi
-python3 -m pip install aiohttp onnxruntime openwakeword resampy soundfile mutagen
+python3 -m pip install aiohttp onnxruntime openwakeword==0.6.0 resampy soundfile mutagen
 python3 server.py                      # → http://localhost:8321
 ```
 
@@ -363,7 +363,7 @@ rpi/
 ```bash
 # on the Pi
 sudo apt update && sudo apt install -y python3-pip libportaudio2
-python3 -m pip install aiohttp onnxruntime openwakeword resampy soundfile mutagen
+python3 -m pip install aiohttp onnxruntime openwakeword==0.6.0 resampy soundfile mutagen
 python3 server.py                 # → http://<pi-ip>:8321
 ```
 

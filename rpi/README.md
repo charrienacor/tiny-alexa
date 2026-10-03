@@ -38,12 +38,20 @@ pipeline is unaffected.
 
 ## Run on the Raspberry Pi 4
 
+Raspberry Pi OS (Bookworm) blocks `pip install` into the system Python
+(`externally-managed-environment`), so use a virtual environment:
+
 ```bash
-sudo apt update && sudo apt install -y python3-pip
-python3 -m pip install aiohttp onnxruntime openwakeword resampy soundfile mutagen
-# copy this whole folder (including music/) to the Pi, then:
-python3 server.py            # → http://<pi-ip>:8321
+sudo apt update && sudo apt install -y python3-venv libportaudio2
+cd ~/tiny-alexa/rpi            # wherever you copied this folder
+python3 -m venv .venv
+source .venv/bin/activate
+pip install aiohttp onnxruntime openwakeword==0.6.0 resampy soundfile mutagen
+python3 server.py              # → http://<pi-ip>:8321
 ```
+
+(Re-run `source .venv/bin/activate` in each new terminal, or call
+`.venv/bin/python server.py` directly.)
 
 First run downloads the small openWakeWord models (~3 MB) into the
 `openwakeword` package. Open `http://<pi-ip>:8321` in Chrome/Edge/Safari,
@@ -62,7 +70,7 @@ python3 server.py --debug                  # log every wake/command + latency
 
 ```bash
 python3 -m venv .venv && . .venv/bin/activate
-pip install aiohttp onnxruntime openwakeword resampy soundfile mutagen
+pip install aiohttp onnxruntime openwakeword==0.6.0 resampy soundfile mutagen
 python3 server.py
 ```
 
@@ -72,6 +80,20 @@ Then open **http://localhost:8321**.
 > `tiny-alexa.html?demo` — it plays a scripted conversation so you can see
 > the full animation flow (wake → listening → confirm → idle) instantly.
 > Add `&debug` to show the CRNN latency chip.
+
+## Troubleshooting
+
+- **`error: externally-managed-environment`** — Raspberry Pi OS (Bookworm)
+  protects the system Python. Don't bypass it with `--break-system-packages`;
+  use the venv flow above.
+- **`cannot import name 'download_models' from 'openwakeword'`** — you have
+  openwakeword < 0.6 installed (older wheels bundle the models differently and
+  have no downloader). Fix:
+  ```bash
+  pip install -U "openwakeword==0.6.0"
+  ```
+  `server.py` tolerates both: on < 0.6 it skips the explicit download and
+  relies on the bundled model files.
 
 ## Latency (measured)
 
