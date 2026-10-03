@@ -1,4 +1,12 @@
-data/
+# dataset audio is kept local (~950 MB) — ship only docs + class tables + manifests
+data/*
+!data/README.md
+!data/labels.json
+!data/slots.json
+!data/manifest.csv
+!data/MYVOICE/
+data/MYVOICE/*
+!data/MYVOICE/myvoice_manifest.csv
 .venv/
 __pycache__/
 *.pyc

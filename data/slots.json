@@ -1,0 +1,50 @@
+{
+  "TIMER": {
+    "slot": "duration",
+    "values": [
+      "10 seconds",
+      "30 seconds",
+      "1 minute"
+    ]
+  },
+  "ALARM": {
+    "slot": "time",
+    "values": [
+      "6 AM",
+      "8 AM",
+      "9 PM"
+    ]
+  },
+  "TEMPERATURE": {
+    "slot": "degrees",
+    "values": [
+      "18 degrees",
+      "22 degrees",
+      "26 degrees"
+    ]
+  },
+  "BRIGHTNESS": {
+    "slot": "percent",
+    "values": [
+      "20 percent",
+      "60 percent",
+      "100 percent"
+    ]
+  },
+  "COLOR": {
+    "slot": "color",
+    "values": [
+      "red",
+      "blue",
+      "green"
+    ]
+  },
+  "CREATE_REMINDER": {
+    "slot": "task",
+    "values": [
+      "drink water",
+      "study",
+      "exercise"
+    ]
+  }
+}

@@ -279,7 +279,8 @@ STFT → triangular mel filters → log → pad/trim to 480 frames.
 
 ## The dataset
 
-Built and documented in [`data/`](data/) (see `data/README.md`):
+Built and documented in [`data/`](data/README.md). The WAV files themselves are too large for a git repo (~950 MB), so the repo ships the full dataset **documentation, class tables, and manifests** — `data/README.md`, `data/labels.json`, `data/slots.json`, `data/manifest.csv`, and `data/MYVOICE/myvoice_manifest.csv` — which fully describe every file:
+
 
 | Item | Value |
 |---|---:|
@@ -425,13 +426,13 @@ tiny-alexa/
 │   ├── infer.py            #   reference CLI inference (mic or WAV, wake word optional)
 │   ├── record.py           #   guided recorder for your own voice (data/MYVOICE)
 │   └── wakeword.py         #   reference openWakeWord wrapper
-├── data/                   # the dataset (≈950 MB) — 17,851 active WAVs + manifest
+├── data/                   # dataset docs + class tables (the ≈950 MB WAVs stay local)
+│   ├── README.md           #   full dataset documentation (speakers, splits, filtering)
 │   ├── labels.json         #   the 31 labels, in model order
 │   ├── slots.json          #   slot vocabulary
 │   ├── manifest.csv        #   path/label/intent/speaker/split/transcript/slot/duration
-│   ├── <31 label dirs>/    #   16 kHz mono WAVs (clean + noisy)
-│   ├── FLAGGED/            #   749 filtered-out files
-│   └── MYVOICE/            #   optional personal-voice grading set
+│   └── MYVOICE/
+│       └── myvoice_manifest.csv  #   personal-voice grading set (93 recordings)
 ├── models/                 # crnn.pt (3.97 MB) · crnn.onnx (3.96 MB)
 ├── results/                # metrics.txt · history.csv · confusion/class PNGs
 ├── screenshots/            # 19 UI captures (JPEG) — referenced throughout this README
@@ -516,7 +517,7 @@ Patterns and fixes that came out of building and stress-testing the UI:
 
 | Area | Status |
 |---|---|
-| Dataset (100 speakers, 17,851 utterances, clean + noisy) | ✅ built, filtered, documented |
+| Dataset (100 speakers, 17,851 utterances, clean + noisy) | ✅ built, filtered, documented (docs + manifests in `data/`; WAVs kept local) |
 | CRNN training (99.55 % test, 99.94 % slot) | ✅ done, charts in `results/` |
 | ONNX export + runtime verification | ✅ `crnn.onnx` (3.96 MB) |
 | Server: wake word, adaptive endpointing, inference, music, WS protocol | ✅ running and tested on macOS (port 8321) |
