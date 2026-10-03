@@ -240,7 +240,12 @@ def worker(q, evq, loop, debug):
 
         if st["state"] == "idle":
             scores = WW.predict(chunk)
-            s = scores.get("alexa", 0.0) if isinstance(scores, dict) else float(scores)
+            if isinstance(scores, dict):
+                # 0.4.x keys by model-file stem ("alexa_v0.1"); 0.6+ by name ("alexa").
+                # We load exactly one wake word, so fall back to the top value.
+                s = scores.get("alexa", max(scores.values(), default=0.0))
+            else:
+                s = float(scores)
             if s >= ARGS.threshold:
                 try:
                     WW.reset()
