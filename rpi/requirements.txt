@@ -12,7 +12,8 @@
 
 aiohttp>=3.9            # web UI + WebSocket mic stream (server.py)
 onnxruntime>=1.17       # CRNN inference engine (runs crnn.onnx)
-openwakeword==0.6.0     # "hey alexa" wake word, local ONNX models (no cloud)
+openwakeword==0.4.0     # "hey alexa" wake word, local ONNX models (no cloud)
+scipy>=1.10             # required by openwakeword 0.4.0 (AudioFeatures)
 numpy>=1.26             # feature extraction + audio buffers
 resampy>=0.4.2          # resamples browser audio to 16 kHz
 soundfile>=0.12         # WAV reading (test clips, music player)

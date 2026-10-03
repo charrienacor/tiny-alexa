@@ -67,7 +67,8 @@ cycling through every scene. Add `&debug` to show the CRNN latency chip.
 
 ```bash
 cd rpi
-python3 -m pip install aiohttp onnxruntime openwakeword==0.6.0 resampy soundfile mutagen
+python3 -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
 python3 server.py                      # → http://localhost:8321
 ```
 
@@ -354,6 +355,7 @@ The deployable artifact is the **`rpi/` folder** — copy it whole to the Pi:
 rpi/
 ├── tiny-alexa.html      # the entire UI (self-contained)
 ├── server.py            # wake word + endpointing + CRNN + music + HTTP/WS
+├── requirements.txt     # pinned runtime (openwakeword 0.4.0, onnxruntime, …)
 ├── crnn.onnx            # the 3.96 MB command model
 ├── src/                 # features.py, infer.py, wakeword.py (shared front end)
 ├── data/                # labels.json, slots.json, manifest.csv (class tables)
@@ -362,14 +364,17 @@ rpi/
 
 ```bash
 # on the Pi
-sudo apt update && sudo apt install -y python3-pip libportaudio2
-python3 -m pip install aiohttp onnxruntime openwakeword==0.6.0 resampy soundfile mutagen
+sudo apt update && sudo apt install -y python3-venv libportaudio2
+cd ~/tiny-alexa/rpi
+python3 -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
 python3 server.py                 # → http://<pi-ip>:8321
 ```
 
-First run downloads the small openWakeWord "alexa" model (~3 MB) into the package cache.
-Then open `http://<pi-ip>:8321` in any modern browser (Chrome/Edge/Safari — phone or
-tablet work fine; the UI is responsive), grant the mic, tap **start**, and talk.
+The openWakeWord "alexa" model ships inside the `openwakeword` package —
+nothing is downloaded at runtime. Open `http://<pi-ip>:8321` in any modern browser
+(Chrome/Edge/Safari — phone or tablet work fine; the UI is responsive), grant the mic,
+tap **start**, and talk.
 
 Useful flags:
 

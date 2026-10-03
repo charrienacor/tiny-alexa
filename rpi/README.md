@@ -54,9 +54,9 @@ python3 server.py              # → http://<pi-ip>:8321
 (Re-run `source .venv/bin/activate` in each new terminal, or call
 `.venv/bin/python server.py` directly.)
 
-First run downloads the small openWakeWord models (~3 MB) into the
-`openwakeword` package. Open `http://<pi-ip>:8321` in Chrome/Edge/Safari,
-grant the microphone permission, and say **"Hey Alexa"**.
+The openWakeWord "alexa" model ships inside the `openwakeword` package
+(no download step — everything is local). Open `http://<pi-ip>:8321` in
+Chrome/Edge/Safari, grant the microphone permission, and say **"Hey Alexa"**.
 
 Useful flags:
 
@@ -95,6 +95,15 @@ Then open **http://localhost:8321**.
   ```
   `server.py` tolerates both: on < 0.6 it skips the explicit download and
   relies on the bundled model files.
+- **`Model.__init__() got an unexpected keyword argument 'wakeword_models'`**
+  (or `unexpected keyword argument 'inference_framework'`) — you have
+  openwakeword < 0.5 installed; those kwargs were added later. Pin the
+  supported version:
+  ```bash
+  pip install "openwakeword==0.4.0"
+  ```
+  `server.py` uses the 0.4.x API (loads the bundled `alexa` model by path),
+  so 0.4.0 is the tested target.
 
 ## Latency (measured)
 

@@ -15,10 +15,10 @@ Run (from the tiny-alexa folder):
     python server.py --debug              # print every event + latency
 
 On the Raspberry Pi 4 (4 GB):
+    python3 -m venv .venv && source .venv/bin/activate
     pip install -r requirements.txt
     python3 server.py
 then open http://<pi-ip>:8321 in a browser (Chrome / Edge / Safari).
-First run downloads the small openWakeWord models (~a few MB) to ~/.cache.
 
 Latency budget (measured on M-series; Pi 4 is ~3-4x slower on the CPU parts):
     wake word  ~5-15 ms / 80 ms chunk
@@ -101,16 +101,21 @@ def load_models(model_path):
     # warmup (first run is slow: kernel selection + caches)
     CRNN.run(None, {"logmel": np.zeros((1, 1, N_MELS, MAX_FRAMES), dtype=np.float32)})
 
+    # openWakeWord "alexa" model — supports both API generations:
+    #   0.4.x: Model(wakeword_model_paths=[...]) — model ships inside the wheel
+    #   0.6+ : Model(wakeword_models=["alexa"])  — downloads on first run
+    import inspect
+    import openwakeword
     from openwakeword.model import Model
-    try:
-        from openwakeword.utils import download_models
-        download_models(["alexa"])             # no-op once cached; ~a few MB first run
-    except ImportError:
-        # openwakeword < 0.6 bundles the models in the wheel (or has no
-        # downloader); just try loading. Upgrade if the model file is missing:
-        #   pip install -U "openwakeword==0.6.0"
-        pass
-    WW = Model(wakeword_models=["alexa"], inference_framework="onnx")
+    if "wakeword_model_paths" in inspect.signature(Model.__init__).parameters:
+        WW = Model(wakeword_model_paths=[openwakeword.models["alexa"]["model_path"]])
+    else:
+        try:
+            from openwakeword.utils import download_models
+            download_models(["alexa"])   # 0.6+ ships no models; ~a few MB first run
+        except ImportError:
+            pass
+        WW = Model(wakeword_models=["alexa"], inference_framework="onnx")
     print(f"[tiny-alexa] CRNN loaded: {model_path.name} "
           f"(threads={ARGS.threads})")
     print("[tiny-alexa] openWakeWord 'alexa' loaded")
