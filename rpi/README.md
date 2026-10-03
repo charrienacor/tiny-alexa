@@ -35,6 +35,7 @@ pipeline is unaffected.
 | `data/labels.json` | The 31 labels, in model order. |
 | `data/manifest.csv` | label → intent / slot mapping. |
 | `music/` | Local MP3 playlist (ID3 tags + embedded album art are read automatically). |
+| `requirements.txt` | Python dependencies for `server.py` (install with `pip install -r requirements.txt`). |
 
 ## Run on the Raspberry Pi 4
 
@@ -46,7 +47,7 @@ sudo apt update && sudo apt install -y python3-venv libportaudio2
 cd ~/tiny-alexa/rpi            # wherever you copied this folder
 python3 -m venv .venv
 source .venv/bin/activate
-pip install aiohttp onnxruntime openwakeword==0.6.0 resampy soundfile mutagen
+pip install -r requirements.txt
 python3 server.py              # → http://<pi-ip>:8321
 ```
 
@@ -70,7 +71,7 @@ python3 server.py --debug                  # log every wake/command + latency
 
 ```bash
 python3 -m venv .venv && . .venv/bin/activate
-pip install aiohttp onnxruntime openwakeword==0.6.0 resampy soundfile mutagen
+pip install -r requirements.txt
 python3 server.py
 ```
 

@@ -15,7 +15,7 @@ Run (from the tiny-alexa folder):
     python server.py --debug              # print every event + latency
 
 On the Raspberry Pi 4 (4 GB):
-    python3 -m pip install aiohttp onnxruntime openwakeword==0.6.0 resampy soundfile
+    pip install -r requirements.txt
     python3 server.py
 then open http://<pi-ip>:8321 in a browser (Chrome / Edge / Safari).
 First run downloads the small openWakeWord models (~a few MB) to ~/.cache.

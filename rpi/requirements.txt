@@ -1,0 +1,22 @@
+# tiny-alexa — Raspberry Pi runtime (rpi/)
+#
+# Install inside a virtual environment (Raspberry Pi OS Bookworm blocks
+# pip installs into the system Python — "externally-managed-environment"):
+#
+#   sudo apt install -y python3-venv libportaudio2
+#   python3 -m venv .venv
+#   source .venv/bin/activate
+#   pip install -r requirements.txt
+#
+# Verified on Python 3.13, aarch64 (Raspberry Pi 4, 4 GB) and macOS (M-series).
+
+aiohttp>=3.9            # web UI + WebSocket mic stream (server.py)
+onnxruntime>=1.17       # CRNN inference engine (runs crnn.onnx)
+openwakeword==0.6.0     # "hey alexa" wake word, local ONNX models (no cloud)
+numpy>=1.26             # feature extraction + audio buffers
+resampy>=0.4.2          # resamples browser audio to 16 kHz
+soundfile>=0.12         # WAV reading (test clips, music player)
+mutagen>=1.45           # exact track durations in the /music list
+
+# Offline CLI only (src/infer.py — records from the Pi's own microphone):
+#   pip install sounddevice
