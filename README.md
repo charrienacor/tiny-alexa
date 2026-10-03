@@ -19,8 +19,10 @@ answers with an animated **pink-on-black** UI.
 - Command → response in **< 50 ms** on an M-series Mac; expected **well under 200 ms** on
   the Pi 4.
 
-![tiny alexa UI](../r1.jpg)
-*Reference screenshots of the UI in action (see `r1.jpg` / `r2.jpg` alongside this file).*
+![tiny alexa — Hey Alexa wake word](screenshots/TO_WAKE_ALEXA.jpg)
+
+*The full UI in action — every scene below is captured from the live app. Full gallery:
+[screenshots](#screenshots).*
 
 > **Status:** developed and verified on macOS (M-series). Deployment to the Raspberry Pi 4
 > is fully prepared (see [`rpi/`](rpi/)) but **hardware testing is still pending** — see
@@ -35,17 +37,18 @@ answers with an animated **pink-on-black** UI.
 3. [The 31 commands](#the-31-commands)
 4. [The UI](#the-ui)
 5. [The animated scenes](#the-animated-scenes)
-6. [The model (CRNN)](#the-model-crnn)
-7. [The dataset](#the-dataset)
-8. [Training & results](#training--results)
-9. [Latency](#latency)
-10. [Deploying to the Raspberry Pi 4](#deploying-to-the-raspberry-pi-4)
-11. [Development on Mac / PC](#development-on-mac--pc)
-12. [Project layout](#project-layout)
-13. [Tools & utilities](#tools--utilities)
-14. [Weather & music](#weather--music)
-15. [Engineering notes](#engineering-notes)
-16. [Status & pending verification](#status--pending-verification)
+6. [Screenshots](#screenshots)
+7. [The model (CRNN)](#the-model-crnn)
+8. [The dataset](#the-dataset)
+9. [Training & results](#training--results)
+10. [Latency](#latency)
+11. [Deploying to the Raspberry Pi 4](#deploying-to-the-raspberry-pi-4)
+12. [Development on Mac / PC](#development-on-mac--pc)
+13. [Project layout](#project-layout)
+14. [Tools & utilities](#tools--utilities)
+15. [Weather & music](#weather--music)
+16. [Engineering notes](#engineering-notes)
+17. [Status & pending verification](#status--pending-verification)
 
 ---
 
@@ -201,6 +204,45 @@ from ever fighting over the screen:
 ```
 music → timer → aircon → color → lamp → call (hangUp) → alarm (alarmOff) → message (closeOut) → generic
 ```
+
+---
+
+## Screenshots
+
+Every scene below was captured from the **live app** (macOS, full-resolution browser,
+`?debug` off) — nothing mocked. All 19 originals live in [`screenshots/`](screenshots/).
+
+### The flow
+
+| "Hey Alexa" — wake | Listening | Music playing |
+|---|---|---|
+| ![wake](screenshots/TO_WAKE_ALEXA.jpg) | *(waveform locked to the mic)* | ![play music](screenshots/PLAY_MUSIC.jpg) |
+
+| Timer 30 s | Alarm 8:00 AM | Stop |
+|---|---|---|
+| ![timer](screenshots/TIMER_30s.jpg) | ![alarm](screenshots/ALARM_8_00_AM.jpg) | ![stop](screenshots/STOP.jpg) |
+
+### Lights & climate
+
+| Light on | Brightness 100 | Color — green | Temperature 22° |
+|---|---|---|---|
+| ![light on](screenshots/LIGHT_ON.jpg) | ![brightness](screenshots/BRIGHTNESS_100.jpg) | ![color green](screenshots/COLOR_GREEN.jpg) | ![temperature](screenshots/TEMPERATURE_22.jpg) |
+
+### Calls, messages, info
+
+| Call | Message | Weather | Time |
+|---|---|---|---|
+| ![call](screenshots/CALL.jpg) | ![message](screenshots/MESSAGE.jpg) | ![weather](screenshots/WEATHER.jpg) | ![time](screenshots/TIME.jpg) |
+
+### Volume & reminders
+
+| Volume down | Volume up | Create reminder | List reminders |
+|---|---|---|---|
+| ![volume down](screenshots/VOLUME_DOWN.jpg) | ![volume up](screenshots/VOLUME_UP.jpg) | ![create reminder](screenshots/CREATE_REMINDER_EXERCISE.jpg) | ![list reminders](screenshots/LIST_REMINDERS.jpg) |
+
+Two extra takes (same scenes, different moments):
+[`MESSAGE_ALT`](screenshots/MESSAGE_ALT.jpg) — the bubble mid-typewriter ·
+[`VOLUME_DOWN_ALT`](screenshots/VOLUME_DOWN_ALT.jpg) — volume at a lower level.
 
 ---
 
@@ -392,6 +434,7 @@ tiny-alexa/
 │   └── MYVOICE/            #   optional personal-voice grading set
 ├── models/                 # crnn.pt (3.97 MB) · crnn.onnx (3.96 MB)
 ├── results/                # metrics.txt · history.csv · confusion/class PNGs
+├── screenshots/            # 19 UI captures (JPEG) — referenced throughout this README
 └── rpi/                    # ★ the deployable folder — copy this to the Pi
     ├── tiny-alexa.html     #   the whole UI: state machine, 7 scenes, music, weather
     ├── server.py           #   aiohttp WS+HTTP server (wake word, endpointing, CRNN, music)
