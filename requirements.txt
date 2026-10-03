@@ -1,0 +1,17 @@
+# tiny-vcm — Python 3.13
+#
+# ── Training / evaluation (run on your PC or available accelerator) ────────────
+torch>=2.6.0            # CRNN training + ONNX export
+numpy>=2.1.0            # feature extraction + metrics
+scipy>=1.14.1           # resampling of non-16 kHz WAVs
+soundfile>=0.13.0       # WAV reading
+matplotlib>=3.9.2       # training curves, confusion matrix, per-class charts
+onnx>=1.17.0            # used by torch.onnx.export
+onnxruntime>=1.20.0     # export verification + Raspberry Pi inference engine
+#
+# ── Raspberry Pi only (real-time microphone inference + UI) ───────────────
+sounddevice>=0.5.1      # microphone capture (needs PortAudio: sudo apt install libportaudio2)
+openwakeword>=0.6.0     # wake-word detection, local ONNX models (no cloud, no ASR)
+#
+# The Raspberry Pi does NOT need torch, matplotlib or onnx. On the Pi run:
+#   pip install numpy soundfile onnxruntime sounddevice openwakeword

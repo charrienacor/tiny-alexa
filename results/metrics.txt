@@ -1,0 +1,51 @@
+test utterances: 1789
+
+best epoch: 28   val acc: 97.56%   (from history.csv)
+training time: 3046 s (0 hr 50 min 45.8 s / 0.85 hr)
+
+intent accuracy: 0.9955   macro P/R/F1: 0.994/0.993/0.993
+slot accuracy:   0.9994   macro P/R/F1: 0.999/0.999/0.999
+label accuracy (intent + slot decoded jointly): 0.9955   macro F1: 0.995   (same metric as val acc in training)
+
+clean accuracy: 0.9933 (895 utterances)
+noisy accuracy: 0.9978 (894 utterances)
+
+ALARM: precision 0.994  recall 1.000  f1 0.997
+BRIGHTNESS: precision 1.000  recall 1.000  f1 1.000
+CALL: precision 1.000  recall 1.000  f1 1.000
+COLOR: precision 0.994  recall 1.000  f1 0.997
+CREATE_REMINDER: precision 1.000  recall 0.994  f1 0.997
+LIGHT_OFF: precision 1.000  recall 0.983  f1 0.991
+LIGHT_ON: precision 1.000  recall 1.000  f1 1.000
+LIST_REMINDERS: precision 0.983  recall 1.000  f1 0.991
+MESSAGE: precision 1.000  recall 1.000  f1 1.000
+NEXT: precision 1.000  recall 0.983  f1 0.991
+PAUSE: precision 1.000  recall 0.982  f1 0.991
+PLAY_MUSIC: precision 0.983  recall 1.000  f1 0.991
+STOP: precision 0.982  recall 1.000  f1 0.991
+TEMPERATURE: precision 1.000  recall 1.000  f1 1.000
+TIME: precision 1.000  recall 0.925  f1 0.961
+TIMER: precision 1.000  recall 1.000  f1 1.000
+VOLUME_DOWN: precision 0.981  recall 1.000  f1 0.990
+VOLUME_UP: precision 0.967  recall 1.000  f1 0.983
+WEATHER: precision 1.000  recall 1.000  f1 1.000
+
+1 minute: precision 1.000  recall 1.000  f1 1.000
+10 seconds: precision 1.000  recall 1.000  f1 1.000
+100 percent: precision 1.000  recall 1.000  f1 1.000
+18 degrees: precision 0.984  recall 1.000  f1 0.992
+20 percent: precision 1.000  recall 1.000  f1 1.000
+22 degrees: precision 1.000  recall 0.983  f1 0.992
+26 degrees: precision 1.000  recall 1.000  f1 1.000
+30 seconds: precision 1.000  recall 1.000  f1 1.000
+6 AM: precision 1.000  recall 1.000  f1 1.000
+60 percent: precision 1.000  recall 1.000  f1 1.000
+8 AM: precision 1.000  recall 1.000  f1 1.000
+9 PM: precision 1.000  recall 1.000  f1 1.000
+blue: precision 1.000  recall 1.000  f1 1.000
+drink water: precision 1.000  recall 1.000  f1 1.000
+exercise: precision 1.000  recall 1.000  f1 1.000
+green: precision 1.000  recall 1.000  f1 1.000
+red: precision 1.000  recall 1.000  f1 1.000
+study: precision 1.000  recall 1.000  f1 1.000
+NO_SLOT: precision 1.000  recall 1.000  f1 1.000
