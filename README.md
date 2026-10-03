@@ -19,7 +19,7 @@ answers with an animated **pink-on-black** UI.
 - Command → response in **< 50 ms** on an M-series Mac; expected **well under 200 ms** on
   the Pi 4.
 
-![tiny alexa — Hey Alexa wake word](screenshots/TO_WAKE_ALEXA.jpg)
+![tiny alexa — Hey Alexa wake word](screenshots/TO_WAKE_ALEXA.png)
 
 *The full UI in action — every scene below is captured from the live app. Full gallery:
 [screenshots](#screenshots).*
@@ -69,7 +69,7 @@ cycling through every scene. Add `&debug` to show the CRNN latency chip.
 cd rpi
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-python3 server.py                      # → http://localhost:8321
+python3 src/server.py              # → http://localhost:8321
 ```
 
 Open `http://localhost:8321`, grant the microphone permission, tap **start**, and say
@@ -98,7 +98,7 @@ Division of labor — the Pi does **only** DSP + inference; the browser does **e
 | Where | What |
 |---|---|
 | **Browser** | Mic capture (AudioWorklet, echo cancellation on), resample to 16 kHz, stream 80 ms int16 chunks; live waveform (`AnalyserNode`); the whole state machine; every animation and every sound effect (Web Audio synthesis — there are **zero audio files** in the UI); weather fetch; reminders persistence (`localStorage`). |
-| **Pi / server.py** | Wake-word detection on each chunk; adaptive endpointing (measures the room-noise floor, stops at 0.8 s silence or 4 s cap); silence-trim → log-mel → CRNN inference; joint intent+slot decoding; confidence gating; ID3 tag + album-art scan of `music/`; serves the page, `/music`, `/health`, `/ws`. |
+| **Pi / src/server.py** | Wake-word detection on each chunk; adaptive endpointing (measures the room-noise floor, stops at 0.8 s silence or 4 s cap); silence-trim → log-mel → CRNN inference; joint intent+slot decoding; confidence gating; ID3 tag + album-art scan of `music/`; serves the page, `/music`, `/health`, `/ws`. |
 
 Server endpoints:
 
@@ -217,40 +217,40 @@ Every scene below was captured from the **live app** (macOS, full-resolution bro
 
 | "Hey Alexa" — wake | Listening | Music playing |
 |---|---|---|
-| ![wake](screenshots/TO_WAKE_ALEXA.jpg) | *(waveform locked to the mic)* | ![play music](screenshots/PLAY_MUSIC.jpg) |
+| ![wake](screenshots/TO_WAKE_ALEXA.png) | *(waveform locked to the mic)* | ![play music](screenshots/PLAY_MUSIC.png) |
 
 | Timer 30 s | Alarm 8:00 AM | Stop |
 |---|---|---|
-| ![timer](screenshots/TIMER_30s.jpg) | ![alarm](screenshots/ALARM_8_00_AM.jpg) | ![stop](screenshots/STOP.jpg) |
+| ![timer](screenshots/TIMER_30s.png) | ![alarm](screenshots/ALARM_8_00_AM.png) | ![stop](screenshots/STOP.png) |
 
 ### Lights & climate
 
 | Light on | Brightness 100 | Color — green | Temperature 22° |
 |---|---|---|---|
-| ![light on](screenshots/LIGHT_ON.jpg) | ![brightness](screenshots/BRIGHTNESS_100.jpg) | ![color green](screenshots/COLOR_GREEN.jpg) | ![temperature](screenshots/TEMPERATURE_22.jpg) |
+| ![light on](screenshots/LIGHT_ON.png) | ![brightness](screenshots/BRIGHTNESS_100.png) | ![color green](screenshots/COLOR_GREEN.png) | ![temperature](screenshots/TEMPERATURE_22.png) |
 
 ### Calls, messages, info
 
 | Call | Message | Weather | Time |
 |---|---|---|---|
-| ![call](screenshots/CALL.jpg) | ![message](screenshots/MESSAGE.jpg) | ![weather](screenshots/WEATHER.jpg) | ![time](screenshots/TIME.jpg) |
+| ![call](screenshots/CALL.png) | ![message](screenshots/MESSAGE.png) | ![weather](screenshots/WEATHER.png) | ![time](screenshots/TIME.png) |
 
 ### Volume & reminders
 
 | Volume down | Volume up | Create reminder | List reminders |
 |---|---|---|---|
-| ![volume down](screenshots/VOLUME_DOWN.jpg) | ![volume up](screenshots/VOLUME_UP.jpg) | ![create reminder](screenshots/CREATE_REMINDER_EXERCISE.jpg) | ![list reminders](screenshots/LIST_REMINDERS.jpg) |
+| ![volume down](screenshots/VOLUME_DOWN.png) | ![volume up](screenshots/VOLUME_UP.png) | ![create reminder](screenshots/CREATE_REMINDER_EXERCISE.png) | ![list reminders](screenshots/LIST_REMINDERS.png) |
 
 Two extra takes (same scenes, different moments):
-[`MESSAGE_ALT`](screenshots/MESSAGE_ALT.jpg) — the bubble mid-typewriter ·
-[`VOLUME_DOWN_ALT`](screenshots/VOLUME_DOWN_ALT.jpg) — volume at a lower level.
+[`MESSAGE_ALT`](screenshots/MESSAGE_ALT.png) — the bubble mid-typewriter ·
+[`VOLUME_DOWN_ALT`](screenshots/VOLUME_DOWN_ALT.png) — volume at a lower level.
 
 ---
 
 ## The model (CRNN)
 
 A compact two-head CRNN classifies each command clip. Defined in [`src/model.py`](src/model.py),
-exported to ONNX in [`rpi/crnn.onnx`](rpi/crnn.onnx) (**3.96 MB**).
+exported to ONNX in [`rpi/model/crnn.onnx`](rpi/model/crnn.onnx) (**3.96 MB**).
 
 ```
 log-mel (1 × 64 × 480)      16 kHz, 10 ms hop, 64 mel bands, ~4.8 s padded
@@ -354,12 +354,14 @@ The deployable artifact is the **`rpi/` folder** — copy it whole to the Pi:
 ```
 rpi/
 ├── tiny-alexa.html      # the entire UI (self-contained)
-├── server.py            # wake word + endpointing + CRNN + music + HTTP/WS
-├── requirements.txt     # pinned runtime (openwakeword 0.4.0, onnxruntime, …)
-├── crnn.onnx            # the 3.96 MB command model
-├── src/                 # features.py, infer.py, wakeword.py (shared front end)
+├── src/
+│   ├── server.py        # wake word + endpointing + CRNN + music + HTTP/WS
+│   └── features.py      # log-mel front end + class tables (shared with training)
+├── model/
+│   └── crnn.onnx        # the 3.96 MB command model
 ├── data/                # labels.json, slots.json, manifest.csv (class tables)
-└── music/               # your MP3s (ID3 tags + embedded art read at startup)
+├── music/               # your MP3s (ID3 tags + embedded art read at startup)
+└── requirements.txt     # pinned runtime (openwakeword 0.4.0, onnxruntime, …)
 ```
 
 ```bash
@@ -368,7 +370,7 @@ sudo apt update && sudo apt install -y python3-venv libportaudio2
 cd ~/tiny-alexa/rpi
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-python3 server.py                 # → http://<pi-ip>:8321
+python3 src/server.py             # → http://<pi-ip>:8321
 ```
 
 The openWakeWord "alexa" model ships inside the `openwakeword` package —
@@ -379,10 +381,10 @@ tap **start**, and talk.
 Useful flags:
 
 ```bash
-python3 server.py --port 9000
-python3 server.py --model crnn_int8.onnx   # quantized model, if you export one
-python3 server.py --threshold 0.5          # wake sensitivity (lower = easier to trigger)
-python3 server.py --debug                  # log every wake/command + latency
+python3 src/server.py --port 9000
+python3 src/server.py --model model/crnn_int8.onnx   # quantized model, if you export one
+python3 src/server.py --threshold 0.5          # wake sensitivity (lower = easier to trigger)
+python3 src/server.py --debug                  # log every wake/command + latency
 ```
 
 Notes for the 4 GB board: the voice path is tiny (ONNX Runtime + a 4 MB model); the 4
@@ -408,7 +410,7 @@ python3 classify_mic.py                # 3 s mic clip → instant prediction (de
 ```
 
 Rebuilding the model: `src/train.py` (PyTorch) → `src/export_onnx.py` (ONNX, BatchNorm
-folded) → copy `crnn.onnx` into `rpi/`. The class tables (`data/labels.json`,
+folded) → copy `crnn.onnx` into `rpi/model/`. The class tables (`data/labels.json`,
 `data/manifest.csv`) are the single source of truth shared by training, evaluation, and
 the server.
 
@@ -440,12 +442,11 @@ tiny-alexa/
 │       └── myvoice_manifest.csv  #   personal-voice grading set (93 recordings)
 ├── models/                 # crnn.pt (3.97 MB) · crnn.onnx (3.96 MB)
 ├── results/                # metrics.txt · history.csv · confusion/class PNGs
-├── screenshots/            # 19 UI captures (JPEG) — referenced throughout this README
+├── screenshots/            # 19 UI captures (PNG) — referenced throughout this README
 └── rpi/                    # ★ the deployable folder — copy this to the Pi
     ├── tiny-alexa.html     #   the whole UI: state machine, 7 scenes, music, weather
-    ├── server.py           #   aiohttp WS+HTTP server (wake word, endpointing, CRNN, music)
-    ├── crnn.onnx           #   the model
-    ├── src/                #   features.py · infer.py · wakeword.py
+    ├── src/                #   server.py (aiohttp WS+HTTP) · features.py (front end)
+    ├── model/              #   crnn.onnx — the model
     ├── data/               #   labels.json · slots.json · manifest.csv
     └── music/              #   Juna (Clairo) · blink (Clara Benin) + extracted covers
 ```
@@ -477,7 +478,7 @@ wind, high/low). "What's the weather?" renders e.g. *"Partly cloudy, 28°C — f
 voice path degrades gracefully — it never waits on the network.
 
 **Music** is a local playlist: drop `.mp3` files into `rpi/music/` and that's the whole
-setup. `server.py` reads each file's ID3 tags (title/artist/album/duration) at startup and
+setup. `src/server.py` reads each file's ID3 tags (title/artist/album/duration) at startup and
 extracts the embedded album art to `<name>_art.jpg`. The browser fetches `/music`, builds
 the player card (cover, seek, prev/play/next, volume), and — while a track plays — the
 main waveform **reacts to the actual music** via the `AnalyserNode`. Auto-advance on track

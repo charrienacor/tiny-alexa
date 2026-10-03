@@ -8,16 +8,16 @@ int16 microphone PCM over a WebSocket; this server detects the wake word,
 records the command with endpointing, runs the CRNN, and sends state events
 back. Everything is local — no cloud, no internet after the first model load.
 
-Run (from the tiny-alexa folder):
-    python server.py                     # http://localhost:8321
-    python server.py --port 9000
-    python server.py --model crnn_int8.onnx     # quantized model (faster on Pi)
-    python server.py --debug              # print every event + latency
+Run (from the rpi folder):
+    python3 src/server.py               # http://localhost:8321
+    python3 src/server.py --port 9000
+    python3 src/server.py --model model/crnn_int8.onnx   # quantized model (faster on Pi)
+    python3 src/server.py --debug       # print every event + latency
 
 On the Raspberry Pi 4 (4 GB):
     python3 -m venv .venv && source .venv/bin/activate
     pip install -r requirements.txt
-    python3 server.py
+    python3 src/server.py
 then open http://<pi-ip>:8321 in a browser (Chrome / Edge / Safari).
 
 Latency budget (measured on M-series; Pi 4 is ~3-4x slower on the CPU parts):
@@ -43,7 +43,8 @@ import numpy as np
 import onnxruntime as ort
 from aiohttp import web
 
-HERE = Path(__file__).resolve().parent
+# Layout: this file lives in rpi/src/, so the project root is one level up.
+HERE = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(HERE / "src"))
 from features import (SAMPLE_RATE, N_MELS, MAX_FRAMES,
                       log_mel, trim_silence, load_intents_slots)  # noqa: E402
@@ -399,7 +400,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--host", default="0.0.0.0")
     ap.add_argument("--port", type=int, default=8321)
-    ap.add_argument("--model", default=str(HERE / "crnn.onnx"))
+    ap.add_argument("--model", default=str(HERE / "model" / "crnn.onnx"))
     ap.add_argument("--threads", type=int, default=3,
                     help="CRNN intra-op threads (Pi 4 has 4 cores; 3 leaves one for audio)")
     ap.add_argument("--threshold", type=float, default=0.5,

@@ -27,15 +27,14 @@ pipeline is unaffected.
 | File | What it is |
 |---|---|
 | `tiny-alexa.html` | The whole UI — self-contained, no CDN, no external assets. |
-| `server.py` | Local WebSocket server: wake word + endpointing + CRNN inference. |
-| `crnn.onnx` | The command model (2 heads: 19 intents × 19 slots → 31 valid labels). |
+| `src/server.py` | Local WebSocket server: wake word + endpointing + CRNN inference. |
 | `src/features.py` | Audio front end (log-mel) + class mappings — shared with training. |
-| `src/infer.py` | Reference CLI inference (the Python equivalent of `server.py`). |
-| `src/wakeword.py` | Reference openWakeWord wrapper. |
+| `model/crnn.onnx` | The command model (2 heads: 19 intents × 19 slots → 31 valid labels). |
 | `data/labels.json` | The 31 labels, in model order. |
-| `data/manifest.csv` | label → intent / slot mapping. |
+| `data/slots.json` | The 18 slot values (+ `NO_SLOT`), in model order. |
+| `data/manifest.csv` | label → intent / slot mapping (17,851 rows). |
 | `music/` | Local MP3 playlist (ID3 tags + embedded album art are read automatically). |
-| `requirements.txt` | Python dependencies for `server.py` (install with `pip install -r requirements.txt`). |
+| `requirements.txt` | Python dependencies for `src/server.py` (install with `pip install -r requirements.txt`). |
 
 ## Run on the Raspberry Pi 4
 
@@ -48,11 +47,11 @@ cd ~/tiny-alexa/rpi            # wherever you copied this folder
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-python3 server.py              # → http://<pi-ip>:8321
+python3 src/server.py            # → http://<pi-ip>:8321
 ```
 
 (Re-run `source .venv/bin/activate` in each new terminal, or call
-`.venv/bin/python server.py` directly.)
+`.venv/bin/python src/server.py` directly.)
 
 The openWakeWord "alexa" model ships inside the `openwakeword` package
 (no download step — everything is local). Open `http://<pi-ip>:8321` in
@@ -61,10 +60,10 @@ Chrome/Edge/Safari, grant the microphone permission, and say **"Hey Alexa"**.
 Useful flags:
 
 ```bash
-python3 server.py --port 9000
-python3 server.py --model crnn_int8.onnx   # quantized model = faster on Pi
-python3 server.py --threshold 0.5          # wake-word sensitivity (0.3 easier)
-python3 server.py --debug                  # log every wake/command + latency
+python3 src/server.py --port 9000
+python3 src/server.py --model model/crnn_int8.onnx   # quantized model = faster on Pi
+python3 src/server.py --threshold 0.5          # wake-word sensitivity (0.3 easier)
+python3 src/server.py --debug                  # log every wake/command + latency
 ```
 
 ## Run on a Mac / PC (for development)
@@ -72,7 +71,7 @@ python3 server.py --debug                  # log every wake/command + latency
 ```bash
 python3 -m venv .venv && . .venv/bin/activate
 pip install -r requirements.txt
-python3 server.py
+python3 src/server.py
 ```
 
 Then open **http://localhost:8321**.
@@ -93,7 +92,7 @@ Then open **http://localhost:8321**.
   ```bash
   pip install -U "openwakeword==0.6.0"
   ```
-  `server.py` tolerates both: on < 0.6 it skips the explicit download and
+  `src/server.py` tolerates both: on < 0.6 it skips the explicit download and
   relies on the bundled model files.
 - **`Model.__init__() got an unexpected keyword argument 'wakeword_models'`**
   (or `unexpected keyword argument 'inference_framework'`) — you have
@@ -102,7 +101,7 @@ Then open **http://localhost:8321**.
   ```bash
   pip install "openwakeword==0.4.0"
   ```
-  `server.py` uses the 0.4.x API (loads the bundled `alexa` model by path),
+  `src/server.py` uses the 0.4.x API (loads the bundled `alexa` model by path),
   so 0.4.0 is the tested target.
 
 ## Latency (measured)
@@ -123,7 +122,7 @@ milliseconds. On the Pi, `--model crnn_int8.onnx` (if you export one) and
 1. **Capture** — `tiny-alexa.html` grabs the mic with an AudioWorklet,
    resamples to 16 kHz, and streams 80 ms int16 chunks over a WebSocket.
    The same stream feeds an `AnalyserNode` that draws the live waveform.
-2. **Wake word** — `server.py` runs openWakeWord's "alexa" model on each
+2. **Wake word** — `src/server.py` runs openWakeWord's "alexa" model on each
    chunk. On detection it emits `awake` (the UI shows "Uh-huh / Yes / Yeah?").
 3. **Endpointing** — the server measures the room-noise floor in the pause
    after the wake word, then records until you've been silent for 0.8 s
@@ -168,7 +167,7 @@ No new dependencies on the Pi: weather uses only browser `fetch`.
 
 ## Music (local MP3s)
 
-Drop `.mp3` files into `music/` — that's the whole setup. `server.py` reads
+Drop `.mp3` files into `music/` — that's the whole setup. `src/server.py` reads
 each file's ID3 tags (title, artist, album, track number) and extracts the
 embedded album art at startup, then serves:
 
