@@ -8,11 +8,10 @@ Produces results/pi_report.json, the Pi half of the project dashboard:
   * (optional) ONNX intent accuracy       — proves the exported model
                                             matches the GPU-trained one
 
-Run from the repo root on the Pi:
-    python src/bench_pi.py \
-        --tp-dir  wake_tests/positives \
-        --far-dir wake_tests/negatives \
-        --accuracy 200
+Run from the repo root on the Pi (wake_tests/ is used by default):
+    python src/bench_pi.py
+    python src/bench_pi.py --accuracy 200
+    python src/bench_pi.py --tp-dir MY_POS --far-dir MY_NEG
 
 Test clips must be 16 kHz mono WAV. Put one "Alexa ..." utterance per
 positive file (extra speech after the wake word is fine — it is what the
@@ -107,7 +106,11 @@ def run_wake_files(detector, folder, expected):
     Returns (detected_count, per-file results). expected=True marks files
     that contain the wake word (TP set); False marks the FAR set.
     """
-    files = sorted(Path(folder).glob("*.wav"))
+    folder = Path(folder)
+    if not folder.is_dir():
+        raise SystemExit(f"error: {folder} does not exist — record test clips "
+                         f"there (16 kHz mono WAV) or pass --tp-dir/--far-dir")
+    files = sorted(folder.glob("*.wav"))
     if not files:
         raise SystemExit(f"error: no .wav files in {folder}")
     silence = np.zeros(WAKE_CHUNK, dtype=np.int16)
@@ -299,8 +302,12 @@ def labels_index(cmd, label):
 def main():
     parser = argparse.ArgumentParser(description=__doc__,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--tp-dir", help="folder of WAVs containing the wake word")
-    parser.add_argument("--far-dir", help="folder of WAVs WITHOUT the wake word")
+    parser.add_argument("--tp-dir", default=ROOT / "wake_tests" / "positives",
+                        help="folder of WAVs containing the wake word "
+                             "(default: wake_tests/positives)")
+    parser.add_argument("--far-dir", default=ROOT / "wake_tests" / "negatives",
+                        help="folder of WAVs WITHOUT the wake word "
+                             "(default: wake_tests/negatives)")
     parser.add_argument("--accuracy", type=int, default=0, metavar="N",
                         help="also run the ONNX model on N held-out test "
                              "utterances (needs data/manifest.csv)")
@@ -315,9 +322,6 @@ def main():
                         help="benchmark models/TCN_int8.onnx if present")
     parser.add_argument("--results", default=ROOT / "results")
     args = parser.parse_args()
-
-    if not (args.tp_dir or args.far_dir or args.live):
-        parser.error("provide --tp-dir/--far-dir or --live")
 
     results = Path(args.results)
     results.mkdir(parents=True, exist_ok=True)

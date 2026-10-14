@@ -84,13 +84,16 @@ python src/infer.py --file a.wav    # offline test
 **Benchmark + dashboard**
 
 ```bash
-python src/bench_pi.py --tp-dir wake_tests/positives --far-dir wake_tests/negatives --accuracy 200
+python src/bench_pi.py              # uses wake_tests/ by default
+python src/bench_pi.py --accuracy 200
 python src/dashboard.py             # on a machine that has both reports
 ```
 
-`--accuracy` reads the dataset WAVs and needs `scipy`, because about a third
-of them are 12 kHz. `wake_tests/` is not in the repo — record a handful of
-positive clips (say "Alexa") and negatives (anything else) yourself.
+`--tp-dir` / `--far-dir` override the default `wake_tests/positives` and
+`wake_tests/negatives` folders (16 kHz mono WAV — record your own to improve
+the FAR; a few positives saying "Alexa" and a dozen negatives of everyday
+speech, TV, music, or silence). `--accuracy` reads the dataset WAVs and needs
+`scipy`, because about a third of them are 12 kHz.
 
 ## Supported commands
 
