@@ -8,7 +8,7 @@ Produces results/pi_report.json, the Pi half of the project dashboard:
   * (optional) ONNX intent accuracy       — proves the exported model
                                             matches the GPU-trained one
 
-Run from the repo root on the Pi (wake_tests/ is used by default):
+Run from the repo root on the Pi (data/wake_tests/ is used by default):
     python src/bench_pi.py
     python src/bench_pi.py --accuracy 200
     python src/bench_pi.py --tp-dir MY_POS --far-dir MY_NEG
@@ -302,12 +302,12 @@ def labels_index(cmd, label):
 def main():
     parser = argparse.ArgumentParser(description=__doc__,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--tp-dir", default=ROOT / "wake_tests" / "positives",
+    parser.add_argument("--tp-dir", default=ROOT / "data" / "wake_tests" / "positives",
                         help="folder of WAVs containing the wake word "
-                             "(default: wake_tests/positives)")
-    parser.add_argument("--far-dir", default=ROOT / "wake_tests" / "negatives",
+                             "(default: data/wake_tests/positives)")
+    parser.add_argument("--far-dir", default=ROOT / "data" / "wake_tests" / "negatives",
                         help="folder of WAVs WITHOUT the wake word "
-                             "(default: wake_tests/negatives)")
+                             "(default: data/wake_tests/negatives)")
     parser.add_argument("--accuracy", type=int, default=0, metavar="N",
                         help="also run the ONNX model on N held-out test "
                              "utterances (needs data/manifest.csv)")

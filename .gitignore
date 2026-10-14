@@ -4,6 +4,8 @@ data/*
 !data/labels.json
 !data/slots.json
 !data/manifest.csv
+# wake-word test clips are small (512 KB) and needed by bench_pi.py defaults
+!data/wake_tests/
 .venv/
 __pycache__/
 *.pyc
