@@ -1,0 +1,20 @@
+{
+  "timestamp": "2026-10-14T08:48:59+08:00",
+  "objective": "cross-entropy (intent head) + cross-entropy (slot head), label smoothing 0.1; joint decode over the 31 valid (intent, slot) combinations",
+  "optimizer": "AdamW (lr=0.001, weight_decay=0.01) + 2-epoch linear warmup + per-step cosine decay to 1e-5 over 40 epochs",
+  "augmentation": "speed 0.9-1.1, time shift <=0.25 s, white/pink noise 5-30 dB SNR (p=0.5), SpecAugment 2x8 bands + 2x20 frames",
+  "filipino_weight": 2.0,
+  "selection": "mean of foreign and Filipino-English val accuracy",
+  "seed": 0,
+  "epochs_planned": 40,
+  "batch_size": 64,
+  "patience": 10,
+  "train_utts": 14256,
+  "valid_utts": 1806,
+  "steps_per_epoch": 223,
+  "model_params": 229958,
+  "torch": "2.14.1",
+  "hostname": "Charries-MacBook-Air.local",
+  "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+  "python": "3.13.9"
+}

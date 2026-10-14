@@ -1,10 +1,10 @@
-"""Export the trained two-head CRNN to ONNX for Raspberry Pi inference.
+"""Export the trained two-head TCN to ONNX for Raspberry Pi inference.
 
 Run from the repo root:
-    python src/export_onnx.py            # models/crnn.onnx (FP32, verified)
-    python src/export_onnx.py --int8     # additionally models/crnn_int8.onnx
+    python src/export_onnx.py            # models/TCN.onnx (FP32, verified)
+    python src/export_onnx.py --int8     # additionally models/TCN_int8.onnx
 
-The exported model has two outputs: intent_logits and slot_logits.
+Outputs: intent_logits and slot_logits.
 """
 
 import argparse
@@ -16,18 +16,15 @@ import onnxruntime as ort
 import torch
 
 from features import load_intents_slots
-from model import CRNN
+from model import TCN
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
 def export_model(model, dummy, out_path):
-    """Export to ONNX, silencing two expected, harmless warnings:
-
-    1. torch >= 2.9 deprecates the legacy TorchScript exporter (we use it
-       on purpose: identical behavior across torch versions).
-    2. The generic GRU batch-size caution. Inference always uses a fixed
-       batch of 1 with shape (1, 64, 480), so it does not apply here.
+    """Export to ONNX, silencing two expected, harmless warnings
+    (TorchScript-exporter deprecation; the generic batch-size caution,
+    which does not apply — inference is always batch 1).
     """
     with warnings.catch_warnings():
         warnings.filterwarnings("ignore", category=DeprecationWarning)
@@ -51,13 +48,13 @@ def main():
     args = parser.parse_args()
 
     intents, slots, _ = load_intents_slots(ROOT / "data")
-    model = CRNN(n_intents=len(intents), n_slots=len(slots))
-    model.load_state_dict(torch.load(ROOT / "models" / "crnn.pt",
+    model = TCN(n_intents=len(intents), n_slots=len(slots))
+    model.load_state_dict(torch.load(ROOT / "models" / "TCN.pt",
                                      map_location="cpu"))
     model.eval()
 
     dummy = torch.randn(1, 1, 64, 480)          # one log-mel spectrogram
-    out_path = ROOT / "models" / "crnn.onnx"
+    out_path = ROOT / "models" / "TCN.onnx"
 
     export_model(model, dummy, out_path)
     print(f"exported {out_path} ({out_path.stat().st_size / 1e6:.1f} MB)")
@@ -75,7 +72,7 @@ def main():
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", category=UserWarning)
             from onnxruntime.quantization import quantize_dynamic, QuantType
-        int8_path = ROOT / "models" / "crnn_int8.onnx"
+        int8_path = ROOT / "models" / "TCN_int8.onnx"
         quantize_dynamic(str(out_path), str(int8_path), weight_type=QuantType.QInt8)
         print(f"exported {int8_path} ({int8_path.stat().st_size / 1e6:.1f} MB)")
         print("check its accuracy on the test set before deploying it")

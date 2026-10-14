@@ -1,297 +1,323 @@
-"""Real-time command recognition: microphone -> log-mel -> CRNN -> action.
+"""Real-time voice-command pipeline for the Raspberry Pi 4.
 
-The ONNX model has two outputs (intent head + slot head). They are decoded
-jointly: only the 31 valid (intent, slot) combinations can be predicted,
-so the system can never output an impossible combination.
+mic (16 kHz) -> openWakeWord 0.4.0 "Alexa" -> record 4.8 s -> TCN.onnx
+-> "INTENT  slot=value". Everything runs locally: no ASR, no LLM, no cloud.
 
-Run from the repo root:
-    python src/infer.py --wav data/MYVOICE/ALARM/ALARM_4_AM_v1_r1.wav
-    python src/infer.py --myvoice         # classify your own recordings
-    python src/infer.py --no-wakeword     # record + classify once, no wake word
-    python src/infer.py                   # wake word -> one command
-    python src/infer.py --loop            # wake word -> commands, forever
-    python src/infer.py --model models/crnn_int8.onnx   # use the INT8 model
+Prerequisite: models/TCN.onnx (train.py + export_onnx.py on the GPU box,
+then copy to the Pi).
+
+Usage:
+    python src/infer.py                 # live microphone
+    python src/infer.py --file a.wav    # test with a WAV file
+    python src/infer.py --int8          # use TCN_int8.onnx if present
+
+Requires: pip install numpy soundfile onnxruntime sounddevice openwakeword==0.4.0
+          sudo apt install libportaudio2
 """
 
 import argparse
-import csv
 import json
+import sys
 import time
-from datetime import datetime
+import warnings
 from pathlib import Path
 
 import numpy as np
 import onnxruntime as ort
-import sounddevice as sd
+import soundfile as sf
 
-from features import (SAMPLE_RATE, N_MELS, MAX_FRAMES,
-                      load_wav, log_mel, trim_silence, load_intents_slots)
-from wakeword import load_wake_word_model, wait_for_wake_word
+# Silence onnxruntime's CUDAExecutionProvider warning (requested by
+# openWakeWord, absent on the Pi; harmless).
+warnings.filterwarnings("ignore", message=".*CUDAExecutionProvider.*")
+
+import openwakeword
+from openwakeword.model import Model
+
+from features import SAMPLE_RATE, load_intents_slots, log_mel, trim_silence
 
 ROOT = Path(__file__).resolve().parents[1]
-MYVOICE_DIR = ROOT / "data" / "MYVOICE"
-MYVOICE_CSV = MYVOICE_DIR / "myvoice_manifest.csv"
 
-# Human-readable action per intent. "{slot}" is replaced by the slot value.
-INTENT_MESSAGES = {
-    "PLAY_MUSIC": "Playing music",
-    "PAUSE": "Paused playback",
-    "STOP": "Stopped playback",
-    "NEXT": "Skipping to the next song",
-    "VOLUME_UP": "Turning the volume up",
-    "VOLUME_DOWN": "Turning the volume down",
-    "LIGHT_ON": "Turning the lights on",
-    "LIGHT_OFF": "Turning the lights off",
-    "BRIGHTNESS": "Brightness set to {slot}",
-    "COLOR": "Light color set to {slot}",
-    "TEMPERATURE": "Temperature set to {slot}",
-    "TIMER": "Timer started for {slot}",
-    "ALARM": "Alarm set for {slot}",
-    "CALL": "Starting a call",
-    "MESSAGE": "Sending a message",
-    "WEATHER": "Weather information is not available offline",
-    "TIME": "TIME",  # replaced with the actual clock time below
-    "CREATE_REMINDER": "Reminder created: {slot}",
-    "LIST_REMINDERS": "You have no reminders yet",
-}
+# ── openWakeWord 0.4.0 ─────────────────────────────────────────────
+# predict() wants int16 PCM in 80 ms chunks (1280 samples @ 16 kHz);
+# float input overflows the internal int16 cast and corrupts features.
+WAKE_CHUNK = 1280
 
-# ---- unknown-command rejection ----
-# If the joint probability of the best label falls below this, the
-# command is treated as out-of-vocabulary. Calibrate with --myvoice.
-UNKNOWN_THRESHOLD = 0.50
-UNKNOWN_MESSAGE = ("Sorry, that's beyond what I can do. I understand alarms, "
-                   "timers, lights, brightness, colors, music and more — try "
-                   "something like 'set an alarm for 6 AM'.")
+# Bundled "Alexa" model — ships inside the wheel, no download needed.
+ALEXA_MODEL_PATH = openwakeword.models["alexa"]["model_path"]
 
-def handle_command(session, wav, labels, label_map):
-    """Classify and execute, with unknown-command rejection.
+# Detection policy.
+WAKE_THRESHOLD = 0.5
+PATIENCE = 2           # 2 x 80 ms of sustained score before firing
+WARMUP_CHUNKS = 10     # ~0.8 s after startup/reset before trusting scores
+REFRACTORY_CHUNKS = 15 # ~1.2 s after a detection: the score stays high for
+                       # the whole spoken word, so without this one "Alexa"
+                       # fires several times
 
-    Returns (label, prob, message, rejected).
+# After the wake word: record this much audio, then run the TCN once.
+COMMAND_WINDOW_S = 4.8          # matches the 480-frame TCN input (10 ms hop)
+COMMAND_WINDOW_SAMPLES = int(COMMAND_WINDOW_S * SAMPLE_RATE)   # 76800
+
+# Below this confidence the command is reported as unclear. 0.4 turns the
+# low-confidence "lights out" -> LIGHT_ON mistakes into "didn't catch that"
+# without rejecting any correct val/test prediction (0.5 starts to).
+COMMAND_THRESHOLD = 0.4
+
+
+# ── wake word ────────────────────────────────────────────────────────────────
+
+def make_wakeword_model():
+    """Load only the bundled Alexa model (all five would waste ~5 MB on the Pi)."""
+    assert Path(ALEXA_MODEL_PATH).exists(), f"missing bundled model: {ALEXA_MODEL_PATH}"
+    return Model(wakeword_model_paths=[ALEXA_MODEL_PATH])
+
+
+def wake_key(wakeword):
+    """Key of the loaded model in predict()'s return dict ('alexa_v0.1')."""
+    return next(iter(wakeword.models))
+
+
+class WakeWordDetector:
+    """Streaming wrapper around openWakeWord's Model.
+
+    Feed int16 chunks of exactly WAKE_CHUNK samples; reports a detection
+    after PATIENCE consecutive chunks above the threshold.
     """
-    label, prob = predict(session, wav, labels)
-    if prob < UNKNOWN_THRESHOLD:
-        print(">>> " + UNKNOWN_MESSAGE)
-        return label, prob, UNKNOWN_MESSAGE, True
-    return label, prob, execute_command(label, label_map), False
+
+    def __init__(self, wakeword, threshold=WAKE_THRESHOLD, patience=PATIENCE):
+        self.wakeword = wakeword
+        self.key = wake_key(wakeword)
+        self.threshold = threshold
+        self.patience = patience
+        self.streak = 0
+        self.reset()
+
+    def reset(self):
+        """Clear detection state; call after each command."""
+        self.streak = 0
+        self._chunks_since_reset = 0
+        self._refractory_left = 0
+        self.wakeword.reset()          # v0.4.0: clears the 30-frame score buffer
+
+    def process(self, chunk_int16):
+        """One 80 ms chunk in -> True if the wake word fired."""
+        assert chunk_int16.dtype == np.int16 and len(chunk_int16) == WAKE_CHUNK, \
+            f"expected int16[1280], got {chunk_int16.dtype}[{len(chunk_int16)}]"
+        scores = self.wakeword.predict(chunk_int16)
+        score = float(scores[self.key])
+        self._chunks_since_reset += 1
+
+        if self._refractory_left > 0:
+            self._refractory_left -= 1
+            return False
+        if self._chunks_since_reset <= WARMUP_CHUNKS:
+            # Let the streaming front end settle before trusting scores.
+            return False
+
+        if score >= self.threshold:
+            self.streak += 1
+        else:
+            self.streak = 0
+        if self.streak >= self.patience:
+            self.streak = 0
+            self._refractory_left = REFRACTORY_CHUNKS
+            return True
+        return False
 
 
-_COMBO = None      # (intent index per label, slot index per label)
-_LABEL_MAP = None  # label -> (intent, slot value or NO_SLOT)
+# ── command model ────────────────────────────────────────────────────────────
 
+class CommandModel:
+    """TCN.onnx inference + joint decode over the 31 valid combinations."""
 
-def load_labels():
-    """Ordered label list from data/labels.json."""
-    with open(ROOT / "data" / "labels.json", encoding="utf-8") as f:
-        return json.load(f)
+    def __init__(self, onnx_path, data_dir, use_int8=False):
+        path = Path(onnx_path)
+        if use_int8:
+            int8_path = path.with_name(path.stem + "_int8" + path.suffix)
+            if int8_path.exists():
+                path = int8_path
+            else:
+                print(f"note: {int8_path.name} not found, using {path.name}")
+        opts = ort.SessionOptions()
+        opts.intra_op_num_threads = 1    # 1 thread: less contention with the
+        opts.inter_op_num_threads = 1    # wake-word loop on a 4-core Pi
+        self.session = ort.InferenceSession(str(path), sess_options=opts,
+                                            providers=["CPUExecutionProvider"])
+        self.input_name = self.session.get_inputs()[0].name   # "logmel"
+        self.output_names = [o.name for o in self.session.get_outputs()]
+        # output order is fixed by export_onnx.py: [intent_logits, slot_logits]
+        assert self.output_names == ["intent_logits", "slot_logits"], \
+            f"unexpected ONNX outputs: {self.output_names}"
 
+        intents, slots, label_map = load_intents_slots(data_dir)
+        self.intents = intents
+        self.slots = slots
+        intent_to_idx = {n: i for i, n in enumerate(intents)}
+        slot_to_idx = {n: i for i, n in enumerate(slots)}
+        with open(Path(data_dir) / "labels.json", encoding="utf-8") as f:
+            labels = json.load(f)
+        # same 31-combination layout as train.py / evaluate.py
+        self.combo = np.array(
+            [[intent_to_idx[label_map[l][0]], slot_to_idx[label_map[l][1]]]
+             for l in labels], dtype=np.int64)
+        self.labels = labels
 
-def load_label_map():
-    """label -> (intent, slot value), taken from data/manifest.csv.
+    def predict(self, wav_float):
+        """16 kHz mono float32 waveform -> (label, intent, slot_value, prob).
 
-    Also builds the label -> (intent idx, slot idx) combo table used for
-    joint decoding. Loads once, then cached.
-    """
-    global _COMBO, _LABEL_MAP
-    if _LABEL_MAP is None:
-        labels = load_labels()
-        intents, slots, label_map = load_intents_slots(ROOT / "data")
-        intent_to_idx = {name: i for i, name in enumerate(intents)}
-        slot_to_idx = {name: i for i, name in enumerate(slots)}
-        _COMBO = (np.array([intent_to_idx[label_map[l][0]] for l in labels]),
-                  np.array([slot_to_idx[label_map[l][1]] for l in labels]))
-        _LABEL_MAP = label_map
-    return _LABEL_MAP
+        Returns (None, None, None, prob) when the best combination's
+        probability is below COMMAND_THRESHOLD (unclear command).
+        """
+        mel = log_mel(trim_silence(np.asarray(wav_float, dtype=np.float32)))
+        mel = mel[None, ...]    # add batch axis: (1, 64, 480) -> (1, 1, 64, 480)
+        intent_logits, slot_logits = self.session.run(
+            self.output_names, {self.input_name: mel})
+        intent_logits = intent_logits[0]      # (19,) — drop batch dim
+        slot_logits = slot_logits[0]
+        # joint decode: log p(intent) + log p(slot) over valid pairs only
+        scores = _log_softmax(intent_logits)[self.combo[:, 0]] + \
+                 _log_softmax(slot_logits)[self.combo[:, 1]]
+        k = int(scores.argmax())
+        prob = float(np.exp(scores[k] - _logsumexp(scores)))
+        if prob < COMMAND_THRESHOLD:
+            return None, None, None, prob
+        label = self.labels[k]
+        intent = self.intents[self.combo[k, 0]]
+        slot_value = self.slots[self.combo[k, 1]]
+        return label, intent, slot_value, prob
 
 
 def _log_softmax(x):
-    x = x - x.max()
-    return x - np.log(np.exp(x).sum())
+    x = x - x.max(axis=-1, keepdims=True)
+    return x - np.log(np.exp(x).sum(axis=-1, keepdims=True))
 
 
-def create_session(model_path=ROOT / "models" / "crnn.onnx"):
-    """Load the exported ONNX model for fast CPU inference."""
-    options = ort.SessionOptions()
-    options.intra_op_num_threads = 3   # leave one core for the microphone stream
-    session = ort.InferenceSession(str(model_path), sess_options=options,
-                                   providers=["CPUExecutionProvider"])
-    # warmup: the first run is always slower (kernel selection, caches)
-    session.run(None, {"logmel": np.zeros((1, 1, N_MELS, MAX_FRAMES), dtype=np.float32)})
-    return session
+def _logsumexp(x):
+    m = x.max()
+    return m + np.log(np.exp(x - m).sum())
 
 
-def predict(session, wav, labels):
-    """Waveform -> (predicted label, probability) via joint decoding."""
-    load_label_map()                                    # builds _COMBO once
-    mel = log_mel(trim_silence(wav))[np.newaxis]        # (1, 1, 64, 480)
-    intent_logits, slot_logits = session.run(None, {"logmel": mel})
-    log_pi = _log_softmax(intent_logits[0])             # (n_intents,)
-    log_ps = _log_softmax(slot_logits[0])               # (n_slots,)
-    combo_i, combo_s = _COMBO
-    # joint score of every valid (intent, slot) combination = the 31 labels
-    scores = log_pi[combo_i] + log_ps[combo_s]          # (31,)
-    probs = np.exp(scores - scores.max())
-    probs = probs / probs.sum()
-    idx = int(probs.argmax())
-    return labels[idx], float(probs[idx])
+# ── audio capture ────────────────────────────────────────────────────────────
 
-
-def record_command(max_sec=4.0, silence_sec=0.8):
-    """Record one spoken command from the microphone.
-
-    Waits for speech to start, then records until the speaker has been
-    silent for `silence_sec` (or `max_sec` is reached). This endpointing
-    is what makes the system respond as soon as you finish speaking.
-    Returns float32 samples at 16 kHz, or None if no speech was heard.
-    """
-    block = int(SAMPLE_RATE * 0.1)                       # 100 ms per block
-    max_blocks = int(max_sec * SAMPLE_RATE / block)
-    silence_blocks = max(1, int(silence_sec / 0.1))
-
-    print("listening for a command...")
-    frames = []
-    with sd.InputStream(samplerate=SAMPLE_RATE, channels=1,
-                        dtype="float32", blocksize=block) as stream:
-        # 1) measure the room noise for 0.5 s to set the speech threshold
-        noise = []
-        for _ in range(5):
-            data, _ = stream.read(block)
-            noise.append(data[:, 0])
-        noise_rms = float(np.sqrt(np.mean(np.concatenate(noise) ** 2)))
-        threshold = max(0.004, 4.0 * noise_rms)
-
-        # 2) wait up to 6 s for speech to start
-        for _ in range(60):
-            data, _ = stream.read(block)
-            rms = float(np.sqrt(np.mean(data ** 2)))
-            if rms > threshold:
-                frames.append(data[:, 0])
-                break
-        if not frames:
-            print("no speech detected")
-            return None
-
-        # 3) keep recording until the speaker stops talking
-        silent = 0
-        while len(frames) < max_blocks:
-            data, _ = stream.read(block)
-            frames.append(data[:, 0])
-            rms = float(np.sqrt(np.mean(data ** 2)))
-            silent = silent + 1 if rms < threshold else 0
-            if silent >= silence_blocks:
-                break
-
-    wav = np.concatenate(frames).astype(np.float32)
-    print(f"captured {len(wav) / SAMPLE_RATE:.2f} s of speech")
+def read_wav_int16(path):
+    """WAV -> int16 mono 16 kHz (same input domain the mic provides)."""
+    wav, sr = sf.read(path, dtype="int16")
+    if wav.ndim > 1:
+        wav = wav.mean(axis=1).astype(np.int16)
+    if sr != SAMPLE_RATE:
+        from math import gcd
+        from scipy.signal import resample_poly
+        g = gcd(int(sr), SAMPLE_RATE)
+        wav = resample_poly(wav.astype(np.float32), SAMPLE_RATE // g,
+                            sr // g).astype(np.int16)
     return wav
 
 
-def execute_command(label, label_map):
-    """Turn a predicted label into an action and return a readable message."""
-    intent, slot_value = label_map.get(label, (label, ""))
-    message = INTENT_MESSAGES.get(intent, intent.replace("_", " ").lower())
-    if "{slot}" in message:
-        message = message.replace("{slot}", slot_value)
-    if intent == "TIME":
-        message = "It is " + datetime.now().strftime("%I:%M %p").lstrip("0")
-    print(">>> " + message)
-    return message
+def mic_stream():
+    """Generator of int16 chunks of exactly WAKE_CHUNK samples (80 ms)."""
+    import sounddevice as sd
+    with sd.RawInputStream(samplerate=SAMPLE_RATE, blocksize=WAKE_CHUNK,
+                           dtype="int16", channels=1) as stream:
+        while True:
+            chunk, _overflowed = stream.read(WAKE_CHUNK)
+            yield np.frombuffer(chunk, dtype=np.int16)
 
 
-def classify_myvoice(session, labels):
-    """Classify every recording listed in data/MYVOICE/myvoice_manifest.csv.
-
-    The manifest needs at least two columns: "path" (relative to
-    data/MYVOICE/) and "label" (the expected label, e.g. ALARM_6_00AM).
-    Every file goes through the exact same pipeline as the microphone
-    (trim -> log-mel -> ONNX -> joint decode), so this measures the
-    deployed system on your own voice.
-    """
-    if not MYVOICE_CSV.exists():
-        print(f"not found: {MYVOICE_CSV}")
-        print("create it with columns: path,label")
-        return
-    with open(MYVOICE_CSV, newline="", encoding="utf-8") as f:
-        rows = [r for r in csv.DictReader(f) if (r.get("path") or "").strip()]
-    print(f"my voice: {len(rows)} recordings")
-
-    n_labeled, n_correct, n_missing = 0, 0, 0
-    for row in rows:
-        wav_path = MYVOICE_DIR / row["path"]
-        if not wav_path.exists():          # path may already start with MYVOICE/
-            wav_path = ROOT / "data" / row["path"]
-        if not wav_path.exists():
-            print(f"  MISSING {row['path']}")
-            n_missing += 1
-            continue
-        label, prob = predict(session, load_wav(wav_path), labels)
-        expected = (row.get("label") or "").strip()
-        if expected:
-            n_labeled += 1
-            if label == expected:
-                n_correct += 1
-                print(f"  ok    {row['path']} -> {label} ({prob * 100:.0f}%)")
-            else:
-                print(f"  WRONG {row['path']} -> {label} ({prob * 100:.0f}%)   "
-                      f"expected {expected}")
-        else:
-            print(f"        {row['path']} -> {label} ({prob * 100:.0f}%)")
-
-    if n_missing:
-        print(f"{n_missing} file(s) not found")
-    if n_labeled:
-        print(f"my voice accuracy: {n_correct}/{n_labeled} "
-              f"({n_correct / n_labeled * 100:.1f}%)")
-
+# ── main loop ────────────────────────────────────────────────────────────────
 
 def main():
-    parser = argparse.ArgumentParser(description="Tiny voice command recognizer")
-    parser.add_argument("--wav", help="classify a WAV file instead of using the microphone")
-    parser.add_argument("--myvoice", action="store_true",
-                        help="classify the WAVs listed in data/MYVOICE/myvoice_manifest.csv")
-    parser.add_argument("--model", default=str(ROOT / "models" / "crnn.onnx"),
-                        help="ONNX model to use (e.g. models/crnn_int8.onnx)")
-    parser.add_argument("--loop", action="store_true", help="keep listening after each command")
-    parser.add_argument("--no-wakeword", action="store_true", help="skip wake-word detection")
+    parser = argparse.ArgumentParser(description=__doc__,
+                                     formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("--file", help="process a WAV file instead of the microphone")
+    parser.add_argument("--int8", action="store_true",
+                        help="use models/TCN_int8.onnx if present")
+    parser.add_argument("--wake-threshold", type=float, default=WAKE_THRESHOLD)
+    parser.add_argument("--command-window", type=float, default=COMMAND_WINDOW_S,
+                        help="seconds of audio recorded after the wake word")
     args = parser.parse_args()
 
-    session = create_session(args.model)
-    labels = load_labels()
-    label_map = load_label_map()
+    # int8 if requested and present, else fp32
+    base = ROOT / "models" / "TCN.onnx"
+    onnx_path = base.with_name("TCN_int8.onnx") if (args.int8 and (ROOT / "models" / "TCN_int8.onnx").exists()) else base
+    if not onnx_path.exists():
+        sys.exit(f"error: {onnx_path.name} not found in models/.\n"
+                 f"Train and export first (GPU box):  python src/train.py && python src/export_onnx.py\n"
+                 f"then copy the file to the Pi's models/ directory.")
 
-    if args.wav:  # offline test on a file
-        label, prob = predict(session, load_wav(args.wav), labels)
-        print(f"{args.wav} -> {label} ({prob * 100:.1f}% confidence)")
-        return
+    print(f"loading wake word: {Path(ALEXA_MODEL_PATH).name} (openwakeword 0.4.0)")
+    wakeword = make_wakeword_model()
+    detector = WakeWordDetector(wakeword, threshold=args.wake_threshold)
+    print(f"loading command model: {onnx_path.name}")
+    cmd = CommandModel(onnx_path, ROOT / "data")
 
-    if args.myvoice:  # batch test on your own recordings
-        classify_myvoice(session, labels)
-        return
+    if args.file:
+        run_file(detector, cmd, read_wav_int16(args.file), args.command_window)
+    else:
+        run_live(detector, cmd, args.command_window)
 
-    wake_model = None if args.no_wakeword else load_wake_word_model()
+
+def run_file(detector, cmd, wav_int16, command_window_s=COMMAND_WINDOW_S):
+    """Offline mode: stream a WAV through the wake word, then classify the
+    command window that follows each detection. Same code path as live."""
+    window_samples = int(command_window_s * SAMPLE_RATE)
+    n = len(wav_int16)
+    i = 0
+    detections = 0
+    while i + WAKE_CHUNK <= n:
+        if detector.process(wav_int16[i:i + WAKE_CHUNK]):
+            detections += 1
+            print(f"\n>>> wake word detected at {i / SAMPLE_RATE:.2f} s")
+            i += WAKE_CHUNK
+            window_end = min(n, i + window_samples)
+            window = wav_int16[i:window_end]
+            i = window_end
+            if len(window) < SAMPLE_RATE:          # < 1 s of audio: skip
+                print("    (command window too short, skipping)")
+                continue
+            t0 = time.perf_counter()
+            wav_f = window.astype(np.float32) / 32768.0
+            label, intent, slot_value, prob = cmd.predict(wav_f)
+            dt = time.perf_counter() - t0
+            if label is None:
+                print(f"    unclear command (best prob {prob:.2f})")
+            else:
+                print(f"    {label}   [{intent}{'  ' + slot_value if slot_value != 'NO_SLOT' else ''}]  "
+                      f"prob={prob:.2f}  ({dt * 1000:.0f} ms)")
+            detector.reset()
+        else:
+            i += WAKE_CHUNK
+    if detections == 0:
+        print("no wake word detected in file")
+    else:
+        print(f"\n{detections} wake word detection(s)")
+
+
+def run_live(detector, cmd, command_window_s):
+    """Live microphone loop: stream 80 ms chunks into the wake word; on a
+    detection, read the command window straight from the mic and classify."""
+    window_samples = int(command_window_s * SAMPLE_RATE)
+    print(f'say "Alexa", then speak your command. Ctrl+C to quit.')
+    stream = mic_stream()
     try:
         while True:
-            if wake_model is not None:
-                wait_for_wake_word(wake_model)
-            wav = record_command()
-            if wav is None:
-                if args.loop:
-                    continue
-                return
-            t0 = time.perf_counter()
-            label, prob, message, rejected = handle_command(
-                session, wav, labels, label_map)
-            elapsed = (time.perf_counter() - t0) * 1000
-            if rejected:
-                print(f"unknown command (confidence only {prob * 100:.0f}%, "
-                      f"{elapsed:.0f} ms)")
-            else:
-                print(f"predicted {label} ({prob * 100:.1f}% confidence, "
-                      f"{elapsed:.0f} ms)")
-            execute_command(label, label_map)
-            if not args.loop:
-                return
+            chunk = next(stream)
+            if detector.process(chunk):
+                print("\n>>> Alexa!")
+                # record the command window: 76800 samples = 60 x 1280
+                window = np.empty(window_samples, dtype=np.int16)
+                for j in range(0, window_samples, WAKE_CHUNK):
+                    window[j:j + WAKE_CHUNK] = next(stream)
+                t0 = time.perf_counter()
+                label, intent, slot_value, prob = cmd.predict(
+                    window.astype(np.float32) / 32768.0)
+                dt = time.perf_counter() - t0
+                if label is None:
+                    print(f"    Sorry, I didn't catch that. (best prob {prob:.2f})")
+                else:
+                    slot_txt = "" if slot_value == "NO_SLOT" else f"  {slot_value}"
+                    print(f"    {intent}{slot_txt}   prob={prob:.2f}  ({dt * 1000:.0f} ms)")
+                detector.reset()
     except KeyboardInterrupt:
-        print("\nstopped")
+        print("\nstopped.")
 
 
 if __name__ == "__main__":

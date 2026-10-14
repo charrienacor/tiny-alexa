@@ -4,9 +4,6 @@ data/*
 !data/labels.json
 !data/slots.json
 !data/manifest.csv
-!data/MYVOICE/
-data/MYVOICE/*
-!data/MYVOICE/myvoice_manifest.csv
 .venv/
 __pycache__/
 *.pyc

@@ -5,6 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>tiny alexa</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='6' fill='%23ff3d9e'/%3E%3C/svg%3E" />
   <style>
     /* ============================================================
      tiny alexa — black / pink / white, minimalist
@@ -24,7 +25,22 @@
       /* primary hot pink */
       --pink-600: #f0128a;
       --pink-700: #c4006e;
-      --glow: rgba(255, 61, 158, .55);
+      /* the same theme as rgb triplets, for rgba(var(--accent-rgb), a);
+         COLOR commands retint all of these (see THEMES in the script) */
+      --accent-rgb: 255, 61, 158;
+      /* = --pink-500 */
+      --accent-hi-rgb: 255, 158, 203;
+      /* = --pink-300 */
+      --accent-lo-rgb: 255, 225, 239;
+      /* = --pink-100 */
+      --sweep-rgb: 255, 61, 158;
+      --glow: rgba(var(--accent-rgb), .55);
+      /* light / dark mode (LIGHT_ON / LIGHT_OFF): the script blends these
+         together with --bg, --white and --muted between the MODES below */
+      --surface-rgb: 9, 9, 11;
+      /* card / panel fill */
+      --line-rgb: 255, 255, 255;
+      /* hairlines + tracks drawn on top of surfaces */
     }
 
     * {
@@ -55,7 +71,7 @@
       position: fixed;
       inset: 0;
       pointer-events: none;
-      background: radial-gradient(120% 90% at 50% 38%, rgba(255, 61, 158, .06), transparent 60%);
+      background: radial-gradient(120% 90% at 50% 38%, rgba(var(--accent-rgb), .06), transparent 60%);
     }
 
     .stage {
@@ -79,6 +95,7 @@
       padding-left: .42em;
       /* balance trailing letter-space */
       transition: opacity .5s ease, transform .5s ease, font-size .5s ease;
+      -webkit-user-select: none;
       user-select: none;
     }
 
@@ -150,6 +167,16 @@
 
     .phrase.confirm {
       color: var(--white);
+    }
+
+    /* the lamp, call, alarm and aircon scenes fill the middle of the stage
+       and carry their own captions ("SETTING TO 60%", "RINGING — 6:00 AM"),
+       so the phrase / detail line would only peek out from behind them */
+    body.ac-active .status,
+    body.lamp-active .status,
+    body.call-active .status,
+    body.alarm-active .status {
+      opacity: 0;
     }
 
     /* lift the confirm line above the timer ring while one is running */
@@ -235,7 +262,7 @@
     }
 
     .ring-track {
-      stroke: rgba(255, 61, 158, .13);
+      stroke: rgba(var(--accent-rgb), .13);
     }
 
     .ring-fill {
@@ -272,11 +299,12 @@
     .timer.stop {
       pointer-events: auto;
       cursor: pointer;
+      -webkit-user-select: none;
       user-select: none;
       padding: 12px 24px;
       border-radius: 999px;
-      border: 1px solid rgba(255, 61, 158, .35);
-      background: rgba(255, 61, 158, .07);
+      border: 1px solid rgba(var(--accent-rgb), .35);
+      background: rgba(var(--accent-rgb), .07);
       color: var(--pink-200);
       font-size: 12px;
       letter-spacing: .16em;
@@ -285,7 +313,7 @@
     }
 
     .timer.stop:hover {
-      background: rgba(255, 61, 158, .15);
+      background: rgba(var(--accent-rgb), .15);
       border-color: var(--pink-400);
     }
 
@@ -373,8 +401,8 @@
       aspect-ratio: 2.2/1;
       border-radius: 18px;
       background: linear-gradient(180deg, #16161b 0%, #0c0c10 100%);
-      border: 1px solid rgba(255, 61, 158, .4);
-      box-shadow: 0 0 44px rgba(255, 61, 158, .14), inset 0 1px 0 rgba(255, 255, 255, .07);
+      border: 1px solid rgba(var(--accent-rgb), .4);
+      box-shadow: 0 0 44px rgba(var(--accent-rgb), .14), inset 0 1px 0 rgba(255, 255, 255, .07);
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -388,17 +416,17 @@
 
     @keyframes acOn {
       0% {
-        box-shadow: 0 0 0 rgba(255, 61, 158, 0);
+        box-shadow: 0 0 0 rgba(var(--accent-rgb), 0);
       }
 
       45% {
-        box-shadow: 0 0 70px rgba(255, 61, 158, .45);
+        box-shadow: 0 0 70px rgba(var(--accent-rgb), .45);
         border-color: var(--pink-300);
       }
 
       100% {
-        box-shadow: 0 0 44px rgba(255, 61, 158, .14);
-        border-color: rgba(255, 61, 158, .4);
+        box-shadow: 0 0 44px rgba(var(--accent-rgb), .14);
+        border-color: rgba(var(--accent-rgb), .4);
       }
     }
 
@@ -425,13 +453,15 @@
       font-size: clamp(34px, 8vh, 52px);
       font-variant-numeric: tabular-nums;
       letter-spacing: .02em;
-      color: var(--pink-300);
+      color: rgb(var(--accent-hi-rgb));
+      /* on a dark device face: keep the bright shade in light mode too */
       text-shadow: 0 0 20px var(--glow);
     }
 
     .ac-screen .ac-deg {
       font-size: .45em;
-      color: var(--pink-400);
+      color: rgb(var(--accent-hi-rgb));
+      /* on the dark unit: stays bright in light mode */
     }
 
     .ac-screen .ac-mode {
@@ -515,7 +545,7 @@
       top: -34px;
       border-radius: 3px;
       opacity: 0;
-      background: linear-gradient(180deg, rgba(255, 255, 255, .9), rgba(255, 158, 203, .35) 55%, transparent);
+      background: linear-gradient(180deg, rgba(255, 255, 255, .9), rgba(var(--accent-hi-rgb), .35) 55%, transparent);
       filter: blur(.4px);
       animation: airFall linear forwards;
     }
@@ -545,7 +575,7 @@
       width: 130%;
       height: 70px;
       pointer-events: none;
-      background: radial-gradient(ellipse at center top, rgba(255, 158, 203, .3), transparent 70%);
+      background: radial-gradient(ellipse at center top, rgba(var(--accent-hi-rgb), .3), transparent 70%);
       opacity: 0;
       transition: opacity .9s ease;
     }
@@ -597,7 +627,7 @@
       margin-bottom: clamp(110px, 22vh, 170px);
     }
 
-    /* ---------- lamp — pendant light for BRIGHTNESS / LIGHT_ON / LIGHT_OFF ---------- */
+    /* ---------- lamp — pendant light for BRIGHTNESS ---------- */
     .lamp {
       position: fixed;
       inset: 0;
@@ -627,7 +657,7 @@
       width: clamp(300px, 72vmin, 620px);
       aspect-ratio: 1;
       transform: translate(-50%, -50%) scale(calc(.55 + .75*var(--lum, 0)));
-      background: radial-gradient(circle, rgba(255, 209, 236, .5) 0%, rgba(255, 158, 203, .28) 30%, rgba(255, 61, 158, .12) 52%, transparent 70%);
+      background: radial-gradient(circle, rgba(var(--accent-lo-rgb), .5) 0%, rgba(var(--accent-hi-rgb), .28) 30%, rgba(var(--accent-rgb), .12) 52%, transparent 70%);
       opacity: var(--lum, 0);
     }
 
@@ -647,7 +677,7 @@
       top: 4px;
       border-radius: 50%;
       opacity: 0;
-      background: radial-gradient(circle, #ffd9ec, rgba(255, 158, 203, .4) 70%);
+      background: radial-gradient(circle, var(--pink-100), rgba(var(--accent-hi-rgb), .4) 70%);
       animation: rayDrift linear forwards;
     }
 
@@ -699,13 +729,13 @@
       height: 8px;
       border-radius: 4px;
       background: #1a1a20;
-      border: 1px solid rgba(255, 61, 158, .3);
+      border: 1px solid rgba(var(--accent-rgb), .3);
     }
 
     .lamp-cord {
       width: 2px;
       height: 13vh;
-      background: linear-gradient(180deg, rgba(255, 61, 158, .5), rgba(255, 61, 158, .16));
+      background: linear-gradient(180deg, rgba(var(--accent-rgb), .5), rgba(var(--accent-rgb), .16));
     }
 
     .lamp-shade {
@@ -714,9 +744,9 @@
       aspect-ratio: 2/1;
       border-radius: 50% 50% 0 0 / 100% 100% 0 0;
       background: linear-gradient(180deg, #191920 0%, #0d0d11 100%);
-      border: 1px solid rgba(255, 61, 158, .4);
+      border: 1px solid rgba(var(--accent-rgb), .4);
       border-bottom: 2px solid var(--pink-500);
-      box-shadow: 0 0 30px rgba(255, 61, 158, .12), inset 0 6px 14px rgba(255, 255, 255, .05);
+      box-shadow: 0 0 30px rgba(var(--accent-rgb), .12), inset 0 6px 14px rgba(255, 255, 255, .05);
     }
 
     .lamp-bulb {
@@ -728,7 +758,7 @@
       aspect-ratio: 1;
       border-radius: 50%;
       background: radial-gradient(circle at 50% 38%, #2b2b33, #101014 72%);
-      border: 1px solid rgba(255, 61, 158, .3);
+      border: 1px solid rgba(var(--accent-rgb), .3);
     }
 
     .lamp-bulb::after {
@@ -790,7 +820,7 @@
       transform: translateX(-50%);
       width: 80vw;
       height: 16vh;
-      background: radial-gradient(ellipse at center, rgba(255, 158, 203, .4), transparent 68%);
+      background: radial-gradient(ellipse at center, rgba(var(--accent-hi-rgb), .4), transparent 68%);
       opacity: calc(var(--lum, 0)*.75);
     }
 
@@ -883,7 +913,7 @@
       aspect-ratio: 1;
       transform: translate(-50%, -58%);
       border-radius: 50%;
-      background: radial-gradient(circle, rgba(255, 61, 158, .16), transparent 65%);
+      background: radial-gradient(circle, rgba(var(--accent-rgb), .16), transparent 65%);
       animation: glowPulse 2.8s ease-in-out infinite;
     }
 
@@ -930,8 +960,8 @@
       inset: 12%;
       border-radius: 50%;
       background: radial-gradient(circle at 35% 30%, #23232b, #101014 75%);
-      border: 1px solid rgba(255, 61, 158, .55);
-      box-shadow: 0 0 40px rgba(255, 61, 158, .28), inset 0 0 24px rgba(255, 61, 158, .12);
+      border: 1px solid rgba(var(--accent-rgb), .55);
+      box-shadow: 0 0 40px rgba(var(--accent-rgb), .28), inset 0 0 24px rgba(var(--accent-rgb), .12);
     }
 
     .call-icon {
@@ -978,7 +1008,7 @@
       font-weight: 200;
       font-size: clamp(26px, 5.4vh, 40px);
       letter-spacing: .04em;
-      color: #fff;
+      color: var(--white);
       text-shadow: 0 0 24px var(--glow);
       animation: nameIn .55s ease .1s backwards;
     }
@@ -1116,13 +1146,13 @@
       width: clamp(64px, 12vh, 84px);
       aspect-ratio: 1;
       border-radius: 50%;
-      border: 1px solid rgba(255, 61, 158, .55);
+      border: 1px solid rgba(var(--accent-rgb), .55);
       cursor: pointer;
       background: radial-gradient(circle at 35% 30%, #2a1520, #150a10 75%);
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 0 30px rgba(255, 61, 158, .3), inset 0 0 18px rgba(255, 61, 158, .15);
+      box-shadow: 0 0 30px rgba(var(--accent-rgb), .3), inset 0 0 18px rgba(var(--accent-rgb), .15);
       transition: transform .25s cubic-bezier(.2, .7, .2, 1), box-shadow .25s ease;
       animation: btnIn .5s ease .25s backwards;
     }
@@ -1147,7 +1177,7 @@
 
     .call-btn:hover {
       transform: scale(1.08);
-      box-shadow: 0 0 44px rgba(255, 61, 158, .5), inset 0 0 22px rgba(255, 61, 158, .25);
+      box-shadow: 0 0 44px rgba(var(--accent-rgb), .5), inset 0 0 22px rgba(var(--accent-rgb), .25);
     }
 
     .call-btn:active {
@@ -1218,7 +1248,7 @@
       transform: translate(-50%, -50%);
       width: clamp(340px, 80vmin, 640px);
       aspect-ratio: 1;
-      background: radial-gradient(circle, rgba(255, 158, 203, .22), rgba(255, 61, 158, .1) 45%, transparent 68%);
+      background: radial-gradient(circle, rgba(var(--accent-hi-rgb), .22), rgba(var(--accent-rgb), .1) 45%, transparent 68%);
       opacity: 0;
       transition: opacity .6s ease;
     }
@@ -1310,8 +1340,8 @@
       aspect-ratio: 1;
       border-radius: 50% 50% 8% 8%;
       background: linear-gradient(160deg, #23232b, #101015 70%);
-      border: 1px solid rgba(255, 61, 158, .5);
-      box-shadow: 0 0 18px rgba(255, 61, 158, .18), inset 0 4px 8px rgba(255, 255, 255, .06);
+      border: 1px solid rgba(var(--accent-rgb), .5);
+      box-shadow: 0 0 18px rgba(var(--accent-rgb), .18), inset 0 4px 8px rgba(255, 255, 255, .06);
       transform-origin: 50% 92%;
     }
 
@@ -1335,7 +1365,7 @@
       width: 34%;
       height: 30%;
       border-radius: 50%;
-      background: radial-gradient(circle at 40% 35%, rgba(255, 217, 236, .5), transparent 70%);
+      background: radial-gradient(circle at 40% 35%, rgba(var(--accent-lo-rgb), .5), transparent 70%);
     }
 
     .alarm.ringing .alarm-bell.left {
@@ -1403,8 +1433,8 @@
       width: 260%;
       aspect-ratio: 1;
       border-radius: 50%;
-      background: radial-gradient(circle at 40% 35%, #ffd9ec, var(--pink-500) 75%);
-      box-shadow: 0 0 12px rgba(255, 61, 158, .6);
+      background: radial-gradient(circle at 40% 35%, var(--pink-100), var(--pink-500) 75%);
+      box-shadow: 0 0 12px rgba(var(--accent-rgb), .6);
     }
 
     .alarm.ringing .alarm-hammer {
@@ -1427,8 +1457,8 @@
       inset: 0;
       border-radius: 50%;
       background: radial-gradient(circle at 50% 32%, #1d1d25, #0b0b0f 78%);
-      border: 2px solid rgba(255, 61, 158, .55);
-      box-shadow: 0 0 34px rgba(255, 61, 158, .22), inset 0 0 26px rgba(0, 0, 0, .65);
+      border: 2px solid rgba(var(--accent-rgb), .55);
+      box-shadow: 0 0 34px rgba(var(--accent-rgb), .22), inset 0 0 26px rgba(0, 0, 0, .65);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -1440,7 +1470,7 @@
       position: absolute;
       inset: 7%;
       border-radius: 50%;
-      background: repeating-conic-gradient(from -1deg, rgba(255, 158, 203, .55) 0 2deg, transparent 2deg 30deg);
+      background: repeating-conic-gradient(from -1deg, rgba(var(--accent-hi-rgb), .55) 0 2deg, transparent 2deg 30deg);
       -webkit-mask: radial-gradient(circle, transparent 0 88%, #000 88% 92%, transparent 92%);
       mask: radial-gradient(circle, transparent 0 88%, #000 88% 92%, transparent 92%);
     }
@@ -1452,7 +1482,7 @@
       transform-origin: 50% 100%;
       border-radius: 4px;
       background: linear-gradient(180deg, var(--pink-200), var(--pink-400));
-      box-shadow: 0 0 8px rgba(255, 61, 158, .5);
+      box-shadow: 0 0 8px rgba(var(--accent-rgb), .5);
       transition: transform .9s cubic-bezier(.2, .7, .2, 1);
     }
 
@@ -1489,7 +1519,8 @@
       font-size: clamp(15px, 3.6vh, 21px);
       font-variant-numeric: tabular-nums;
       letter-spacing: .06em;
-      color: var(--pink-200);
+      color: rgb(var(--accent-lo-rgb));
+      /* on a dark device face: keep the bright shade in light mode too */
       text-shadow: 0 0 14px var(--glow);
       white-space: nowrap;
     }
@@ -1517,7 +1548,7 @@
       height: 9%;
       border-radius: 0 0 50% 50%;
       background: linear-gradient(180deg, #1c1c24, #0d0d11);
-      border: 1px solid rgba(255, 61, 158, .35);
+      border: 1px solid rgba(var(--accent-rgb), .35);
       border-top: none;
     }
 
@@ -1537,7 +1568,7 @@
       top: -16%;
       width: 44%;
       aspect-ratio: 1;
-      border: 2px solid rgba(255, 158, 203, .65);
+      border: 2px solid rgba(var(--accent-hi-rgb), .65);
       border-radius: 50%;
       border-bottom-color: transparent;
       border-left-color: transparent;
@@ -1649,9 +1680,10 @@
       width: clamp(52px, 11vh, 64px);
       aspect-ratio: 1;
       border-radius: 50%;
-      border: 1px solid rgba(255, 61, 158, .5);
-      background: rgba(20, 20, 26, .7);
+      border: 1px solid rgba(var(--accent-rgb), .5);
+      background: rgba(var(--surface-rgb), .7);
       backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
       color: var(--pink-200);
       font-size: 15px;
       font-weight: 600;
@@ -1664,18 +1696,85 @@
     }
 
     .alarm-btn.stop {
-      border-color: rgba(255, 90, 140, .8);
-      color: #ff8fae;
+      border-color: rgba(var(--accent-rgb), .8);
+      color: var(--pink-300);
       font-size: 17px;
     }
 
     .alarm-btn:hover {
       transform: scale(1.08);
-      box-shadow: 0 0 34px rgba(255, 61, 158, .4);
+      box-shadow: 0 0 34px rgba(var(--accent-rgb), .4);
     }
 
     .alarm-btn:active {
       transform: scale(.94);
+    }
+
+    /* snooze only makes sense while ringing */
+    .alarm:not(.ringing):not(.snoozed) .alarm-btn.snooze {
+      display: none;
+    }
+
+    /* ---------- pending alarms (top-left, under the reminder chip) ---------- */
+    .alarmChip {
+      position: fixed;
+      left: 16px;
+      top: 18px;
+      z-index: 5;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      max-width: 60vw;
+      opacity: 0;
+      transform: translateY(-8px);
+      pointer-events: none;
+      transition: opacity .4s ease, transform .4s ease, top .4s ease;
+    }
+
+    .alarmChip.show {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    body.has-reminders .alarmChip {
+      top: 62px;
+    }
+
+    .apill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(var(--accent-rgb), .07);
+      border: 1px solid rgba(var(--accent-rgb), .28);
+      color: var(--pink-200);
+      padding: 7px 12px;
+      border-radius: 999px;
+      font: inherit;
+      font-size: 12px;
+      letter-spacing: .02em;
+      font-variant-numeric: tabular-nums;
+      cursor: pointer;
+      transition: background .2s ease, border-color .2s ease;
+    }
+
+    .apill:hover {
+      background: rgba(var(--accent-rgb), .14);
+      border-color: rgba(var(--accent-rgb), .55);
+    }
+
+    .apill .asn {
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .apill .ax {
+      opacity: .45;
+      font-size: 10px;
+    }
+
+    .apill:hover .ax {
+      opacity: 1;
     }
 
     /* while the alarm is the hero, fade the rest back (same as the timer / AC) */
@@ -1692,345 +1791,44 @@
       margin-bottom: clamp(110px, 22vh, 170px);
     }
 
-    /* ---------- color (COLOR intent) — a natural object per color ----------
-     red -> apple, green -> sprout, blue -> raindrop + ripples.
-     Same scene contract as the aircon: owns the hold, one-shot fade. */
-    .color {
+    /* ---------- theme switch (COLOR intent) ----------
+     "red" / "green" / "blue" retint the whole UI: JS tweens the theme
+     variables in :root, and this sweep washes the new color out from the
+     center so the change reads as one gesture. */
+    .theme-sweep {
       position: fixed;
-      inset: 0;
-      z-index: 4;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: clamp(14px, 3vh, 24px);
-      pointer-events: none;
-      opacity: 0;
-      transform: scale(.92) translateY(10px);
-      transition: opacity .5s cubic-bezier(.2, .7, .2, 1), transform .5s cubic-bezier(.2, .7, .2, 1);
-    }
-
-    .color.show {
-      opacity: 1;
-      transform: none;
-    }
-
-    .c-col {
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      gap: clamp(10px, 2vh, 18px);
-    }
-
-    .color.show .c-col.on {
-      display: flex;
-      animation: sceneIn .7s cubic-bezier(.2, .7, .2, 1);
-    }
-
-    @keyframes sceneIn {
-      from {
-        opacity: 0;
-        transform: scale(.85) translateY(14px);
-      }
-
-      to {
-        opacity: 1;
-        transform: none;
-      }
-    }
-
-    /* --- red: apple --- */
-    .c-apple {
-      position: relative;
-      width: clamp(120px, 26vh, 170px);
-      aspect-ratio: 1;
-    }
-
-    .apple-body {
-      position: absolute;
-      inset: 0;
-      border-radius: 50% 50% 48% 52% / 55% 55% 45% 45%;
-      background: radial-gradient(circle at 35% 32%, #ff8a94 0%, #ff4d5e 45%, #c81e33 100%);
-      box-shadow: 0 0 50px rgba(255, 77, 94, .35), inset -14px -18px 30px rgba(120, 0, 20, .35);
-      animation: appleBob 2.6s ease-in-out infinite;
-    }
-
-    @keyframes appleBob {
-
-      0%,
-      100% {
-        transform: translateY(0) rotate(-2deg);
-      }
-
-      50% {
-        transform: translateY(-10px) rotate(2deg);
-      }
-    }
-
-    .apple-shine {
-      position: absolute;
-      left: 24%;
-      top: 16%;
-      width: 22%;
-      height: 14%;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, .55);
-      filter: blur(3px);
-      transform: rotate(-24deg);
-    }
-
-    .apple-stem {
-      position: absolute;
-      left: 50%;
-      top: -9%;
-      width: 5px;
-      height: 16%;
-      border-radius: 3px;
-      background: #7a4a2b;
-      transform: translateX(-50%) rotate(6deg);
-    }
-
-    .apple-leaf {
-      position: absolute;
-      left: 56%;
-      top: -13%;
-      width: 34%;
-      height: 18%;
-      border-radius: 0 100% 0 100%;
-      background: linear-gradient(120deg, #3ddc84, #1f9d55);
-      transform: rotate(-18deg);
-      box-shadow: 0 0 14px rgba(61, 220, 132, .3);
-    }
-
-    /* --- green: sprout --- */
-    .c-sprout {
-      position: relative;
-      width: clamp(140px, 30vh, 190px);
-      aspect-ratio: 1;
-    }
-
-    .sprout-soil {
-      position: absolute;
-      left: 50%;
-      bottom: 6%;
-      transform: translateX(-50%);
-      width: 74%;
-      height: 9%;
-      border-radius: 50%;
-      background: radial-gradient(ellipse at center, rgba(122, 74, 43, .9), rgba(122, 74, 43, .25) 70%, transparent);
-    }
-
-    .sprout-stem {
-      position: absolute;
-      left: 50%;
-      bottom: 10%;
-      width: 6px;
-      height: 44%;
-      transform: translateX(-50%);
-      transform-origin: bottom center;
-      background: linear-gradient(#8af0b8, #2fae66);
-      border-radius: 3px;
-      animation: stemGrow 1s cubic-bezier(.2, .7, .2, 1) both;
-    }
-
-    @keyframes stemGrow {
-      from {
-        transform: translateX(-50%) scaleY(0);
-      }
-
-      to {
-        transform: translateX(-50%) scaleY(1);
-      }
-    }
-
-    .sprout-leaf {
-      position: absolute;
-      bottom: 46%;
-      left: 50%;
-      width: 46%;
-      height: 26%;
-      box-shadow: 0 0 22px rgba(61, 220, 132, .4);
-    }
-
-    .sprout-leaf.l {
-      border-radius: 0 100% 0 100%;
-      background: linear-gradient(135deg, #8af0b8, #3ddc84 60%, #1f9d55);
-      transform-origin: bottom right;
-      animation: leafL .9s .25s cubic-bezier(.2, .7, .2, 1) both, leafSwayL 3s 1.4s ease-in-out infinite;
-    }
-
-    .sprout-leaf.r {
-      border-radius: 100% 0 100% 0;
-      background: linear-gradient(225deg, #8af0b8, #3ddc84 60%, #1f9d55);
-      transform-origin: bottom left;
-      animation: leafR .9s .25s cubic-bezier(.2, .7, .2, 1) both, leafSwayR 3s 1.4s ease-in-out infinite;
-    }
-
-    @keyframes leafL {
-      from {
-        transform: translateX(-100%) rotate(-6deg) scale(0);
-      }
-
-      to {
-        transform: translateX(-100%) rotate(-6deg) scale(1);
-      }
-    }
-
-    @keyframes leafR {
-      from {
-        transform: rotate(6deg) scale(0);
-      }
-
-      to {
-        transform: rotate(6deg) scale(1);
-      }
-    }
-
-    @keyframes leafSwayL {
-
-      0%,
-      100% {
-        transform: translateX(-100%) rotate(-6deg) scale(1);
-      }
-
-      50% {
-        transform: translateX(-100%) rotate(-14deg) scale(1);
-      }
-    }
-
-    @keyframes leafSwayR {
-
-      0%,
-      100% {
-        transform: rotate(6deg) scale(1);
-      }
-
-      50% {
-        transform: rotate(14deg) scale(1);
-      }
-    }
-
-    /* --- blue: raindrop + ripples --- */
-    .c-drop {
-      position: relative;
-      width: clamp(120px, 26vh, 170px);
-      aspect-ratio: 1;
-    }
-
-    .drop-body {
-      position: absolute;
-      left: 50%;
-      top: 4%;
-      width: 64%;
-      aspect-ratio: 1;
-      transform: translateX(-50%) rotate(45deg);
-      border-radius: 0 50% 50% 50%;
-      background: linear-gradient(135deg, #8ac6ff 0%, #3d9bff 55%, #1f6fd6 100%);
-      box-shadow: 0 0 50px rgba(61, 155, 255, .4), inset -10px -12px 24px rgba(10, 40, 110, .4);
-      animation: dropBob 2.4s ease-in-out infinite;
-    }
-
-    @keyframes dropBob {
-
-      0%,
-      100% {
-        transform: translateX(-50%) rotate(45deg) translateY(0);
-      }
-
-      50% {
-        transform: translateX(-50%) rotate(45deg) translateY(-12px);
-      }
-    }
-
-    .drop-shine {
-      position: absolute;
-      right: 20%;
-      bottom: 16%;
-      width: 16%;
-      height: 26%;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, .5);
-      filter: blur(2px);
-      transform: rotate(-18deg);
-    }
-
-    .c-ripples {
-      position: relative;
-      width: clamp(220px, 44vw, 320px);
-      height: clamp(90px, 18vh, 130px);
-    }
-
-    .drop-glow {
-      position: absolute;
-      left: 50%;
-      bottom: 0;
-      transform: translateX(-50%);
-      width: 70%;
-      height: 26px;
-      border-radius: 50%;
-      background: radial-gradient(ellipse, rgba(61, 155, 255, .35), transparent 70%);
-    }
-
-    .ripple {
-      position: absolute;
       left: 50%;
       top: 50%;
-      width: 40px;
-      height: 14px;
-      margin: -7px 0 0 -20px;
+      width: 10px;
+      height: 10px;
+      margin: -5px 0 0 -5px;
       border-radius: 50%;
-      border: 2px solid rgba(138, 198, 255, .8);
+      pointer-events: none;
+      z-index: 1;
       opacity: 0;
-      animation: rippleOut 2.2s ease-out infinite;
+      background: radial-gradient(circle, rgba(var(--sweep-rgb), .5) 0%, rgba(var(--sweep-rgb), .16) 45%, rgba(var(--sweep-rgb), 0) 70%);
     }
 
-    .ripple:nth-child(2) {
-      animation-delay: .7s;
+    .theme-sweep.go {
+      animation: themeSweep 1.3s cubic-bezier(.2, .7, .3, 1) forwards;
     }
 
-    .ripple:nth-child(3) {
-      animation-delay: 1.4s;
-    }
-
-    @keyframes rippleOut {
+    @keyframes themeSweep {
       0% {
-        transform: scale(.3);
-        opacity: .9;
+        transform: scale(1);
+        opacity: .95;
       }
 
       100% {
-        transform: scale(5.5);
+        transform: scale(320);
         opacity: 0;
       }
     }
 
-    .c-sub {
-      font-size: 12px;
-      letter-spacing: .22em;
-      text-transform: uppercase;
-      font-weight: 500;
-      opacity: 0;
-      transform: translateY(6px);
-      transition: opacity .5s ease .15s, transform .5s ease .15s;
-    }
-
-    .color.show .c-sub {
-      opacity: .9;
-      transform: none;
-    }
-
-    /* while the color scene is the hero, fade the rest back (same as the aircon) */
-    body.color-active .wave-wrap {
-      opacity: .12;
-      transition: opacity .5s ease;
-    }
-
-    body.color-active .wordmark {
-      opacity: .12;
-    }
-
-    body.color-active .status {
-      margin-bottom: clamp(110px, 22vh, 170px);
+    @media (prefers-reduced-motion: reduce) {
+      .theme-sweep.go {
+        animation: none;
+      }
     }
 
     /* ---------- hint ---------- */
@@ -2041,6 +1839,7 @@
       color: var(--muted);
       opacity: .8;
       transition: opacity .4s ease;
+      -webkit-user-select: none;
       user-select: none;
     }
 
@@ -2059,21 +1858,22 @@
       gap: 10px;
       padding: 12px 22px;
       border-radius: 999px;
-      background: rgba(255, 61, 158, .08);
-      border: 1px solid rgba(255, 61, 158, .35);
+      background: rgba(var(--accent-rgb), .08);
+      border: 1px solid rgba(var(--accent-rgb), .35);
       color: var(--pink-200);
       font-size: 13px;
       letter-spacing: .14em;
       text-transform: uppercase;
       cursor: pointer;
       backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
       transition: background .3s ease, border-color .3s ease, transform .2s ease, opacity .4s ease;
       animation: pulse 2.6s ease-in-out infinite;
       z-index: 5;
     }
 
     .start:hover {
-      background: rgba(255, 61, 158, .16);
+      background: rgba(var(--accent-rgb), .16);
       border-color: var(--pink-400);
     }
 
@@ -2081,12 +1881,29 @@
       transform: translateX(-50%) scale(.97);
     }
 
-    .start .ring {
+    /* own class: ".ring" belongs to the call screen's absolutely positioned sonar rings */
+    .start-dot {
+      flex: none;
       width: 9px;
       height: 9px;
       border-radius: 50%;
       background: var(--pink-500);
       box-shadow: 0 0 12px var(--glow);
+      animation: dotBlink 1.6s ease-in-out infinite;
+    }
+
+    @keyframes dotBlink {
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: .35;
+        transform: scale(.8);
+      }
     }
 
     .start.hidden {
@@ -2098,19 +1915,28 @@
 
       0%,
       100% {
-        box-shadow: 0 0 0 0 rgba(255, 61, 158, .0);
+        box-shadow: 0 0 0 0 rgba(var(--accent-rgb), .0);
       }
 
       50% {
-        box-shadow: 0 0 26px 2px rgba(255, 61, 158, .18);
+        box-shadow: 0 0 26px 2px rgba(var(--accent-rgb), .18);
       }
     }
 
     /* tiny status dot (live) */
-    .live {
+    /* top-right row: live status, then the weather chip (shared so they
+       can't overlap, whatever width the place name has) */
+    .topbar {
       position: fixed;
-      top: 20px;
-      right: 22px;
+      top: 14px;
+      right: 16px;
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .live {
       display: flex;
       align-items: center;
       gap: 8px;
@@ -2120,7 +1946,6 @@
       color: var(--muted);
       opacity: 0;
       transition: opacity .4s ease;
-      z-index: 5;
     }
 
     .live.show {
@@ -2143,7 +1968,8 @@
     /* latency chip (debug, hidden by default) */
     .latency {
       position: fixed;
-      top: 18px;
+      top: 66px;
+      /* below the reminders chip */
       left: 22px;
       font-size: 11px;
       letter-spacing: .1em;
@@ -2162,8 +1988,8 @@
       left: 50%;
       bottom: 26px;
       transform: translateX(-50%) translateY(20px);
-      background: rgba(255, 61, 158, .12);
-      border: 1px solid rgba(255, 61, 158, .3);
+      background: rgba(var(--accent-rgb), .12);
+      border: 1px solid rgba(var(--accent-rgb), .3);
       color: var(--pink-200);
       padding: 10px 18px;
       border-radius: 12px;
@@ -2181,31 +2007,29 @@
       transform: translateX(-50%) translateY(0);
     }
 
+
     /* ---------- weather chip (top-right) ---------- */
     .weather {
-      position: fixed;
-      top: 14px;
-      right: 16px;
-      z-index: 5;
       display: flex;
       align-items: center;
       gap: 8px;
-      background: rgba(255, 61, 158, .07);
-      border: 1px solid rgba(255, 61, 158, .22);
+      background: rgba(var(--accent-rgb), .07);
+      border: 1px solid rgba(var(--accent-rgb), .22);
       color: var(--pink-200);
       padding: 7px 13px;
       border-radius: 999px;
       font-size: 12px;
       letter-spacing: .02em;
       cursor: pointer;
+      -webkit-user-select: none;
       user-select: none;
       transition: border-color .25s ease, background .25s ease;
       font-variant-numeric: tabular-nums;
     }
 
     .weather:hover {
-      border-color: rgba(255, 61, 158, .55);
-      background: rgba(255, 61, 158, .12);
+      border-color: rgba(var(--accent-rgb), .55);
+      background: rgba(var(--accent-rgb), .12);
     }
 
     .weather .wicon {
@@ -2222,7 +2046,7 @@
     .weather .wloc {
       color: var(--muted);
       font-size: 11px;
-      max-width: 90px;
+      max-width: 140px;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -2243,13 +2067,13 @@
       display: flex;
       align-items: center;
       gap: 12px;
-      background: rgba(18, 3, 10, .88);
+      background: linear-gradient(rgba(var(--accent-rgb), .05), rgba(var(--accent-rgb), .05)), rgba(var(--surface-rgb), .9);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
-      border: 1px solid rgba(255, 61, 158, .30);
+      border: 1px solid rgba(var(--accent-rgb), .30);
       border-radius: 18px;
       padding: 12px;
-      box-shadow: 0 12px 40px rgba(0, 0, 0, .55), 0 0 26px rgba(255, 61, 158, .10);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, .55), 0 0 26px rgba(var(--accent-rgb), .10);
       opacity: 0;
       transform: translate(-50%, 16px) scale(.97);
       pointer-events: none;
@@ -2264,8 +2088,8 @@
     }
 
     .player.playing {
-      border-color: rgba(255, 61, 158, .55);
-      box-shadow: 0 12px 44px rgba(0, 0, 0, .6), 0 0 34px rgba(255, 61, 158, .22);
+      border-color: rgba(var(--accent-rgb), .55);
+      box-shadow: 0 12px 44px rgba(0, 0, 0, .6), 0 0 34px rgba(var(--accent-rgb), .22);
     }
 
     .pcov {
@@ -2274,8 +2098,8 @@
       height: 58px;
       border-radius: 12px;
       overflow: hidden;
-      background: linear-gradient(135deg, #3d0a26, #12030a);
-      border: 1px solid rgba(255, 61, 158, .35);
+      background: linear-gradient(135deg, rgba(var(--accent-rgb), .24), rgba(var(--accent-rgb), .04)), var(--bg-soft);
+      border: 1px solid rgba(var(--accent-rgb), .35);
       position: relative;
     }
 
@@ -2350,7 +2174,7 @@
     .pbar {
       height: 3px;
       border-radius: 2px;
-      background: rgba(255, 255, 255, .10);
+      background: rgba(var(--line-rgb), .10);
       margin-top: 9px;
       cursor: pointer;
       position: relative;
@@ -2364,7 +2188,7 @@
       width: 0%;
       border-radius: 2px;
       background: linear-gradient(90deg, var(--pink-600), var(--pink-400));
-      box-shadow: 0 0 8px rgba(255, 61, 158, .6);
+      box-shadow: 0 0 8px rgba(var(--accent-rgb), .6);
     }
 
     .ptime {
@@ -2388,8 +2212,8 @@
       width: 34px;
       height: 34px;
       border-radius: 50%;
-      border: 1px solid rgba(255, 61, 158, .35);
-      background: rgba(255, 61, 158, .10);
+      border: 1px solid rgba(var(--accent-rgb), .35);
+      background: rgba(var(--accent-rgb), .10);
       color: var(--pink-200);
       font-size: 12px;
       line-height: 1;
@@ -2401,7 +2225,7 @@
     }
 
     .pbtn:hover {
-      background: rgba(255, 61, 158, .24);
+      background: rgba(var(--accent-rgb), .24);
       color: var(--white);
     }
 
@@ -2416,7 +2240,7 @@
       color: var(--white);
       background: linear-gradient(135deg, var(--pink-500), var(--pink-600));
       border: none;
-      box-shadow: 0 4px 16px rgba(255, 61, 158, .4);
+      box-shadow: 0 4px 16px rgba(var(--accent-rgb), .4);
     }
 
     .pbtn.main:hover {
@@ -2432,11 +2256,11 @@
 
       0%,
       100% {
-        box-shadow: 0 4px 16px rgba(255, 61, 158, .35);
+        box-shadow: 0 4px 16px rgba(var(--accent-rgb), .35);
       }
 
       50% {
-        box-shadow: 0 4px 26px rgba(255, 61, 158, .75);
+        box-shadow: 0 4px 26px rgba(var(--accent-rgb), .75);
       }
     }
 
@@ -2450,7 +2274,7 @@
       width: 22px;
       height: 20px;
       border-radius: 6px;
-      border: 1px solid rgba(255, 61, 158, .25);
+      border: 1px solid rgba(var(--accent-rgb), .25);
       background: transparent;
       color: var(--pink-200);
       font-size: 9px;
@@ -2459,7 +2283,21 @@
     }
 
     .pvol button:hover {
-      background: rgba(255, 61, 158, .18);
+      background: rgba(var(--accent-rgb), .18);
+    }
+
+    .pvol button:disabled {
+      opacity: .35;
+      cursor: default;
+      background: transparent;
+    }
+
+    .pvlvl {
+      width: 22px;
+      text-align: center;
+      font-size: 9px;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
     }
 
     /* ---------- reminder chip (top-left; shows saved count, tap to list) ---------- */
@@ -2471,13 +2309,14 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      background: rgba(255, 61, 158, .07);
-      border: 1px solid rgba(255, 61, 158, .28);
+      background: rgba(var(--accent-rgb), .07);
+      border: 1px solid rgba(var(--accent-rgb), .28);
       color: var(--pink-200);
       padding: 8px 14px;
       border-radius: 999px;
       font-size: 12px;
       letter-spacing: .02em;
+      -webkit-user-select: none;
       user-select: none;
       cursor: pointer;
       opacity: 0;
@@ -2567,10 +2406,10 @@
       z-index: 6;
       width: min(92vw, 420px);
       transform: translate(-50%, 24px) scale(.97);
-      background: rgba(11, 11, 14, .92);
-      border: 1px solid rgba(255, 61, 158, .3);
+      background: rgba(var(--surface-rgb), .92);
+      border: 1px solid rgba(var(--accent-rgb), .3);
       border-radius: 18px;
-      box-shadow: 0 18px 60px rgba(0, 0, 0, .6), 0 0 30px rgba(255, 61, 158, .12);
+      box-shadow: 0 18px 60px rgba(0, 0, 0, .6), 0 0 30px rgba(var(--accent-rgb), .12);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
       opacity: 0;
@@ -2603,7 +2442,7 @@
       width: 24px;
       height: 24px;
       border-radius: 50%;
-      border: 1px solid rgba(255, 61, 158, .35);
+      border: 1px solid rgba(var(--accent-rgb), .35);
       background: transparent;
       color: var(--muted);
       font-size: 12px;
@@ -2615,7 +2454,7 @@
     }
 
     .remHead .rh-close:hover {
-      background: rgba(255, 61, 158, .18);
+      background: rgba(var(--accent-rgb), .18);
       color: var(--white);
     }
 
@@ -2652,8 +2491,8 @@
       width: 34px;
       height: 34px;
       border-radius: 50%;
-      background: rgba(255, 61, 158, .1);
-      border: 1px solid rgba(255, 61, 158, .3);
+      background: rgba(var(--accent-rgb), .1);
+      border: 1px solid rgba(var(--accent-rgb), .3);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -2714,7 +2553,7 @@
       aspect-ratio: 1;
       transform: translate(-50%, -58%);
       border-radius: 50%;
-      background: radial-gradient(circle, rgba(255, 61, 158, .16), transparent 65%);
+      background: radial-gradient(circle, rgba(var(--accent-rgb), .16), transparent 65%);
       animation: glowPulse 2.8s ease-in-out infinite;
     }
 
@@ -2730,10 +2569,10 @@
       position: relative;
       max-width: min(84vw, 400px);
       padding: clamp(14px, 2.6vh, 20px) clamp(18px, 3.4vw, 26px);
-      background: linear-gradient(160deg, rgba(255, 61, 158, .16), rgba(255, 61, 158, .05));
-      border: 1px solid rgba(255, 61, 158, .45);
+      background: linear-gradient(160deg, rgba(var(--accent-rgb), .16), rgba(var(--accent-rgb), .05));
+      border: 1px solid rgba(var(--accent-rgb), .45);
       border-radius: 22px 22px 22px 6px;
-      box-shadow: 0 18px 50px rgba(0, 0, 0, .5), 0 0 34px rgba(255, 61, 158, .14);
+      box-shadow: 0 18px 50px rgba(0, 0, 0, .5), 0 0 34px rgba(var(--accent-rgb), .14);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
       min-height: 58px;
@@ -2827,7 +2666,7 @@
       padding: 6px;
       border-radius: 50%;
       background: var(--pink-500);
-      box-shadow: 0 0 18px rgba(255, 61, 158, .6);
+      box-shadow: 0 0 18px rgba(var(--accent-rgb), .6);
       opacity: 0;
       transform: rotate(45deg) scale(.4);
       transition: opacity .25s ease, transform .25s ease;
@@ -2901,13 +2740,14 @@
 
     .msg-close {
       position: absolute;
-      top: clamp(18px, 5vh, 40px);
+      top: 64px;
+      /* below the live / weather row */
       right: clamp(18px, 5vw, 40px);
       width: 42px;
       height: 42px;
       border-radius: 50%;
-      border: 1px solid rgba(255, 61, 158, .5);
-      background: rgba(11, 11, 14, .7);
+      border: 1px solid rgba(var(--accent-rgb), .5);
+      background: rgba(var(--surface-rgb), .7);
       color: var(--pink-300);
       font-size: 16px;
       cursor: pointer;
@@ -2920,7 +2760,7 @@
 
     .msg-close:hover {
       transform: scale(1.1);
-      box-shadow: 0 0 24px rgba(255, 61, 158, .4);
+      box-shadow: 0 0 24px rgba(var(--accent-rgb), .4);
     }
 
     .msg-close:active {
@@ -2945,14 +2785,16 @@
 
 <body>
   <div class="latency" id="latency"></div>
-  <div class="live" id="live"><span class="led"></span><span id="liveTxt">off</span></div>
-  <div class="weather loading" id="weather" title="tap to refresh">
-    <span class="wicon" id="wIcon">☁️</span>
-    <span class="wt" id="wTemp">--°</span>
-    <span class="wloc" id="wLoc">locating…</span>
+  <div class="topbar">
+    <div class="live" id="live"><span class="led"></span><span id="liveTxt">off</span></div>
+    <div class="weather loading" id="weather" title="tap to refresh">
+      <span class="wicon" id="wIcon">☁️</span>
+      <span class="wt" id="wTemp">--°</span>
+      <span class="wloc" id="wLoc">locating…</span>
+    </div>
   </div>
 
-  <!-- music player card (local MP3s from the music/ folder) -->
+  <!-- music player card (local MP3s from the data/music/ folder) -->
   <div class="player" id="player">
     <div class="pcov" id="pCover"><span class="ph">♪</span></div>
     <div class="pmeta">
@@ -2969,6 +2811,7 @@
       <button class="pbtn" id="pNext" title="next">⏭</button>
       <div class="pvol">
         <button id="pVolUp" title="volume up">▲</button>
+        <span class="pvlvl" id="pVolLvl" title="volume">80</span>
         <button id="pVolDn" title="volume down">▼</button>
       </div>
     </div>
@@ -2980,6 +2823,9 @@
     <span class="rcount" id="remCount">0</span>
     <span>reminders</span>
   </div>
+
+  <!-- pending alarms (one pill per alarm; tap a pill to cancel it) -->
+  <div class="alarmChip" id="alarmChip" aria-label="alarms"></div>
 
   <!-- reminder panel (slides up on LIST_REMINDERS or chip tap) -->
   <div class="remPanel" id="remPanel">
@@ -3008,8 +2854,8 @@
         <svg viewBox="0 0 200 200">
           <defs>
             <linearGradient id="tg" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stop-color="#ff9ecb" />
-              <stop offset="100%" stop-color="#f0128a" />
+              <stop offset="0%" style="stop-color: var(--pink-300)" />
+              <stop offset="100%" style="stop-color: var(--pink-600)" />
             </linearGradient>
           </defs>
           <circle class="ring-track" cx="100" cy="100" r="88" fill="none" stroke-width="6" />
@@ -3028,13 +2874,13 @@
     <div class="ac" id="ac">
       <div class="ac-unit">
         <svg class="ac-fan" viewBox="0 0 100 100" aria-hidden="true">
-          <g fill="none" stroke="#ff9ecb" stroke-width="5" stroke-linecap="round">
+          <g fill="none" style="stroke: var(--pink-300)" stroke-width="5" stroke-linecap="round">
             <path d="M50 50 C 50 30, 38 22, 30 26 C 24 30, 26 42, 50 50 Z" />
             <path d="M50 50 C 70 50, 78 38, 74 30 C 70 24, 58 26, 50 50 Z" />
             <path d="M50 50 C 50 70, 62 78, 70 74 C 76 70, 74 58, 50 50 Z" />
             <path d="M50 50 C 30 50, 22 62, 26 70 C 30 76, 42 74, 50 50 Z" />
           </g>
-          <circle cx="50" cy="50" r="7" fill="#ff3d9e" />
+          <circle cx="50" cy="50" r="7" style="fill: var(--pink-500)" />
         </svg>
         <div class="ac-screen"><span id="acTemp">22</span><span class="ac-deg">°C</span><span class="ac-mode"
             id="acMode">cool</span></div>
@@ -3046,34 +2892,8 @@
       <div class="ac-sub" id="acSub">cooling to 22°</div>
     </div>
 
-    <!-- color (hidden until a COLOR command runs) — a natural object per color -->
-    <div class="color" id="color">
-      <div class="c-col" id="colRed">
-        <div class="c-apple">
-          <div class="apple-body"><span class="apple-shine"></span></div>
-          <div class="apple-stem"></div>
-          <div class="apple-leaf"></div>
-        </div>
-      </div>
-      <div class="c-col" id="colGreen">
-        <div class="c-sprout">
-          <div class="sprout-soil"></div>
-          <div class="sprout-stem"></div>
-          <div class="sprout-leaf l"></div>
-          <div class="sprout-leaf r"></div>
-        </div>
-      </div>
-      <div class="c-col" id="colBlue">
-        <div class="c-drop">
-          <div class="drop-body"><span class="drop-shine"></span></div>
-        </div>
-        <div class="c-ripples">
-          <span class="ripple"></span><span class="ripple"></span><span class="ripple"></span>
-          <div class="drop-glow"></div>
-        </div>
-      </div>
-      <div class="c-sub" id="cSub">red</div>
-    </div>
+    <!-- theme sweep (COLOR command): the new color washes out from the center -->
+    <div class="theme-sweep" id="themeSweep"></div>
 
     <!-- phone (hidden until a CALL command runs) -->
     <div class="call" id="call">
@@ -3164,7 +2984,7 @@
     <div class="hint" id="hint">say “hey alexa” to begin</div>
   </main>
 
-  <button class="start" id="start"><span class="ring"></span><span id="startTxt">tap to listen</span></button>
+  <button class="start" id="start"><span class="start-dot"></span><span id="startTxt">tap to listen</span></button>
   <div class="toast" id="toast"></div>
 
   <script>
@@ -3172,7 +2992,7 @@
     /* =====================================================================
        tiny alexa — front end
        - Captures the mic, streams 16 kHz int16 PCM to a local WebSocket
-         server (server.py) which runs openWakeWord + the CRNN (crnn.onnx).
+         server (src/server.py) which runs openWakeWord + the TCN (models/TCN.onnx).
        - Renders a real-time, smooth pink sound-wave from the mic (AnalyserNode)
          and drives the whole state machine from server events.
        - Runs entirely offline once the server is up. No CDN, no external files.
@@ -3191,7 +3011,7 @@
       NEXT: "Skipping to the next song", VOLUME_UP: "Turning the volume up",
       VOLUME_DOWN: "Turning the volume down", LIGHT_ON: "Turning the lights on",
       LIGHT_OFF: "Turning the lights off", BRIGHTNESS: "Brightness set to {slot}",
-      COLOR: "Light color set to {slot}", TEMPERATURE: "Temperature set to {slot}",
+      COLOR: "Theme set to {slot}", TEMPERATURE: "Temperature set to {slot}",
       TIMER: "Timer started for {slot}", ALARM: "Alarm set for {slot}",
       CALL: "Starting a call", MESSAGE: "Sending a message",
       WEATHER: "{weather}", TIME: "It’s {slot}",
@@ -3211,7 +3031,9 @@
     /* ============================ STATE ============================ */
     let state = "idle";            // idle | awake | listening | result
     let ws = null, actx = null, analyser = null, freqData = null;
-    let pending = new Float32Array(0);
+    const pcmOut = new Int16Array(CHUNK); // one 80 ms chunk being filled
+    let pcmFill = 0;
+    let rsPos = 0, rsPrev = 0;     // resampler phase + last input sample, carried across blocks
     let energy = 0;                // 0=idle, 1=active (smoothed, drives waveform+color)
     let lastLatency = 0;
 
@@ -3221,6 +3043,8 @@
        WEATHER — open-meteo (free, open-source, no API key, CORS enabled)
        Browser calls the API directly; nothing touches the Pi's CPU.
        Location: browser Geolocation if allowed, else ipinfo.io (free, no key).
+       GPS coordinates are named via the server's /geo (OpenStreetMap
+       Nominatim), falling back to the IP city, then to the raw coordinates.
        ===================================================================== */
     const WEATHER_CODE = {
       0: ["clear sky", "☀️"], 1: ["mostly clear", "🌤️"], 2: ["partly cloudy", "⛅"], 3: ["overcast", "☁️"],
@@ -3245,20 +3069,39 @@
       if ("geolocation" in navigator) {
         const pos = await new Promise((res, rej) =>
           navigator.geolocation.getCurrentPosition(res, rej, { timeout: 4000, maximumAge: 600000 }));
-        return {
-          lat: pos.coords.latitude, lon: pos.coords.longitude,
-          place: "your location", via: "gps"
-        };
+        const lat = pos.coords.latitude, lon = pos.coords.longitude;
+        return { lat, lon, ...(await placeName(lat, lon)), via: "gps" };
       }
       throw new Error("no geolocation");
+    }
+    // "14.6507, 121.0316" -> {place: "Quezon City", full: "Quezon City, Metro Manila, Philippines"}
+    async function placeName(lat, lon) {
+      try {
+        const r = await fetch(`geo?lat=${lat.toFixed(5)}&lon=${lon.toFixed(5)}`,
+          { signal: AbortSignal.timeout(8000) });
+        const j = await r.json();
+        if (r.ok && j.place) {
+          return { place: j.place, full: [j.place, j.region, j.country].filter(Boolean).join(", ") };
+        }
+      } catch (e) { /* server offline / page opened from file:// */ }
+      try {
+        const ip = await getIpLocation();          // same city as the GPS fix, usually
+        if (Math.hypot(ip.lat - lat, ip.lon - lon) < 0.5) return { place: ip.place, full: ip.full };
+      } catch (e) { /* no network */ }
+      const deg = (v, pos, neg) => `${Math.abs(v).toFixed(2)}°${v >= 0 ? pos : neg}`;
+      const coords = `${deg(lat, "N", "S")}, ${deg(lon, "E", "W")}`;
+      return { place: coords, full: coords };
     }
     async function getIpLocation() {
       const r = await fetch("https://ipinfo.io/json", { signal: AbortSignal.timeout(4000) });
       if (!r.ok) throw new Error("ipinfo " + r.status);
       const j = await r.json();
       const [lat, lon] = String(j.loc || "").split(",").map(Number);
-      if (!lat || !lon) throw new Error("ipinfo no loc");
-      return { lat, lon, place: j.city || j.country || "your area", via: "ip" };
+      if (!Number.isFinite(lat) || !Number.isFinite(lon)) throw new Error("ipinfo no loc");
+      const place = j.city || j.region || j.country || "your area";
+      const full = [j.city, j.region, j.country].filter(Boolean)
+        .filter((v, i, a) => a.indexOf(v) === i).join(", ") || place;
+      return { lat, lon, place, full, via: "ip" };
     }
     async function fetchWeather() {
       if (wxBusy) return; wxBusy = true;
@@ -3280,12 +3123,12 @@
           temp: Math.round(c.temperature_2m), feels: Math.round(c.apparent_temperature),
           hum: c.relative_humidity_2m, wind: Math.round(c.wind_speed_10m),
           hi: Math.round(d.temperature_2m_max[0]), lo: Math.round(d.temperature_2m_min[0]),
-          place: loc.place, via: loc.via, tz: j.timezone
+          place: loc.place, full: loc.full || loc.place, via: loc.via, tz: j.timezone
         };
         wIconEl.textContent = wx.icon;
         wTempEl.textContent = wx.temp + "°";
         wLocEl.textContent = wx.place;
-        wEl.title = `${desc} · ${wx.temp}°C (feels ${wx.feels}°) · humidity ${wx.hum}% · wind ${wx.wind} km/h · high ${wx.hi}° low ${wx.lo}° · ${wx.tz}`;
+        wEl.title = `${wx.full} (${wx.via === "gps" ? "GPS" : "approx., from IP"}) · ${desc} · ${wx.temp}°C (feels ${wx.feels}°) · humidity ${wx.hum}% · wind ${wx.wind} km/h · high ${wx.hi}° low ${wx.lo}° · ${wx.tz}`;
         wEl.classList.remove("loading");
       } catch (e) {
         wIconEl.textContent = "🌐"; wTempEl.textContent = "--°";
@@ -3312,9 +3155,21 @@
     }
     window.addEventListener("resize", resize);
 
-    function hexA(hex, a) {
-      const n = parseInt(hex.slice(1), 16);
-      return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`;
+
+    // Byte spectrum -> NBARS heights in 0..1 over 0-4.8 kHz (the voice
+    // range), log-spaced so the low end gets more bars. `rate` is the
+    // analyser's sample rate: the spectrum spans 0..rate/2.
+    const BAR_MAX_HZ = 4800;
+    function spectrumToBars(spec, rate) {
+      const out = new Float32Array(NBARS);
+      const usable = Math.max(2, Math.floor(spec.length * Math.min(1, BAR_MAX_HZ / (rate / 2))));
+      for (let i = 0; i < NBARS; i++) {
+        const a = Math.floor(Math.pow(i / NBARS, 1.35) * (usable - 1));
+        const b = Math.max(a + 1, Math.floor(Math.pow((i + 1) / NBARS, 1.35) * (usable - 1)));
+        let sum = 0; for (let k = a; k < b; k++) sum += spec[k];
+        out[i] = Math.min(1, Math.pow((sum / (b - a)) / 255, 0.82) * 1.15);
+      }
+      return out;
     }
 
     function draw(t) {
@@ -3326,20 +3181,10 @@
       if (mMusicAn && mFreqData && mStarted && !player.paused) {
         // music is playing — the wave dances to the track
         mMusicAn.getByteFrequencyData(mFreqData);
-        freqData = mFreqData;
+        targets = spectrumToBars(mFreqData, musicCtx.sampleRate);
       } else if (analyser && (state === "awake" || state === "listening" || state === "result")) {
         analyser.getByteFrequencyData(freqData);
-        targets = new Float32Array(NBARS);
-        // use the lower ~60% of the spectrum (voice range), log-spaced bars
-        const usable = Math.floor(freqData.length * 0.6);
-        for (let i = 0; i < NBARS; i++) {
-          const a = Math.floor(Math.pow(i / NBARS, 1.35) * (usable - 1));
-          const b = Math.max(a + 1, Math.floor(Math.pow((i + 1) / NBARS, 1.35) * (usable - 1)));
-          let sum = 0; for (let k = a; k < b; k++) sum += freqData[k];
-          let v = (sum / (b - a)) / 255;
-          v = Math.pow(v, 0.82);
-          targets[i] = Math.min(1, v * 1.15);
-        }
+        targets = spectrumToBars(freqData, actx.sampleRate);
       } else {
         // idle: gentle breathing wave
         targets = new Float32Array(NBARS);
@@ -3367,8 +3212,8 @@
       const base = H * 0.5;
       const maxH = H * 0.46;
 
-      const topCol = hexA("#ff9ecb", 0.55 + 0.45 * energy);
-      const botCol = hexA("#f0128a", 0.35 + 0.55 * energy);
+      const topCol = rgbA(theme[300], 0.55 + 0.45 * energy);
+      const botCol = rgbA(theme[600], 0.35 + 0.55 * energy);
 
       ctx.lineCap = "round";
       for (let i = 0; i < NBARS; i++) {
@@ -3379,7 +3224,7 @@
         g.addColorStop(1, botCol);
         ctx.strokeStyle = g;
         ctx.lineWidth = bw;
-        ctx.shadowColor = hexA("#ff3d9e", 0.25 + 0.5 * energy);
+        ctx.shadowColor = rgbA(theme[500], 0.25 + 0.5 * energy);
         ctx.shadowBlur = (6 + 22 * energy) * Math.min(1, bars[i] + 0.15);
         ctx.beginPath();
         ctx.moveTo(x, base - h);
@@ -3391,7 +3236,7 @@
       // timer ring + aircon + color (share this rAF — no second loop)
       tickTimer();
       tickAc();
-      tickColor();
+      tickTheme(t);
       tickLamp();
       tickCall();
       tickAlarm();
@@ -3399,25 +3244,23 @@
 
       // latency readout
       if (DEBUG && lastLatency > 0)
-        latencyEl.textContent = `crnn ${lastLatency.toFixed(0)} ms   state ${state}`;
+        latencyEl.textContent = `tcn ${lastLatency.toFixed(0)} ms   state ${state}`;
     }
     requestAnimationFrame(draw);
 
     /* =====================================================================
-       REMINDERS  — persistent store (localStorage) + chip + slide-up panel
-       CREATE_REMINDER saves {task, ts}; LIST_REMINDERS pulls the list back.
-       Storage is per-browser (same origin = the Pi's IP:port), so reminders
-       survive reloads and Pi reboots. The panel animates in with staggered
-       rows; the chip's bell swings when a new reminder lands.
+       REMINDERS  — in-memory list + chip + slide-up panel
+       CREATE_REMINDER adds {task, ts}; LIST_REMINDERS shows the list.
+       The list lives only in this page, so every reload starts with no
+       reminders. The panel animates in with staggered rows; the chip's bell
+       swings when a new reminder lands.
        ===================================================================== */
-    const REM_KEY = "tiny-alexa.reminders.v1";
     let reminders = [];
-    try { reminders = JSON.parse(localStorage.getItem(REM_KEY) || "[]") || []; } catch (e) { reminders = []; }
+    // earlier versions kept reminders in localStorage; drop that copy
+    try { localStorage.removeItem("tiny-alexa.reminders.v1"); } catch (e) { }
 
     const remChip = el("remChip"), remCount = el("remCount"),
       remPanel = el("remPanel"), remList = el("remList"), remClose = el("remClose");
-
-    function saveReminders() { localStorage.setItem(REM_KEY, JSON.stringify(reminders)); }
 
     function fmtWhen(ts) {
       const d = new Date(ts), now = new Date();
@@ -3432,12 +3275,12 @@
     function updateRemChip() {
       remCount.textContent = reminders.length;
       remChip.classList.toggle("show", reminders.length > 0);
+      document.body.classList.toggle("has-reminders", reminders.length > 0);
     }
 
     function addReminder(task) {
       const t = String(task || "reminder").trim();
       reminders.unshift({ task: t, ts: Date.now() });   // newest first
-      saveReminders();
       updateRemChip();
       // chip pops in (or bumps), bell swings
       remChip.classList.remove("pop", "bell-swing");
@@ -3492,6 +3335,7 @@
 
     function onAwake() {
       state = "awake";
+      mDuck(true);                   // quieter music so the command is heard
       setPhrase(rand(WAKE_PHRASES), "wake");
       hintEl.textContent = "listening…";
       // brief wake beat, then settle into listening
@@ -3500,6 +3344,8 @@
 
     function onResult(r) {
       state = "result";
+      mDuck(false);
+      if (alarmFinishing) dismissAlarm();     // an alarm scene on its way out yields at once
       // a timer's "stopped" / "time's up" dismissal may still be pending — cancel
       // it now so this result owns the UI (otherwise the ring lingers behind it)
       let timerWasDismissal = false;
@@ -3519,9 +3365,22 @@
           const d = new Date();
           msg = "It’s " + d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
         }
+        if (r.intent === "ALARM" && !DEMO) {
+          const p = alarmPreview(r.slot);
+          const tomorrow = new Date(p.at).toDateString() !== new Date().toDateString();
+          msg = p.exists ? `Your ${p.t.label} alarm is already set`
+            : `Alarm set for ${p.t.label}${tomorrow ? " tomorrow" : ""} — in ${fmtIn(p.at - Date.now())}`;
+        }
+        if (r.intent === "VOLUME_UP" || r.intent === "VOLUME_DOWN") {
+          const up = r.intent === "VOLUME_UP", next = mNextVol(up);
+          msg = next === mVol ? (up ? `Volume is already at maximum (${mVolPct()}%)` : "Volume is already muted (0%)")
+            : next === 0 ? "Turning the volume down to 0% — muted"
+              : `Turning the volume ${up ? "up" : "down"} to ${Math.round(next * 100)}%`;
+          if (!mLoaded) msg += " — say “play music” to start a song";
+        }
         if (r.intent === "WEATHER") {
           if (wx) {
-            msg = `${wx.desc}, ${wx.temp}°C — feels like ${wx.feels}°, high ${wx.hi}° low ${wx.lo}°`;
+            msg = `${esc(wx.place)}: ${wx.desc}, ${wx.temp}°C — feels like ${wx.feels}°, high ${wx.hi}° low ${wx.lo}°`;
             holdMs = 5200;                       // weather line is longer; give it time to read
           } else {
             msg = "Checking the weather…";       // first fetch still in flight
@@ -3530,7 +3389,7 @@
           }
         }
         if (r.intent === "CREATE_REMINDER") {
-          const task = addReminder(r.slot);        // persist + swing the chip's bell
+          const task = addReminder(r.slot);        // add + swing the chip's bell
           msg = `Reminder set: ${task}`;
           holdMs = 3600;
         }
@@ -3580,21 +3439,23 @@
         dismissCall();
         dismissAlarm();
         dismissMessage();
-        const cn = String(r.slot || "").toLowerCase().trim();
-        setColor(cColors[cn] ? cn : "blue");
-        return;                       // skip the generic idle-reset
+        setTheme(String(r.slot || "").toLowerCase().trim());
       }
-      // ---- lights: the lamp owns the timing from here on ----
-      //      BRIGHTNESS carries a percent slot; LIGHT_ON / LIGHT_OFF are 100 / 0
-      if (r && ["BRIGHTNESS", "LIGHT_ON", "LIGHT_OFF"].includes(r.intent)) {
+      // ---- lights on / off: the whole UI turns light / dark ----
+      if (r && (r.intent === "LIGHT_ON" || r.intent === "LIGHT_OFF")) {
         dismissCall();
         dismissAlarm();
         dismissMessage();
-        let pct;
-        if (r.intent === "LIGHT_ON") pct = 100;
-        else if (r.intent === "LIGHT_OFF") pct = 0;
-        else { const bm = String(r.slot || "").match(/\d+/); pct = bm ? parseInt(bm[0], 10) : 60; }   // [0]: /\d+/ has no capture group
-        lampSetLevel(pct, r.slot);
+        dismissLamp();                               // a BRIGHTNESS lamp may still be up
+        setMode(r.intent === "LIGHT_ON");
+      }
+      // ---- brightness: the lamp owns the timing from here on ----
+      if (r && r.intent === "BRIGHTNESS") {
+        dismissCall();
+        dismissAlarm();
+        dismissMessage();
+        const bm = String(r.slot || "").match(/\d+/);   // [0]: /\d+/ has no capture group
+        lampSetLevel(bm ? parseInt(bm[0], 10) : 60, r.slot);
         return;                       // skip the generic idle-reset
       }
       // ---- call: the phone owns the timing from here on ----
@@ -3609,6 +3470,7 @@
       if (r && r.intent === "ALARM") {
         dismissCall();
         dismissAlarm();                           // re-arm: restart the sequence cleanly
+        if (!DEMO) scheduleAlarm(r.slot);         // the real, wall-clock alarm
         alarmStart(r.slot, DEMO);
         return;                       // skip the generic idle-reset
       }
@@ -3619,6 +3481,12 @@
         dismissMessage();                        // re-send: restart the sequence cleanly
         startMessage(DEMO);
         return;                       // skip the generic idle-reset
+      }
+      // ---- "pause" while the alarm rings = snooze (there's no snooze command) ----
+      if (r && r.intent === "PAUSE" && alarmActive && alarmPhase === "ringing") {
+        detailEl.innerHTML = `Snoozed <span class="tag">ALARM · ${esc(alarmLabel)}</span>`;
+        alarmSnooze();
+        return;
       }
       // ---- music intents: the player owns its own UI ----
       if (r && ["PLAY_MUSIC", "PAUSE", "NEXT", "VOLUME_UP", "VOLUME_DOWN"].includes(r.intent)) {
@@ -3633,6 +3501,7 @@
       //      generic "Stopped playback" line is suppressed when something
       //      was actually stopped. ----
       if (r && r.intent === "STOP") {
+        if (alarmActive && alarmPhase === "ringing") { alarmOff(); return; }
         if (mLoaded) { handleMusic("STOP"); holdMs = 2200; }
         else if (timerActive) { stopTimer("stopped"); return; }
         else if (timerWasDismissal) {                         // "time's up" window — treat as timer stop
@@ -3640,7 +3509,6 @@
           finishTimer(700); return;
         }
         else if (acActive) { finishAc(500); return; }
-        else if (colorActive) { finishColor(500); return; }
         else if (lampActive) { finishLamp(500); return; }
         else if (callActive) { hangUp(); return; }
         else if (alarmActive) { alarmOff(); return; }
@@ -3658,6 +3526,7 @@
 
     function onRejected(msg) {
       state = "result";
+      mDuck(false);
       setPhrase("Hmm?", "wake");
       detailEl.innerHTML = msg ? `<span style="color:var(--muted)">${esc(msg)}</span>` : "I didn’t catch that";
       detailEl.classList.add("show");
@@ -3825,7 +3694,7 @@
           s.style.setProperty("--airO", (warm ? 0.5 : 0.75).toFixed(2));
           if (warm) {  // heat: streaks rise from the air zone
             s.style.top = "auto"; s.style.bottom = "-34px";
-            s.style.background = "linear-gradient(0deg, rgba(255,61,158,.9), rgba(255,158,203,.35) 55%, transparent)";
+            s.style.background = "linear-gradient(0deg, rgba(var(--accent-rgb), .9), rgba(var(--accent-hi-rgb), .35) 55%, transparent)";
             s.style.animationName = "airRise";
           }
           acAirEl.appendChild(s);
@@ -3865,67 +3734,102 @@
     document.head.appendChild(acStyle);
 
     /* =====================================================================
-       COLOR  — a natural object per color (COLOR intent: red / green / blue)
-         red   -> a bobbing apple (with leaf + shine)
-         green -> a sprout that grows from the soil, leaves unfurl, then sway
-         blue  -> a raindrop bobbing over expanding ripples
-       Same scene contract as the aircon: the scene owns the hold time, then
-       fades back to idle; STOP dismisses it early.
+       THEME  — COLOR intent: "red" / "green" / "blue" retint the whole UI
+       Tweens every theme variable in :root (the 7 shades + rgb triplets the
+       CSS uses), so cards, glows, the wave and the buttons all shift
+       together, while a sweep of the new color washes out from the center.
+       The theme stays until another color is chosen (reload -> pink).
        ===================================================================== */
-    const colorEl = el("color"), cSubEl = el("cSub");
-    const cCols = { red: el("colRed"), green: el("colGreen"), blue: el("colBlue") };
-    const cColors = {
-      red: { rgb: [255, 77, 94], name: "red" },
-      green: { rgb: [61, 220, 132], name: "green" },
-      blue: { rgb: [61, 155, 255], name: "blue" },
+    const THEMES = {
+      pink: { 100: "#ffe1ef", 200: "#ffc2e0", 300: "#ff9ecb", 400: "#ff6fb5", 500: "#ff3d9e", 600: "#f0128a", 700: "#c4006e" },
+      red: { 100: "#ffe1e3", 200: "#ffc2c7", 300: "#ff9ea6", 400: "#ff6f7c", 500: "#ff3d50", 600: "#f01231", 700: "#c40021" },
+      green: { 100: "#dcfce9", 200: "#b9f7d3", 300: "#8cefb7", 400: "#5ce397", 500: "#2fd67b", 600: "#12b862", 700: "#00924c" },
+      blue: { 100: "#e1edff", 200: "#c2dbff", 300: "#9ec5ff", 400: "#6fa8ff", 500: "#3d8bff", 600: "#126cf0", 700: "#0052c4" },
     };
-    let colorActive = false, colorFinishing = false, colorFinishAt = 0, curColor = null;
-    const COLOR_HOLD_MS = 3400;   // how long the object stays on screen before it fades (ms)
-    const COLOR_FADE_MS = 1400;   // fade-out duration (ms)
+    const SHADES = [100, 200, 300, 400, 500, 600, 700];
+    const THEME_TWEEN_MS = 900;
+    const hexRgb = h => { const n = parseInt(h.slice(1), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; };
+    const rgbA = (c, a) => `rgba(${c[0] | 0},${c[1] | 0},${c[2] | 0},${a})`;
+    const paletteRgb = name => Object.fromEntries(SHADES.map(k => [k, hexRgb(THEMES[name][k])]));
 
-    function setColor(name) {
-      const c = cColors[name] || cColors.blue;
-      curColor = c;
-      Object.values(cCols).forEach(d => d.classList.remove("on"));
-      cCols[c.name].classList.add("on");
-      cSubEl.textContent = c.name;
-      cSubEl.style.color = `rgb(${c.rgb.join(",")})`;
-      cSubEl.style.textShadow = `0 0 18px rgba(${c.rgb.join(",")},.6)`;
-      colorActive = true;
-      colorFinishing = false;
-      clearTimeout(resultTimer);   // cancel any in-flight fade from a previous command
-      colorFinishAt = performance.now() + COLOR_HOLD_MS;
-      colorEl.classList.add("show");
-      document.body.classList.add("color-active", "busy");
+    // Light / dark mode (LIGHT_ON / LIGHT_OFF). `mode` runs 0 (dark) .. 1
+    // (light) and is tweened like the palette. In light mode the pale accent
+    // shades used for text (200 / 300) take deeper tones so they stay
+    // readable on white; glows keep the bright palette.
+    const MODES = {
+      dark: { bg: "#050506", bgSoft: "#0b0b0e", text: "#f6f6f8", muted: "#8b8b93", surface: "#09090b", line: "#ffffff" },
+      light: { bg: "#f3f3f6", bgSoft: "#ffffff", text: "#16161b", muted: "#6b6b75", surface: "#ffffff", line: "#000000" },
+    };
+    const MODE_TWEEN_MS = 1100;
+    const mixRgb = (a, b, k) => a.map((v, i) => v + (b[i] - v) * k);
+    const modeRgb = Object.fromEntries(Object.entries(MODES).map(([n, m]) =>
+      [n, Object.fromEntries(Object.entries(m).map(([k, h]) => [k, hexRgb(h)]))]));
+    let mode = 0, modeTween = null;
+
+    let themeName = "pink";
+    let theme = paletteRgb("pink");         // current (possibly mid-tween) colors; the wave reads this
+    let themeTween = null;
+    const sweepEl = el("themeSweep");
+
+    function paintTheme() {
+      const root = document.documentElement.style;
+      const D = modeRgb.dark, L = modeRgb.light;
+      for (const k of SHADES) {
+        // text shades darken toward 700 / 600 as the page turns light
+        const c = k === 200 ? mixRgb(theme[200], theme[700], mode)
+          : k === 300 || k === 400 ? mixRgb(theme[k], theme[600], mode) : theme[k];
+        root.setProperty(`--pink-${k}`, rgbA(c, 1));
+      }
+      root.setProperty("--bg", rgbA(mixRgb(D.bg, L.bg, mode), 1));
+      root.setProperty("--bg-soft", rgbA(mixRgb(D.bgSoft, L.bgSoft, mode), 1));
+      root.setProperty("--white", rgbA(mixRgb(D.text, L.text, mode), 1));
+      root.setProperty("--muted", rgbA(mixRgb(D.muted, L.muted, mode), 1));
+      root.setProperty("--surface-rgb", mixRgb(D.surface, L.surface, mode).map(v => v | 0).join(", "));
+      root.setProperty("--line-rgb", mixRgb(D.line, L.line, mode).map(v => v | 0).join(", "));
+      document.documentElement.style.colorScheme = mode > .5 ? "light" : "dark";
+      root.setProperty("--accent-rgb", theme[500].map(v => v | 0).join(", "));
+      root.setProperty("--accent-hi-rgb", theme[300].map(v => v | 0).join(", "));
+      root.setProperty("--accent-lo-rgb", theme[100].map(v => v | 0).join(", "));
     }
-    function tickColor() {
-      if (!colorActive || colorFinishing || !curColor) return;
-      const t = performance.now();
-      // ambient glow: the page breathes in the chosen color while the scene is up
-      const pulse = .10 + .05 * Math.sin(t / 650);
-      document.documentElement.style.setProperty("--glow", `rgba(${curColor.rgb.join(",")},${pulse.toFixed(3)})`);
-      if (t >= colorFinishAt) finishColor(COLOR_FADE_MS);   // one-shot: guard above stops re-arming
+    function setTheme(name) {
+      if (!THEMES[name]) return;
+      themeName = name;
+      const from = theme, to = paletteRgb(name), t0 = performance.now();
+      themeTween = { from, to, t0 };
+      // sweep in the new color, restarted even if the same color is asked twice
+      document.documentElement.style.setProperty("--sweep-rgb", to[500].join(", "));
+      sweepEl.classList.remove("go"); void sweepEl.offsetWidth; sweepEl.classList.add("go");
     }
-    function finishColor(fadeMs) {
-      if (colorFinishing) return;                          // tickColor fires every frame — arm the fade only once
-      colorFinishing = true;
-      clearTimeout(resultTimer);
-      resultTimer = setTimeout(() => {
-        colorEl.classList.remove("show");
-        Object.values(cCols).forEach(d => d.classList.remove("on"));
-        document.body.classList.remove("color-active");
-        document.documentElement.style.removeProperty("--glow");
-        phraseEl.classList.remove("show");
-        detailEl.classList.remove("show");
-        document.body.classList.remove("busy");
-        colorActive = false; colorFinishing = false; curColor = null;
-        state = "idle";
-        hintEl.textContent = "say “hey alexa” to begin";
-      }, fadeMs);
+    // LIGHT_ON -> light mode, LIGHT_OFF -> dark mode: light (or darkness)
+    // spreads from the center while every surface and text color blends over.
+    function setMode(light) {
+      const target = light ? 1 : 0;
+      modeTween = { from: mode, to: target, t0: performance.now() };
+      document.documentElement.style.setProperty("--sweep-rgb", light ? "255, 255, 255" : "0, 0, 0");
+      sweepEl.classList.remove("go"); void sweepEl.offsetWidth; sweepEl.classList.add("go");
+    }
+    function tickTheme(t) {
+      if (!themeTween && !modeTween) return;
+      if (themeTween) {
+        const { from, to, t0 } = themeTween;
+        const k = Math.min(1, (t - t0) / THEME_TWEEN_MS);
+        const e = 1 - Math.pow(1 - k, 3);               // ease-out cubic
+        theme = Object.fromEntries(SHADES.map(s => [s, mixRgb(from[s], to[s], e)]));
+        if (k === 1) themeTween = null;
+      }
+      if (modeTween) {
+        const { from, to, t0 } = modeTween;
+        const k = Math.min(1, (t - t0) / MODE_TWEEN_MS);
+        const e = k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;   // ease-in-out cubic
+        mode = from + (to - from) * e;
+        if (k === 1) modeTween = null;
+      }
+      paintTheme();
     }
 
     /* =====================================================================
-       LAMP  — pendant light for BRIGHTNESS / LIGHT_ON / LIGHT_OFF
+       LAMP  — pendant light for BRIGHTNESS (LIGHT_ON / LIGHT_OFF switch
+       the whole UI between light and dark mode instead — see setMode)
        Owns the UI the same way the timer ring and aircon do: it takes over
        the stage, tweens the level, then fades back to the idle wave.
        The glow is driven by a --lum custom property (0..1) set each frame.
@@ -3984,6 +3888,17 @@
       if (t < 1) lampEl.classList.add("igniting");
       else lampEl.classList.remove("igniting");
       if (performance.now() >= lampFinishAt) finishLamp(LAMP_FADE_MS);   // one-shot: guard above stops re-arming
+    }
+    // Take the lamp down immediately (no fade, no idle reset) when another
+    // command takes over the stage.
+    function dismissLamp() {
+      if (!lampActive) return;
+      clearInterval(lampRayTimer);
+      lampEl.classList.remove("show", "igniting");
+      lampRaysEl.innerHTML = "";
+      lampEl.style.setProperty("--lum", 0);
+      document.body.classList.remove("lamp-active");
+      lampActive = false; lampFinishing = false;
     }
     function finishLamp(holdMs) {
       if (lampFinishing) return;                           // tickLamp fires every frame — arm the fade only once
@@ -4143,6 +4058,17 @@
        Same scene contract as the call: owns the hold, one-shot fade,
        voice "stop" ends it early, the ✕ button does too, snooze restarts
        the ring after a short nap.
+
+       Real alarms (everything except ?demo): ALARM schedules a one-shot
+       alarm for the NEXT occurrence of the time — today if it's still
+       ahead, else tomorrow — and the clock only confirms it. Alarms are
+       saved in localStorage (a reload keeps them) and checked every second
+       against the wall clock, so a throttled background tab or a laptop
+       waking from sleep rings as soon as it runs again. The browser rings,
+       not the Pi, so the page has to stay open. Ringing lasts up to 10 min;
+       snooze ("snooze" button or "Alexa, pause") is 9 min; "Alexa, stop"
+       or ✕ turns it off. Pills in the top-left list pending alarms; tap one
+       to cancel it.
        ===================================================================== */
     const alarmEl = el("alarm"), alarmTimeEl = el("alarmTime"), alarmSubEl = el("alarmSub"),
       alarmHandH = el("alarmHandH"), alarmHandM = el("alarmHandM"),
@@ -4151,6 +4077,17 @@
     let alarmLabel = "", alarmHandsT0 = 0, alarmRingAt = 0, alarmFinishAt = 0, alarmSnoozeUntil = 0;
     const ALARM_SET_MS = 1500, ALARM_SNOOZE_MS = 2600, ALARM_FADE_MS = 1400;
     const ALARM_HOLD_MS = 5200, ALARM_HOLD_DEMO_MS = 6800;
+    const ALARM_SET_SHOW_MS = 3600;                   // "alarm set" confirmation on screen
+    const ALARM_RING_MAX_MS = 10 * 60 * 1000;         // like a phone: rings 10 min, then gives up
+    const ALARM_SNOOZE_REAL_MS = 9 * 60 * 1000;       // the classic 9-minute snooze
+    const ALARM_LATE_OK_MS = 10 * 60 * 1000;          // missed by more (page closed) -> dropped
+    const ALARMS_KEY = "tiny-alexa.alarms.v1";
+    const alarmChipEl = el("alarmChip");
+    let alarms = [];                                  // [{at: epoch ms, label: "6:00 AM", snoozed}]
+    try {
+      alarms = (JSON.parse(localStorage.getItem(ALARMS_KEY)) || [])
+        .filter(a => a && Number.isFinite(a.at) && typeof a.label === "string");
+    } catch (e) { alarms = []; }
 
     function parseAlarmTime(slot) {
       // "6 AM" / "6:30 pm" / "7" -> {h,m,ampm,label} ; falls back to 6:00 AM
@@ -4175,11 +4112,94 @@
       alarmHandH.style.transform = `rotate(${t.h * 30 + t.m * 0.5}deg)`;
       alarmHandM.style.transform = `rotate(${t.m * 6}deg)`;
     }
+    function saveAlarms() {
+      try { localStorage.setItem(ALARMS_KEY, JSON.stringify(alarms)); } catch (e) { }
+    }
+    function nextOccurrence(t, from = new Date()) {
+      const d = new Date(from);
+      d.setHours(t.h, t.m, 0, 0);
+      if (d.getTime() <= from.getTime()) d.setDate(d.getDate() + 1);   // already passed today
+      return d.getTime();
+    }
+    function fmtIn(ms) {
+      const mins = Math.max(1, Math.round(ms / 60000));
+      const h = Math.floor(mins / 60), m = mins % 60;
+      return h ? `${h} h${m ? ` ${m} min` : ""}` : `${m} min`;
+    }
+    const fmtClock = ts => new Date(ts).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+    // what ALARM would do, without doing it (the result line is built first)
+    function alarmPreview(slot) {
+      const t = parseAlarmTime(slot);
+      const same = alarms.find(a => !a.snoozed && a.label === t.label);
+      return { t, at: same ? same.at : nextOccurrence(t), exists: !!same };
+    }
+    function scheduleAlarm(slot) {
+      const p = alarmPreview(slot);
+      if (!p.exists) {
+        alarms.push({ at: p.at, label: p.t.label, snoozed: false });
+        saveAlarms();
+      }
+      renderAlarmChip();
+      return p;
+    }
+    function cancelAlarm(a, quiet) {
+      alarms = alarms.filter(x => x !== a);
+      saveAlarms();
+      renderAlarmChip();
+      if (!quiet) toast(`Alarm ${a.label} cancelled`, 1800);
+    }
+    function renderAlarmChip() {
+      alarms.sort((a, b) => a.at - b.at);
+      alarmChipEl.replaceChildren(...alarms.map(a => {
+        const b = document.createElement("button");   // DOM, not innerHTML, for the click handler
+        b.className = "apill";
+        b.innerHTML = `<span>⏰</span><span>${esc(a.label)}</span>`
+          + (a.snoozed ? `<span class="asn">snoozed · ${esc(fmtClock(a.at))}</span>` : "")
+          + `<span class="ax">✕</span>`;
+        const tip = () => { b.title = `rings in ${fmtIn(a.at - Date.now())} — tap to cancel`; };
+        tip();
+        b.addEventListener("mouseenter", tip);
+        b.addEventListener("click", e => { e.stopPropagation(); cancelAlarm(a); });
+        return b;
+      }));
+      alarmChipEl.classList.toggle("show", alarms.length > 0);
+    }
+    function checkAlarms() {
+      const now = Date.now();
+      const due = alarms.filter(a => a.at <= now);
+      if (!due.length) return;
+      alarms = alarms.filter(a => a.at > now);         // one-shot: a rung alarm is done
+      saveAlarms();
+      renderAlarmChip();
+      due.filter(a => now - a.at > ALARM_LATE_OK_MS)
+        .forEach(a => toast(`Missed alarm ${a.label} — the page wasn't open`, 4000));
+      const ring = due.filter(a => now - a.at <= ALARM_LATE_OK_MS).pop();
+      if (ring) alarmRing(ring.label);
+    }
+    function alarmRing(label) {
+      // the alarm takes the stage from any other scene
+      dismissCall(); dismissMessage(); dismissAlarm();
+      alarmLabel = label;
+      alarmTimeEl.textContent = label;
+      alarmSubEl.textContent = `ringing — ${label}`;
+      alarmActive = true; alarmFinishing = false; alarmPhase = "ringing";
+      clearTimeout(resultTimer);
+      alarmEl.classList.remove("show", "ringing", "snoozed", "off");
+      void alarmEl.offsetWidth;
+      alarmSetHands(parseAlarmTime(label));
+      alarmEl.classList.add("show", "ringing");
+      document.body.classList.add("alarm-active", "busy");
+      alarmFinishAt = performance.now() + ALARM_RING_MAX_MS;
+      mDuck(true);                                      // music steps back for the alarm
+      alarmTone("ring");
+    }
+
     function alarmStart(slot, demo) {
       const t = parseAlarmTime(slot);
       alarmLabel = t.label;
       alarmTimeEl.textContent = alarmLabel;
-      alarmSubEl.textContent = `alarm set for ${alarmLabel}`;
+      alarmSubEl.textContent = demo ? `alarm set for ${alarmLabel}`
+        : `rings in ${fmtIn(alarmPreview(slot).at - Date.now())}`;
       alarmActive = true; alarmFinishing = false; alarmPhase = "set";
       clearTimeout(resultTimer);                    // cancel any in-flight fade
       alarmEl.classList.remove("show", "ringing", "snoozed", "off");
@@ -4192,6 +4212,10 @@
       alarmRingAt = performance.now() + ALARM_SET_MS;
       alarmFinishAt = performance.now() + (demo ? ALARM_HOLD_DEMO_MS : ALARM_HOLD_MS);
       requestAnimationFrame(() => requestAnimationFrame(() => alarmSetHands(t)));
+      if (!demo) {                                     // real alarm: confirm, don't ring
+        alarmRingAt = Infinity;
+        finishAlarm(ALARM_SET_SHOW_MS);
+      }
     }
     function tickAlarm() {
       if (!alarmActive || alarmFinishing) return;
@@ -4220,12 +4244,29 @@
       alarmEl.classList.remove("ringing");
       alarmEl.classList.add("snoozed");
       alarmSubEl.textContent = `snoozed — ${alarmLabel}`;
+      if (!DEMO) {                                     // real snooze: ring again in 9 min
+        const at = Date.now() + ALARM_SNOOZE_REAL_MS;
+        alarms.push({ at, label: alarmLabel, snoozed: true });
+        saveAlarms();
+        renderAlarmChip();
+        alarmSubEl.textContent = `snoozed until ${fmtClock(at)}`;
+        alarmTone("snooze");
+        mDuck(false);
+        finishAlarm(2600);
+        return;
+      }
       alarmSnoozeUntil = performance.now() + ALARM_SNOOZE_MS;
       alarmFinishAt = Math.max(alarmFinishAt, alarmSnoozeUntil + 2500);
       alarmTone("snooze");
     }
     function alarmOff() {
       if (!alarmActive || alarmPhase === "off") return;
+      if (alarmPhase === "set") {                      // just the confirmation: close it
+        alarmFinishing = false;
+        finishAlarm(200);
+        return;
+      }
+      mDuck(false);
       alarmPhase = "off";
       alarmEl.classList.remove("ringing", "snoozed");
       alarmEl.classList.add("off");
@@ -4239,7 +4280,8 @@
     /* silent, instant teardown — used when another command supersedes the alarm */
     function dismissAlarm() {
       if (!alarmActive) return;
-      alarmActive = false; alarmPhase = "";
+      alarmActive = false; alarmFinishing = false; alarmPhase = "";
+      clearTimeout(resultTimer);                      // its fade would idle the next scene
       stopAlarmTone();
       alarmEl.classList.remove("show", "ringing", "snoozed", "off");
       document.body.classList.remove("alarm-active");
@@ -4263,25 +4305,32 @@
     /* twin-bell tone — two detuned metallic partials, pulsing like a real bell */
     let alarmToneTimer = null, alarmToneNodes = [];
     function alarmTone(kind) {
-      if (!actx) return;                              // no audio context in demo mode
+      // the mic context if it's running, else the music one (an alarm can ring
+      // before the mic is started; it becomes audible after the first tap)
+      const ctx = actx || ensureMusicCtx();
+      if (!ctx) return;
       stopAlarmTone();
       const strike = (vol, dur) => {
-        const t0 = actx.currentTime;
+        const t0 = ctx.currentTime;
         [1567.98, 2093.0, 2637.02].forEach((f, i) => {   // G6 + partials
-          const o = actx.createOscillator(), g = actx.createGain();
+          const o = ctx.createOscillator(), g = ctx.createGain();
           o.type = "sine"; o.frequency.value = f;
           const v = vol / [1, 0.55, 0.3][i];
           g.gain.setValueAtTime(0.0001, t0);
           g.gain.exponentialRampToValueAtTime(v, t0 + 0.012);
           g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
-          o.connect(g).connect(actx.destination);
+          o.connect(g).connect(ctx.destination);
           o.start(t0); o.stop(t0 + dur + 0.05);
           alarmToneNodes.push(o);
         });
       };
       if (kind === "ring") {
         strike(0.16, 0.5);
-        alarmToneTimer = setInterval(() => { if (!alarmActive) return stopAlarmTone(); strike(0.16, 0.5); }, 700);
+        alarmToneTimer = setInterval(() => {
+          if (!alarmActive) return stopAlarmTone();
+          if (state === "awake" || state === "listening") return;   // hush: let the command be heard
+          strike(0.16, 0.5);
+        }, 700);
       }
       else if (kind === "snooze") { strike(0.10, 0.7); }
       else if (kind === "off") { strike(0.13, 0.8); }     // one final "clink"
@@ -4292,7 +4341,16 @@
       alarmToneNodes = [];
     }
     alarmSnoozeBtn.addEventListener("click", e => { e.stopPropagation(); alarmSnooze(); });
-    alarmStopBtn.addEventListener("click", e => { e.stopPropagation(); if (alarmActive) alarmOff(); else finishAlarm(300); });
+    alarmStopBtn.addEventListener("click", e => {
+      e.stopPropagation();
+      if (alarmActive && alarmPhase === "set" && !DEMO) {    // ✕ on the confirmation = cancel it
+        const a = alarms.find(x => !x.snoozed && x.label === alarmLabel);
+        if (a) cancelAlarm(a);
+      }
+      if (alarmActive) alarmOff(); else finishAlarm(300);
+    });
+    renderAlarmChip();
+    setInterval(checkAlarms, 1000);                   // wall-clock check (see the header above)
 
     function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
 
@@ -4436,7 +4494,7 @@
     });
 
     /* =====================================================================
-       MUSIC  — local MP3 player (music/ folder, served by server.py)
+       MUSIC  — local MP3 player (data/music/ folder, served by server.py at /music)
        Track list + ID3 metadata + album art come from GET /music.
        The audio itself plays in the browser's <audio> element, so the Pi's
        CPU only serves small static files — zero decoding cost.
@@ -4444,16 +4502,39 @@
        PAUSE       -> pause / resume (toggle)
        STOP        -> stop and hide the card
        NEXT        -> next track (PREV = previous)
-       VOLUME_*    -> nudge the player volume
+       VOLUME_*    -> volume in 50% steps (100 -> 50 -> 0 = muted), remembered across reloads;
+                      music is ducked to 25% while a command is being spoken
        ===================================================================== */
     const pEl = el("player"), pCover = el("pCover"), pTitle = el("pTitle"), pArtist = el("pArtist"),
       pBar = el("pBar"), pFill = el("pFill"), pCur = el("pCur"), pDur = el("pDur"),
       pPlay = el("pPlay"), pPrev = el("pPrev"), pNext = el("pNext"),
-      pVolUp = el("pVolUp"), pVolDn = el("pVolDn");
+      pVolUp = el("pVolUp"), pVolDn = el("pVolDn"), pVolLvl = el("pVolLvl");
     const player = new Audio();
     player.preload = "auto";
-    let mTracks = [], mIdx = -1, mVol = .8, mStarted = false, mLoaded = false;
-    let mMusicSrc = null, mMusicAn = null, mFreqData = null;
+    // v2 key: levels saved by the old 10%-step version (e.g. 0.8) aren't on the 50% grid
+    const VOL_KEY = "tiny-alexa.volume.v2", VOL_STEP = .5, VOL_MIN = 0, VOL_MAX = 1, DUCK = .25;
+    let mTracks = [], mIdx = -1, mVol = 1, mStarted = false, mLoaded = false;
+    let mDucked = false;
+    // clamp + round to the step grid, so the level is always 0, 50 or 100%
+    function mSnapVol(v) {
+      return Math.max(VOL_MIN, Math.min(VOL_MAX, Math.round(v / VOL_STEP) * VOL_STEP));
+    }
+    try {
+      const v = parseFloat(localStorage.getItem(VOL_KEY));
+      if (v >= VOL_MIN && v <= VOL_MAX) mVol = mSnapVol(v);
+    } catch (e) { }
+    let mMusicSrc = null, mMusicAn = null, mMusicGain = null, mFreqData = null;
+    // Music gets its own AudioContext at the device's native rate (usually
+    // 48 kHz). The mic context runs at 16 kHz for the model; playing songs
+    // through it would cut everything above 8 kHz and sound muffled.
+    let musicCtx = null;
+    function ensureMusicCtx() {
+      if (!musicCtx) {
+        try { musicCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { }
+      }
+      if (musicCtx && musicCtx.state === "suspended") musicCtx.resume().catch(() => { });
+      return musicCtx;
+    }
 
     /* --- Autoplay unlock ----------------------------------------------------
        Browsers (Safari especially) reject programmatic play() until the element
@@ -4469,6 +4550,7 @@
       playerUnlocked = true;
       try {
         if (actx && actx.state === "suspended") actx.resume().catch(() => { });
+        ensureMusicCtx();                   // create + start it inside the gesture
         if (!player.src) player.src = "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQAAAAA=";
         const p = player.play();
         if (p && p.then) p.then(() => { try { player.pause(); } catch (e) { } }, () => { });
@@ -4498,8 +4580,11 @@
         pTitle.style.animation = "none"; void pTitle.offsetWidth; pTitle.style.animation = "";
         pArtist.style.animation = "none"; void pArtist.offsetWidth; pArtist.style.animation = "";
       }
-      if (t.cover) {
-        pCover.innerHTML = `<img src="${t.cover}?v=${encodeURIComponent(t.file)}" alt="">`;
+      if (t.cover) {                                 // DOM, not innerHTML: names come from the filesystem
+        const img = new Image();
+        img.alt = "";
+        img.src = t.cover.split("/").map(encodeURIComponent).join("/") + "?v=" + encodeURIComponent(t.file);
+        pCover.replaceChildren(img);
       } else {
         pCover.innerHTML = `<span class="ph">♪</span>`;
       }
@@ -4510,28 +4595,39 @@
       if (mTracks.length) return mTracks;
       try {
         const r = await fetch("music", { signal: AbortSignal.timeout(6000) });
+        if (!r.ok) throw new Error("music " + r.status);
         mTracks = (await r.json()).tracks || [];
       } catch (e) { console.warn("music list fetch failed", e); mTracks = []; }
       return mTracks;
     }
     function mWireMusicGraph() {
-      // Route <audio> through the shared AudioContext so the wave can react
-      // to the music. Done once; MediaElementSource can only be created once
-      // per element.
-      if (mMusicSrc || !actx) return;
+      // Route <audio> through the music context so the wave can react to
+      // the song. Done once; MediaElementSource can only be created once per
+      // element, and from then on the element is silent unless the context
+      // runs — so only wire it once the context is actually running (it
+      // starts on the first tap); until then the element plays directly.
+      if (mMusicSrc) return;
+      const ctx = ensureMusicCtx();
+      if (!ctx || ctx.state !== "running") return;
       try {
-        mMusicSrc = actx.createMediaElementSource(player);
-        mMusicAn = actx.createAnalyser();
-        mMusicAn.fftSize = 512;
+        mMusicSrc = ctx.createMediaElementSource(player);
+        mMusicAn = ctx.createAnalyser();
+        mMusicAn.fftSize = 2048;               // ~43 ms at 48 kHz, like the mic analyser's window
         mMusicAn.smoothingTimeConstant = 0.5;
         mFreqData = new Uint8Array(mMusicAn.frequencyBinCount);
+        // gain after the analyser: the wave keeps reacting even when quiet.
+        // A GainNode also works on iOS, where <audio>.volume is read-only.
+        mMusicGain = ctx.createGain();
         mMusicSrc.connect(mMusicAn);
-        mMusicAn.connect(actx.destination);
+        mMusicAn.connect(mMusicGain);
+        mMusicGain.connect(ctx.destination);
+        player.volume = 1;                     // the gain node owns the level now
+        mApplyVol(true);
       } catch (e) { console.warn("music graph:", e); }
     }
     async function mPlayTrack(i) {
       if (!mTracks.length) mTracks = await mEnsureTracks();
-      if (!mTracks.length) { toast("no tracks in music/ yet", 2400); return; }
+      if (!mTracks.length) { toast("no tracks in data/music/ yet", 2400); return; }
       mIdx = ((i % mTracks.length) + mTracks.length) % mTracks.length;
       const t = mTracks[mIdx];
       player.src = "music/" + encodeURIComponent(t.file);
@@ -4541,7 +4637,7 @@
       mRenderTrack(true);
       mWireMusicGraph();
       try {
-        if (actx && actx.state === "suspended") await actx.resume();
+        if (musicCtx && musicCtx.state === "suspended") await musicCtx.resume();
         await player.play();
       } catch (e) { toast("tap the ▶ on the player card, then say “play music” again", 3200); }
       mUI();
@@ -4549,7 +4645,7 @@
     function mToggle() {
       if (!mLoaded) { mPlayTrack(0); return; }
       if (player.paused) {
-        if (actx && actx.state === "suspended") actx.resume().catch(() => { });
+        if (musicCtx && musicCtx.state === "suspended") musicCtx.resume().catch(() => { });
         player.play().catch(() => { });
       } else player.pause();
       mUI();
@@ -4562,10 +4658,33 @@
       mHideCard();
       mUI();
     }
-    function mSetVol(v) {
-      mVol = Math.max(.05, Math.min(1, v));
-      player.volume = mVol;
-      toast("volume " + Math.round(mVol * 100) + "%", 1200);
+    const mVolPct = () => Math.round(mVol * 100);
+    const mNextVol = up => mSnapVol(mVol + (up ? VOL_STEP : -VOL_STEP));
+    function mApplyVol(instant) {
+      const level = mVol * (mDucked ? DUCK : 1);
+      if (mMusicGain) {
+        const now = musicCtx.currentTime;
+        mMusicGain.gain.cancelScheduledValues(now);
+        if (instant) mMusicGain.gain.setValueAtTime(level, now);
+        else mMusicGain.gain.setTargetAtTime(level, now, .08);   // smooth: no clicks
+      } else {
+        player.volume = level;
+      }
+      pVolLvl.textContent = mVolPct();
+      pVolUp.disabled = mVol >= VOL_MAX;
+      pVolDn.disabled = mVol <= VOL_MIN;
+    }
+    function mSetVol(v, quiet) {
+      mVol = mSnapVol(v);
+      try { localStorage.setItem(VOL_KEY, String(mVol)); } catch (e) { }
+      mApplyVol(false);
+      if (!quiet) toast("volume " + mVolPct() + "%", 1200);
+    }
+    function mDuck(on) {
+      if (mDucked === on) return;
+      mDucked = on;
+      if (mLoaded && !player.paused) mApplyVol(false);
+      else mApplyVol(true);
     }
     function handleMusic(intent) {
       switch (intent) {
@@ -4586,8 +4705,9 @@
           if (!mTracks.length) { mPlayTrack(0); break; }
           mPlayTrack(mIdx + 1);
           break;
-        case "VOLUME_UP": mSetVol(mVol + .15); break;
-        case "VOLUME_DOWN": mSetVol(mVol - .15); break;
+        // the result line already says the new level, so no toast here
+        case "VOLUME_UP": mSetVol(mNextVol(true), true); break;
+        case "VOLUME_DOWN": mSetVol(mNextVol(false), true); break;
       }
     }
     player.addEventListener("loadedmetadata", () => {
@@ -4603,8 +4723,9 @@
     pPlay.addEventListener("click", e => { e.stopPropagation(); mToggle(); });
     pNext.addEventListener("click", e => { e.stopPropagation(); mPlayTrack(mIdx + 1); });
     pPrev.addEventListener("click", e => { e.stopPropagation(); mPlayTrack(mIdx - 1); });
-    pVolUp.addEventListener("click", e => { e.stopPropagation(); mSetVol(mVol + .15); });
-    pVolDn.addEventListener("click", e => { e.stopPropagation(); mSetVol(mVol - .15); });
+    pVolUp.addEventListener("click", e => { e.stopPropagation(); mSetVol(mNextVol(true)); });
+    pVolDn.addEventListener("click", e => { e.stopPropagation(); mSetVol(mNextVol(false)); });
+    mApplyVol(true);                       // the saved level applies from the first song
     pBar.addEventListener("click", e => {
       e.stopPropagation();
       if (!isFinite(player.duration) || !player.duration) return;
@@ -4616,29 +4737,48 @@
     /* =====================================================================
        MIC CAPTURE  — AudioWorklet (fallback: ScriptProcessor)
        ===================================================================== */
-    function resampleTo16k(input, inRate) {
-      if (inRate === SR) return input;
-      const ratio = inRate / SR, outLen = Math.floor(input.length / ratio);
-      const out = new Float32Array(outLen);
-      for (let i = 0; i < outLen; i++) {
-        const pos = i * ratio, i0 = pos | 0, i1 = Math.min(i0 + 1, input.length - 1), f = pos - i0;
-        out[i] = input[i0] * (1 - f) + input[i1] * f;
-      }
-      return out;
-    }
-    function pushSamples(f32) {
-      pending = concat(pending, f32);
-      while (pending.length >= CHUNK) {
-        const c = pending.subarray(0, CHUNK);
-        const i16 = new Int16Array(CHUNK);
-        for (let i = 0; i < CHUNK; i++) { const s = Math.max(-1, Math.min(1, c[i])); i16[i] = s < 0 ? s * 0x8000 : s * 0x7fff; }
-        pending = pending.subarray(CHUNK);
-        if (ws && ws.readyState === 1) ws.send(i16.buffer);
+    function pushSample(x) {
+      const s = Math.max(-1, Math.min(1, x));
+      pcmOut[pcmFill++] = s < 0 ? s * 0x8000 : s * 0x7fff;
+      if (pcmFill === CHUNK) {
+        pcmFill = 0;
+        if (ws && ws.readyState === 1) ws.send(pcmOut);   // send() copies the bytes
       }
     }
-    function concat(a, b) { const o = new Float32Array(a.length + b.length); o.set(a); o.set(b, a.length); return o; }
+    // Mic blocks (128 samples from the worklet) -> 16 kHz int16 chunks of CHUNK.
+    // Most browsers honour the 16 kHz AudioContext; when one doesn't, resample
+    // with linear interpolation whose phase carries across blocks (resampling
+    // each block on its own would put a click at every block boundary).
+    function onMicBlock(input, inRate) {
+      if (inRate === SR) { for (let i = 0; i < input.length; i++) pushSample(input[i]); return; }
+      const step = inRate / SR;
+      // rsPos indexes [rsPrev, ...input]: 0 = last sample of the previous block
+      for (; rsPos < input.length; rsPos += step) {
+        const i0 = rsPos | 0, f = rsPos - i0;
+        const a = i0 === 0 ? rsPrev : input[i0 - 1], b = input[i0];
+        pushSample(a + (b - a) * f);
+      }
+      rsPos -= input.length;
+      rsPrev = input[input.length - 1];
+    }
+
+    // Turn getUserMedia / setup failures into something the user can act on.
+    function micErrorMessage(err) {
+      if (!window.isSecureContext || !navigator.mediaDevices)
+        return "the browser only allows the mic on https:// or http://localhost — open this page on the Pi itself, or via an https proxy";
+      switch (err && err.name) {
+        case "NotAllowedError": case "SecurityError":
+          return "microphone permission was blocked — allow it in the address bar, then tap to retry";
+        case "NotFoundError": case "OverconstrainedError":
+          return "no microphone found — plug one in, then tap to retry";
+        case "NotReadableError": case "AbortError":
+          return "the microphone is busy in another app — close it, then tap to retry";
+      }
+      return "microphone unavailable: " + ((err && err.message) || err);
+    }
 
     async function startMic() {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) throw new Error("insecure context");
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: {
           echoCancellation: true, noiseSuppression: true, autoGainControl: true, channelCount: 1
@@ -4661,19 +4801,23 @@
         await actx.audioWorklet.addModule(url);
         const node = new AudioWorkletNode(actx, "miccap");
         src.connect(node);
-        node.port.onmessage = e => pushSamples(resampleTo16k(e.data, actx.sampleRate));
+        node.port.onmessage = e => onMicBlock(e.data, actx.sampleRate);
       } else {
         const sp = actx.createScriptProcessor(2048, 1, 1);
         const mute = actx.createGain(); mute.gain.value = 0;
         src.connect(sp); sp.connect(mute); mute.connect(actx.destination);
-        sp.onaudioprocess = e => pushSamples(resampleTo16k(e.inputBuffer.getChannelData(0), actx.sampleRate));
+        sp.onaudioprocess = e => onMicBlock(e.inputBuffer.getChannelData(0), actx.sampleRate);
       }
     }
 
     /* =====================================================================
        WEBSOCKET  — talk to server.py
        ===================================================================== */
+    // Reconnects with backoff (1 s -> 10 s), so restarting server.py on the Pi
+    // doesn't need a page reload.
+    let wsRetryMs = 1000, wsRetryTimer = null, wsWasUp = false;
     function connectWS() {
+      clearTimeout(wsRetryTimer);
       const proto = location.protocol === "https:" ? "wss" : "ws";
       ws = new WebSocket(`${proto}://${location.host}/ws`);
       ws.binaryType = "arraybuffer";
@@ -4681,6 +4825,8 @@
         liveEl.classList.add("show", "on"); liveTxt.textContent = "live";
         ws.send(String(SR));                 // tell server the rate of incoming PCM
         setLive(true);
+        if (wsWasUp) toast("reconnected", 1400);
+        wsWasUp = true; wsRetryMs = 1000;
       };
       ws.onmessage = ev => {
         if (typeof ev.data !== "string") return;
@@ -4690,22 +4836,56 @@
           case "awake": onAwake(); break;
           case "result": lastLatency = m.latency_ms || 0; onResult(m); break;
           case "rejected": onRejected(m.message); break;
-          case "idle": if (state !== "idle" && !timerActive) {
-            state = "idle"; phraseEl.classList.remove("show");
-            detailEl.classList.remove("show"); document.body.classList.remove("busy");
-            hintEl.textContent = "say “hey alexa” to begin";
-          } break;
+          case "idle": mDuck(false); if (state !== "idle" && !timerActive) backToIdle(); break;
           case "error": toast(m.message, 2600); break;
         }
       };
-      ws.onclose = () => { setLive(false); if (!DEMO) toast("server disconnected — is server.py running?", 4000); };
-      ws.onerror = () => { if (!DEMO) toast("couldn’t reach server.py", 3000); };
+      ws.onclose = () => {
+        setLive(false);
+        if (state === "awake" || state === "listening") backToIdle();   // command was cut off
+        if (wsRetryMs === 1000) toast("server disconnected — is server.py running? retrying…", 4000);
+        wsRetryTimer = setTimeout(connectWS, wsRetryMs);
+        wsRetryMs = Math.min(wsRetryMs * 2, 10000);
+      };
+    }
+    function backToIdle() {
+      mDuck(false);
+      state = "idle"; phraseEl.classList.remove("show");
+      detailEl.classList.remove("show"); document.body.classList.remove("busy");
+      hintEl.textContent = "say “hey alexa” to begin";
     }
     function setLive(on) { liveEl.classList.toggle("on", on); liveTxt.textContent = on ? "live" : "off"; }
 
     /* =====================================================================
        BOOT
        ===================================================================== */
+    /* ---- bottom dock: player, start pill, reminders panel and toast all
+       live at bottom-center. Stack whichever are showing (bottom -> top)
+       instead of letting them overlap; re-run whenever one shows, hides or
+       changes size. Hidden ones park where they would appear. ---- */
+    const DOCK = [
+      { el: pEl, on: () => pEl.classList.contains("show") },
+      { el: startBtn, on: () => !startBtn.classList.contains("hidden") },
+      { el: remPanel, on: () => remPanel.classList.contains("show") },
+      { el: toastEl, on: () => toastEl.classList.contains("show") },
+    ];
+    const DOCK_GAP = 12;
+    DOCK.forEach(d => { d.base = parseFloat(getComputedStyle(d.el).bottom) || 20; });
+    function layoutDock() {
+      let y = 0;
+      for (const d of DOCK) {
+        const bottom = Math.max(d.base, y);
+        d.el.style.bottom = bottom + "px";
+        if (d.on()) y = bottom + d.el.offsetHeight + DOCK_GAP;
+      }
+    }
+    {
+      const mo = new MutationObserver(layoutDock), ro = new ResizeObserver(layoutDock);
+      DOCK.forEach(d => { mo.observe(d.el, { attributes: true, attributeFilter: ["class"] }); ro.observe(d.el); });
+      addEventListener("resize", layoutDock);
+      layoutDock();
+    }
+
     function toast(msg, ms = 2000) {
       toastEl.textContent = msg; toastEl.classList.add("show");
       clearTimeout(toast._t); toast._t = setTimeout(() => toastEl.classList.remove("show"), ms);
@@ -4720,15 +4900,22 @@
         demoLoop();
         return;
       }
+      if (location.protocol === "file:") {
+        // opened straight from disk: there's no server to stream audio to
+        toast("start the server (python3 src/server.py) and open http://localhost:8321 — or add ?demo to preview", 6000);
+        startBtn.classList.remove("hidden");
+        return;
+      }
       try {
         startTxt.textContent = "starting…";
         await startMic();
-        connectWS();
-        hintEl.textContent = "say “hey alexa” to begin";
       } catch (err) {
-        toast("microphone unavailable: " + err.message, 4000);
+        toast(micErrorMessage(err), 6000);
         startBtn.classList.remove("hidden"); startTxt.textContent = "tap to retry";
+        return;
       }
+      connectWS();
+      hintEl.textContent = "say “hey alexa” to begin";
     }
 
     function demoLoop() {

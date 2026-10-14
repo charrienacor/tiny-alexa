@@ -1,41 +1,43 @@
 test utterances: 1789
 
-best epoch: 28   val acc: 97.56%   (from history.csv)
-training time: 3046 s (0 hr 50 min 45.8 s / 0.85 hr)
+best epoch: 29   val acc: 99.61%   group-balanced: 99.09%   (from history.csv)
+training time: 324 s (0 hr 05 min 23.9 s / 0.09 hr)
 
-intent accuracy: 0.9955   macro P/R/F1: 0.994/0.993/0.993
-slot accuracy:   0.9994   macro P/R/F1: 0.999/0.999/0.999
-label accuracy (intent + slot decoded jointly): 0.9955   macro F1: 0.995   (same metric as val acc in training)
+intent accuracy: 0.9966   macro P/R/F1: 0.995/0.994/0.994
+slot accuracy:   1.0000   macro P/R/F1: 1.000/1.000/1.000
+label accuracy (intent + slot decoded jointly): 0.9966   macro F1: 0.997   (same metric as val acc in training)
 
-clean accuracy: 0.9933 (895 utterances)
-noisy accuracy: 0.9978 (894 utterances)
+clean accuracy: 0.9966 (895 utterances)
+noisy accuracy: 0.9966 (894 utterances)
+foreign speakers accuracy: 0.9969 (1614 utterances)
+filipino speakers accuracy: 0.9943 (175 utterances)
 
-ALARM: precision 0.994  recall 1.000  f1 0.997
+ALARM: precision 1.000  recall 1.000  f1 1.000
 BRIGHTNESS: precision 1.000  recall 1.000  f1 1.000
-CALL: precision 1.000  recall 1.000  f1 1.000
-COLOR: precision 0.994  recall 1.000  f1 0.997
-CREATE_REMINDER: precision 1.000  recall 0.994  f1 0.997
-LIGHT_OFF: precision 1.000  recall 0.983  f1 0.991
-LIGHT_ON: precision 1.000  recall 1.000  f1 1.000
-LIST_REMINDERS: precision 0.983  recall 1.000  f1 0.991
+CALL: precision 1.000  recall 0.981  f1 0.990
+COLOR: precision 1.000  recall 1.000  f1 1.000
+CREATE_REMINDER: precision 1.000  recall 1.000  f1 1.000
+LIGHT_OFF: precision 1.000  recall 0.948  f1 0.973
+LIGHT_ON: precision 0.947  recall 1.000  f1 0.973
+LIST_REMINDERS: precision 1.000  recall 1.000  f1 1.000
 MESSAGE: precision 1.000  recall 1.000  f1 1.000
-NEXT: precision 1.000  recall 0.983  f1 0.991
-PAUSE: precision 1.000  recall 0.982  f1 0.991
-PLAY_MUSIC: precision 0.983  recall 1.000  f1 0.991
-STOP: precision 0.982  recall 1.000  f1 0.991
+NEXT: precision 1.000  recall 1.000  f1 1.000
+PAUSE: precision 0.982  recall 1.000  f1 0.991
+PLAY_MUSIC: precision 0.967  recall 1.000  f1 0.983
+STOP: precision 1.000  recall 1.000  f1 1.000
 TEMPERATURE: precision 1.000  recall 1.000  f1 1.000
-TIME: precision 1.000  recall 0.925  f1 0.961
+TIME: precision 1.000  recall 0.962  f1 0.981
 TIMER: precision 1.000  recall 1.000  f1 1.000
-VOLUME_DOWN: precision 0.981  recall 1.000  f1 0.990
-VOLUME_UP: precision 0.967  recall 1.000  f1 0.983
+VOLUME_DOWN: precision 1.000  recall 1.000  f1 1.000
+VOLUME_UP: precision 1.000  recall 1.000  f1 1.000
 WEATHER: precision 1.000  recall 1.000  f1 1.000
 
 1 minute: precision 1.000  recall 1.000  f1 1.000
 10 seconds: precision 1.000  recall 1.000  f1 1.000
 100 percent: precision 1.000  recall 1.000  f1 1.000
-18 degrees: precision 0.984  recall 1.000  f1 0.992
+18 degrees: precision 1.000  recall 1.000  f1 1.000
 20 percent: precision 1.000  recall 1.000  f1 1.000
-22 degrees: precision 1.000  recall 0.983  f1 0.992
+22 degrees: precision 1.000  recall 1.000  f1 1.000
 26 degrees: precision 1.000  recall 1.000  f1 1.000
 30 seconds: precision 1.000  recall 1.000  f1 1.000
 6 AM: precision 1.000  recall 1.000  f1 1.000

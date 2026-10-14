@@ -1,17 +1,12 @@
-"""Evaluate the trained two-head CRNN on the test split.
+"""Evaluate the trained two-head TCN on the test split.
 
 Run from the repo root:   python src/evaluate.py
 
-Writes to results/:
-    metrics.txt               - training summary + intent/slot/label metrics
-    class_metrics_intent.png  - intent per-class precision/recall/F1 bars
-    class_metrics_slot.png    - slot per-class precision/recall/F1 bars
-    confusion_intent.png      - intent confusion matrix (cells = raw counts)
-    confusion_slot.png        - slot confusion matrix (cells = raw counts)
-    accuracy_label.png        - training curves from history.csv
+Writes to results/: metrics.txt, class_metrics_{intent,slot}.png,
+confusion_{intent,slot}.png, accuracy_label.png.
 
-Label accuracy = both heads correct after joint decoding (comparable to
-the old single-head model's number).
+Label accuracy = end-to-end command accuracy: both heads correct after
+joint decoding over the 31 valid (intent, slot) combinations.
 """
 
 import argparse
@@ -25,9 +20,9 @@ import numpy as np
 import torch
 from torch.utils.data import DataLoader
 
-from dataset import VCMDataset, load_labels
+from dataset import GROUPS, VCMDataset, load_labels
 from features import load_intents_slots
-from model import CRNN
+from model import TCN
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -36,7 +31,7 @@ def predict_all(model, dataset, device, combo, batch_size=64):
     """Run both heads over the dataset.
 
     Returns (intent_true, intent_pred, slot_true, slot_pred,
-             label_true, label_pred) as class-index arrays.
+    label_true, label_pred) as class-index arrays.
     """
     loader = DataLoader(dataset, batch_size=batch_size)
     model.eval()
@@ -112,12 +107,10 @@ def grouped_bar_chart(classes, precision, recall, f1, acc, title, path):
 
 
 def confusion_chart(cm, classes, acc, title, path):
-    """Confusion matrix PNG with raw counts printed in the cells.
+    """Confusion matrix PNG with raw counts in the cells.
 
-    The cell NUMBER is the raw count. The cell COLOR stays normalized to
-    % of true class so errors remain visible for classes with few
-    samples — otherwise one big class (e.g. NO_SLOT) would wash out the
-    whole color scale. Blank cells are zero.
+    Cell color is normalized to % of true class so errors stay visible
+    for rare classes; blank cells are zero.
     """
     n = len(classes)
     row_sum = cm.sum(axis=1, keepdims=True)
@@ -148,12 +141,7 @@ def confusion_chart(cm, classes, acc, title, path):
 
 
 def training_curves_chart(history, name, path):
-    """Train acc and val acc (solid lines, circle marker per epoch) plus
-    val loss (dashed) in one combined plot.
-
-    The y-axis auto-scales with headroom above 100% so a saturated train
-    curve (100.0) is not jammed against the plot border.
-    """
+    """Train acc and val acc (solid) plus val loss (dashed, second axis)."""
     train_acc = np.array(history["train_acc"], dtype=float)
     val_acc = np.array(history["val_acc"], dtype=float)
     val_loss = np.array(history["val_loss"], dtype=float)
@@ -162,7 +150,7 @@ def training_curves_chart(history, name, path):
         val_acc *= 100
 
     epochs = np.arange(1, len(val_acc) + 1)
-    best = int(val_acc.argmax())
+    best = int(np.argmax(history["val_select"]))   # the saved checkpoint
 
     fig, ax = plt.subplots(figsize=(9, 5.5))
     # train acc — blue line, circle marker per epoch
@@ -229,8 +217,8 @@ def main():
     print(f"test: {len(test_ds)} utterances, intents: {len(intents)}, "
           f"slots: {len(slots)}")
 
-    model = CRNN(n_intents=len(intents), n_slots=len(slots)).to(device)
-    model.load_state_dict(torch.load(ROOT / "models" / "crnn.pt",
+    model = TCN(n_intents=len(intents), n_slots=len(slots)).to(device)
+    model.load_state_dict(torch.load(ROOT / "models" / "TCN.pt",
                                      map_location=device))
 
     it, ip, st, sp, lt, lp = predict_all(model, test_ds, device, combo,
@@ -263,6 +251,9 @@ def main():
                 "train_acc": [float(r["train_acc"]) for r in rows],
                 "val_acc":   [float(r["val_acc"])   for r in rows],
                 "val_loss":  [float(r["val_loss"])  for r in rows],
+                # checkpoint selection metric (absent in old history.csv files)
+                "val_select": [float(r.get("val_select") or r["val_acc"])
+                               for r in rows],
             }
             # total training time = sum of per-epoch elapsed_s
             # (column is absent in old history.csv files -> skip silently)
@@ -272,9 +263,10 @@ def main():
     # ---- metrics.txt ----
     lines = [f"test utterances: {len(test_ds)}", ""]
     if history is not None:
-        best_ep = int(np.argmax(history["val_acc"])) + 1
-        best_va = max(history["val_acc"])
-        lines.append(f"best epoch: {best_ep}   val acc: {best_va:.2f}%   (from history.csv)")
+        best_ep = int(np.argmax(history["val_select"])) + 1
+        lines.append(f"best epoch: {best_ep}   val acc: "
+                     f"{history['val_acc'][best_ep - 1]:.2f}%   group-balanced: "
+                     f"{history['val_select'][best_ep - 1]:.2f}%   (from history.csv)")
         if "elapsed_s" in history:
             total = history["elapsed_s"]
             h, m, s = int(total // 3600), int(total % 3600 // 60), total % 60
@@ -296,6 +288,13 @@ def main():
         if mask.any():
             lines.append(f"{cond} accuracy: {correct[mask].mean():.4f} "
                          f"({int(mask.sum())} utterances)")
+    groups = np.array(test_ds.groups)
+    for group in GROUPS:
+        mask = groups == group
+        if not mask.any():
+            continue
+        lines.append(f"{group} speakers accuracy: {correct[mask].mean():.4f} "
+                     f"({int(mask.sum())} utterances)")
     lines.append("")
     for i, name in enumerate(intents):
         lines.append(f"{name}: precision {prec_i[i]:.3f}  "

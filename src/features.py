@@ -1,11 +1,8 @@
 """Audio front end: WAV -> log-mel spectrogram.
 
-Uses only NumPy so the exact same features are produced during training
-(PC / A100 cluster) and during inference on the Raspberry Pi.
-
-Every waveform (training file, test file or live microphone audio) goes
-through the same steps: trim leading/trailing silence -> remove DC offset
--> pad with true silence to a fixed length -> log-mel spectrogram.
+NumPy only, so training and Pi inference produce identical features.
+Every waveform goes through the same steps: trim silence -> remove DC
+offset -> pad with true silence to a fixed length -> log-mel.
 """
 
 import numpy as np
@@ -19,11 +16,12 @@ from pathlib import Path
 SAMPLE_RATE = 16000   # the dataset is 16 kHz mono
 N_FFT = 400           # 25 ms analysis window
 HOP = 160             # 10 ms hop -> 100 frames per second
-N_MELS = 64           # mel bands (as in the CRNN diagram)
+N_MELS = 64           # mel bands (front-end width for training and Pi inference)
 MAX_FRAMES = 480      # ~4.8 s; every utterance is padded/trimmed to this
+LOG_FLOOR = 1e-6      # added to mel power before log
 
 _WINDOW = np.hanning(N_FFT)
-_MEL_FB = None  # mel filterbank matrix, built on first use
+_MEL_FB = None        # mel filterbank matrix, built on first use
 
 
 def _hz_to_mel(f):
@@ -55,10 +53,9 @@ def _mel_filterbank():
 def load_wav(path):
     """Load a WAV file as mono float32 in [-1, 1] at 16 kHz.
 
-    Some dataset files are stored at other sample rates (e.g. 12 kHz).
-    They are resampled to 16 kHz here so every file goes through the
-    same front end. scipy is imported lazily: on the Raspberry Pi all
-    audio is already 16 kHz, so scipy is never needed there.
+    Files at other sample rates (e.g. 12 kHz) are resampled here. scipy
+    is imported lazily: Pi audio is already 16 kHz, so it is never needed
+    there.
     """
     wav, sr = sf.read(path, dtype="float32")
     if wav.ndim > 1:
@@ -75,9 +72,8 @@ def trim_silence(wav, threshold_db=-40.0, pad_ms=100):
     """Cut leading/trailing silence from a recording.
 
     The threshold is relative to the clip's own peak, so trimming behaves
-    the same on quiet and loud recordings. Real microphone recordings have
-    dead air around the speech; the dataset clips are tight. Trimming is
-    applied everywhere so training and inference see the same thing.
+    the same on quiet and loud recordings. Applied everywhere so training
+    and inference see the same thing.
     """
     wav = np.asarray(wav, dtype=np.float32)
     frame = int(SAMPLE_RATE * 0.025)               # 25 ms analysis frames
@@ -98,11 +94,22 @@ def trim_silence(wav, threshold_db=-40.0, pad_ms=100):
 def log_mel(wav):
     """Waveform -> log-mel spectrogram of shape (1, N_MELS, MAX_FRAMES).
 
-    Steps: convert to float -> remove DC offset -> pad the waveform with
-    true silence to a fixed length -> Hann window -> FFT -> power spectrum
-    -> mel filterbank -> log.  Padding the waveform (not the spectrogram)
-    means padded frames are real silence, exactly like the silence that
-    follows a spoken command — so live recordings match training data.
+    Remove DC offset -> pad the waveform with true silence to a fixed
+    length -> Hann window -> FFT -> power spectrum -> mel filterbank ->
+    log -> per-utterance normalization. Padding the waveform (not the
+    spectrogram) means padded frames are real silence, so live recordings
+    match training data.
+
+    Normalization uses only the frames that cover real audio: each mel
+    band has its mean subtracted (cancels gain and the microphone's
+    frequency response) and the whole spectrogram is divided by one
+    std. Padded frames are then set to each band's quietest real value,
+    so padding looks like "this speaker's silence" regardless of level.
+
+    Because padded frames are overwritten anyway, only the frames that
+    overlap real audio go through the FFT (~3x faster for a typical
+    1-2 s command; the output is bit-identical to transforming all
+    MAX_FRAMES frames).
     """
     arr = np.asarray(wav)
     if np.issubdtype(arr.dtype, np.integer):        # int16 mic data -> floats
@@ -110,37 +117,32 @@ def log_mel(wav):
     else:
         wav = arr.astype(np.float32)
     wav = wav - wav.mean()                          # remove DC offset
+    # frames that overlap real audio (the rest are padding); recordings
+    # longer than MAX_FRAMES are trimmed to the first MAX_FRAMES frames
+    n_real = min(MAX_FRAMES, max(1, -(-len(wav) // HOP)))
 
-    # pad the waveform with true silence to the exact length we need
-    target_len = N_FFT + HOP * (MAX_FRAMES - 1)
-    if len(wav) < target_len:
-        wav = np.pad(wav, (0, target_len - len(wav)))
+    # pad with true silence so the last real frame is complete
+    need_len = N_FFT + HOP * (n_real - 1)
+    if len(wav) < need_len:
+        wav = np.pad(wav, (0, need_len - len(wav)))
 
-    n_frames = 1 + (len(wav) - N_FFT) // HOP
-    idx = np.arange(N_FFT)[None, :] + HOP * np.arange(n_frames)[:, None]
-    frames = wav[idx] * _WINDOW[None, :]                       # (n_frames, N_FFT)
-    power = (np.abs(np.fft.rfft(frames, axis=1)) ** 2).T       # (N_FFT//2+1, n_frames)
-    mel = _mel_filterbank() @ power                            # (N_MELS, n_frames)
-    logmel = np.log(mel + 1e-6)
+    idx = np.arange(N_FFT)[None, :] + HOP * np.arange(n_real)[:, None]
+    frames = wav[idx] * _WINDOW[None, :]                       # (n_real, N_FFT)
+    power = (np.abs(np.fft.rfft(frames, axis=1)) ** 2).T       # (N_FFT//2+1, n_real)
+    mel = _mel_filterbank() @ power                            # (N_MELS, n_real)
+    real = np.log(mel + LOG_FLOOR)
 
-    # safety net: trim if a recording is longer than MAX_FRAMES
-    if logmel.shape[1] > MAX_FRAMES:
-        logmel = logmel[:, :MAX_FRAMES]
+    logmel = np.empty((N_MELS, MAX_FRAMES))
+    logmel[:, :n_real] = (real - real.mean(axis=1, keepdims=True)) / (real.std() + 1e-5)
+    logmel[:, n_real:] = logmel[:, :n_real].min(axis=1, keepdims=True)
 
     return logmel[np.newaxis, ...].astype(np.float32)          # (1, N_MELS, MAX_FRAMES)
 
-# ---------------------------------------------------------------------
-# Class mappings shared by training and Raspberry Pi inference.
-# This lives here (not in dataset.py) because features.py is the only
-# torch-free module imported by both the training machine and the Pi.
-# ---------------------------------------------------------------------
 def load_intents_slots(data_dir):
     """Read manifest.csv and derive the two-head class mappings.
 
-    Returns:
-      intents   - sorted list of the 19 intent names
-      slots     - sorted list of the 18 slot values + "NO_SLOT" (last)
-      label_map - label -> (intent, slot value or "NO_SLOT")
+    Returns (intents, slots, label_map): 19 intent names, 18 slot values
+    + "NO_SLOT" (last), and label -> (intent, slot value or "NO_SLOT").
     """
     data_dir = Path(data_dir)
     with open(data_dir / "labels.json", encoding="utf-8") as f:
