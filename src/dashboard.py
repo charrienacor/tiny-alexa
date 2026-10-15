@@ -47,6 +47,13 @@ def fmt(value, suffix="", nd=2):
     return f"{value}{suffix}"
 
 
+def fmt_duration(total):
+    """323.9 -> '324 s (0 hr 05 min 23.9 s / 0.09 hr)', as in metrics.txt."""
+    t = round(total, 1)                  # so 59.96 s shows as 1 min 00.0 s
+    h, m, s = int(t // 3600), int(t % 3600 // 60), t % 60
+    return f"{total:.0f} s ({h} hr {m:02d} min {s:04.1f} s / {total / 3600:.2f} hr)"
+
+
 def model_constants():
     """Architecture constants from src/model.py, read without importing it
     (model.py needs torch, which the Pi doesn't have)."""
@@ -182,9 +189,11 @@ def main():
         cluster = TBD
     objective = grec.get("objective", TBD)
     optimizer = grec.get("optimizer", TBD)
+    train_time = gtest.get("training_time_text") or (
+        fmt_duration(gtr["total_seconds"]) if gtr.get("total_seconds") is not None else TBD)
     steps = (f"{gtr.get('total_steps')} steps "
              f"({gtr.get('epochs_run')} epoch(s) x {grec.get('steps_per_epoch')}, "
-             f"{gtr.get('total_seconds')} s)") if gtr else TBD
+             f"{train_time})") if gtr else TBD
     val_loss = fmt(gtr.get("final_val_loss"), nd=3) if gtr else TBD
 
     # ── Validation on RPi 4 ───────────────────────────────────────────────
@@ -195,7 +204,13 @@ def main():
     far = (f"{fmt(fa.get('rate_pct'))}% ({fa['detected']}/{fa['files']} clips)") \
         if fa else TBD
 
-    if gtest.get("intent_accuracy") is not None:
+    # Prefer the end-to-end VCM holdout: the same clips as the keyword
+    # accuracy, so both numbers describe one test.
+    vcm_ia = p.get("vcm_holdout", {}).get("intent_accuracy")
+    if vcm_ia:
+        intent_acc = (f"{fmt(vcm_ia.get('rate_pct'))}% "
+                      f"({vcm_ia['count']}/{vcm_ia['n']} clips)")
+    elif gtest.get("intent_accuracy") is not None:
         intent_acc = (f"{gtest['intent_accuracy'] * 100:.2f}% "
                       f"(full test set, n={int(gtest.get('test_utts', 0))})")
         if pacc:

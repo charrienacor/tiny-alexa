@@ -4,8 +4,10 @@ data/*
 !data/labels.json
 !data/slots.json
 !data/manifest.csv
-# wake-word test clips are small (512 KB) and needed by bench_pi.py defaults
+# wake-word test set: ship the manifest, not the audio (positives/ + negatives/ hold the WAVs)
 !data/wake_tests/
+data/wake_tests/positives/
+data/wake_tests/negatives/
 # local benchmark harness + downloaded holdout audio (kept local, not shipped)
 vcm-benchmark/
 data/vcm_holdout/

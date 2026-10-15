@@ -1,6 +1,6 @@
 # Project dashboard — auto-filled
 
-_generated from: /Users/charrieannenacor/sandbox/tiny-alexa/results/gpu_report.json (present), /Users/charrieannenacor/sandbox/tiny-alexa/results/pi_report.json (present)_
+_generated from: /Users/charrieannenacor/Desktop/tiny-alexa/results/gpu_report.json (present), /Users/charrieannenacor/Desktop/tiny-alexa/results/pi_report.json (present)_
 
 | **Model** | |
 |---|---|
@@ -20,16 +20,16 @@ _generated from: /Users/charrieannenacor/sandbox/tiny-alexa/results/gpu_report.j
 
 | **Training on A100** | |
 |---|---|
-| Cluster (# A100) | Charries-MacBook-Air.local — no NVIDIA GPU found (trained on CPU/MPS); re-run on the A100 to fill this |
+| Cluster (# A100) | Mac.lan — no NVIDIA GPU found (trained on CPU/MPS); re-run on the A100 to fill this |
 | Objective | cross-entropy (intent head) + cross-entropy (slot head), label smoothing 0.1; joint decode over the 31 valid (intent, slot) combinations |
 | Optimizer | AdamW (lr=0.001, weight_decay=0.01) + 2-epoch linear warmup + per-step cosine decay to 1e-5 over 40 epochs |
-| Steps / loss | 8697 steps (39 epoch(s) x 223, 323.9 s) / 1.207 |
+| Steps / loss | 8697 steps (39 epoch(s) x 223, 557 s (0 hr 09 min 16.9 s / 0.15 hr)) / 1.207 |
 
 | **Validation on RPi 4** | |
 |---|---|
-| Hardware | Charries-MacBook-Air.local — arm64 |
+| Hardware | ai231 — 0 — aarch64 |
 | Wake word | alexa_v0.1 (openwakeword 0.4.0), threshold 0.5, patience 2 chunks |
-| Keyword / intent accuracy | 80.00% (4/5 clips) / 99.66% (full test set, n=1789) |
-| False-accept rate | 0.00% (0/8 clips) |
-| Latency p95 / RTF | p95 0.61 ms / RTF 7809.6 (p50 0.58 ms, n=200) |
+| Keyword / intent accuracy | 100.00% (202/202 clips) / 86.14% (174/202 clips) |
+| False-accept rate | 0.00% (0/202 clips) |
+| Latency p95 / RTF | p95 6.89 ms / RTF 696.7 (p50 6.78 ms, n=200) |
 | Runtime | onnxruntime 1.31.0 — 1 thread(s) (TCN.onnx, 898 KB) |

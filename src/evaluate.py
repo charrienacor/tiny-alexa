@@ -269,7 +269,8 @@ def main():
                      f"{history['val_select'][best_ep - 1]:.2f}%   (from history.csv)")
         if "elapsed_s" in history:
             total = history["elapsed_s"]
-            h, m, s = int(total // 3600), int(total % 3600 // 60), total % 60
+            t = round(total, 1)          # so 59.96 s shows as 1 min 00.0 s
+            h, m, s = int(t // 3600), int(t % 3600 // 60), t % 60
             lines.append(f"training time: {total:.0f} s "
                          f"({h} hr {m:02d} min {s:04.1f} s / "
                          f"{total / 3600:.2f} hr)")

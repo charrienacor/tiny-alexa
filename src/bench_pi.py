@@ -7,11 +7,23 @@ Produces results/pi_report.json, the Pi half of the project dashboard:
   * wake-word per-chunk cost              — the streaming loop's budget
   * (optional) ONNX intent accuracy       — proves the exported model
                                             matches the GPU-trained one
+  * VCM holdout, end to end               — "Alexa + command" through the
+                                            wake word, 4.8 s window and TCN,
+                                            scored like vcm-benchmark
+                                            (accuracy, FAR, FRR, misfire)
 
 Run from the repo root on the Pi (data/wake_tests/ is used by default):
     python src/bench_pi.py
     python src/bench_pi.py --accuracy 200
     python src/bench_pi.py --tp-dir MY_POS --far-dir MY_NEG
+    python src/bench_pi.py --vcm-dir ""        # skip the VCM holdout
+
+The VCM holdout set is data/wake_tests/ (built from the
+class holdout): positives/ = "Alexa" + pause + command, negatives/ = the
+same commands without the wake word, manifest.csv = the expected labels.
+It is run whenever manifest.csv is there. Command-level FAR = out-of-scope
+commands the model accepted (prob >= COMMAND_THRESHOLD); a wake word
+firing without "Alexa" is reported separately as the false-wake rate.
 
 Test clips must be 16 kHz mono WAV. Put one "Alexa ..." utterance per
 positive file (extra speech after the wake word is fine — it is what the
@@ -96,6 +108,33 @@ def pct(arr, q):
 
 # ── wake word tests ──────────────────────────────────────────────────────────
 
+FLUSH_CHUNKS = 40   # 3.2 s of silence between files (see first_wake)
+
+
+def first_wake(detector, wav):
+    """Stream int16 audio through the detector from a pre-warmed reset
+    state; return the sample index where the detecting chunk ends, or None.
+
+    openWakeWord's reset() clears only its score history, not its audio and
+    embedding buffers, so after a file that stopped on a detection the next
+    file would start with "Alexa" still in the model's window and fire on
+    it. Flushing with silence and resetting again gives every file the same
+    clean start."""
+    if len(wav) % WAKE_CHUNK:                        # pad to whole 80 ms chunks
+        wav = np.pad(wav, (0, WAKE_CHUNK - len(wav) % WAKE_CHUNK))
+    silence = np.zeros(WAKE_CHUNK, dtype=np.int16)
+    detector.reset()
+    for _ in range(FLUSH_CHUNKS):                    # push the previous file out
+        detector.process(silence)
+    detector.reset()
+    for _ in range(WARMUP_CHUNKS):                   # pre-warm (see run_wake_files)
+        detector.process(silence)
+    for i in range(0, len(wav), WAKE_CHUNK):
+        if detector.process(wav[i:i + WAKE_CHUNK]):
+            return i + WAKE_CHUNK
+    return None
+
+
 def run_wake_files(detector, folder, expected):
     """Feed every WAV in folder through the detector, one file at a time.
 
@@ -113,20 +152,10 @@ def run_wake_files(detector, folder, expected):
     files = sorted(folder.glob("*.wav"))
     if not files:
         raise SystemExit(f"error: no .wav files in {folder}")
-    silence = np.zeros(WAKE_CHUNK, dtype=np.int16)
     per_file = []
     for path in files:
-        wav = read_wav_int16(path)
-        if len(wav) % WAKE_CHUNK:                    # pad to whole 80 ms chunks
-            wav = np.pad(wav, (0, WAKE_CHUNK - len(wav) % WAKE_CHUNK))
-        detector.reset()
-        for _ in range(WARMUP_CHUNKS):               # pre-warm (see docstring)
-            detector.process(silence)
-        detected_at = None
-        for i in range(0, len(wav), WAKE_CHUNK):
-            if detector.process(wav[i:i + WAKE_CHUNK]):
-                detected_at = (i + WAKE_CHUNK) / SAMPLE_RATE
-                break
+        end = first_wake(detector, read_wav_int16(path))
+        detected_at = None if end is None else end / SAMPLE_RATE
         ok = detected_at is not None
         per_file.append({"file": path.name,
                          "expected": expected,
@@ -297,6 +326,122 @@ def labels_index(cmd, label):
     return cmd["labels"].index(label)
 
 
+# ── VCM holdout: wake word + command, end to end ─────────────────────────────
+
+REJECT = "REJECT"   # truth: out of scope; prediction: no wake or prob < threshold
+
+
+def norm_slot(value):
+    """'6:00 AM' / '6 AM' -> '6 am', 'Blue' -> 'blue', 'NO_SLOT' -> ''."""
+    v = (value or "").strip().lower()
+    return "" if v in ("", "no_slot") else " ".join(v.replace(":00", "").split())
+
+
+def wilson(k, n, z=1.96):
+    """95% Wilson interval for k/n, in percent (same as vcm-benchmark)."""
+    if n == 0:
+        return [None, None]
+    p = k / n
+    d = 1 + z * z / n
+    c = (p + z * z / (2 * n)) / d
+    h = z * np.sqrt(p * (1 - p) / n + z * z / (4 * n * n)) / d
+    return [round(100 * max(0.0, c - h), 2), round(100 * min(1.0, c + h), 2)]
+
+
+def rate(k, n):
+    return {"count": k, "n": n, "rate_pct": round(100.0 * k / n, 2) if n else None,
+            "ci95_pct": wilson(k, n)}
+
+
+def run_vcm_holdout(cmd, detector, vcm_dir):
+    """Every positive: stream through the wake word; on a detection classify
+    the next 4.8 s (zero-padded, as the live mic keeps recording silence),
+    exactly like infer.run_file. Every negative: count wake-word fires.
+
+    Scored like vcm-benchmark: out-of-scope truth and a rejected / missing
+    prediction are one class (REJECT), so FAR, FRR and misfire add up with
+    accuracy to the whole picture."""
+    vcm_dir = Path(vcm_dir)
+    with open(vcm_dir / "manifest.csv", newline="", encoding="utf-8") as f:
+        rows = list(csv.DictReader(f))
+
+    trials = []
+    for row in rows:
+        oos = row["out_of_scope"].strip() == "1"
+        wav = read_wav_int16(vcm_dir / row["positive"])
+        end = first_wake(detector, wav)
+        pred_intent, pred_slot, prob, infer_ms = REJECT, "", None, None
+        if end is not None:
+            window = wav[end:end + COMMAND_WINDOW_SAMPLES]
+            window = np.pad(window, (0, COMMAND_WINDOW_SAMPLES - len(window)))
+            t0 = time.perf_counter()
+            mel = log_mel(trim_silence(window.astype(np.float32) / 32768.0))
+            k, intent_idx, prob = decode(cmd, mel)
+            infer_ms = (time.perf_counter() - t0) * 1000
+            if prob >= COMMAND_THRESHOLD:
+                pred_intent = cmd["intents"][intent_idx]
+                pred_slot = norm_slot(cmd["slots"][cmd["combo"][k, 1]])
+        false_wake = first_wake(detector, read_wav_int16(vcm_dir / row["negative"])) is not None
+
+        true_intent = REJECT if oos else row["command"]
+        true_slot = "" if oos else norm_slot(row["slot_value"])
+        intent_ok = pred_intent == true_intent
+        trials.append({
+            "file": row["positive"], "transcript": row["transcript"], "source": row["source"],
+            "true": f"{true_intent} {true_slot}".strip(),
+            "pred": f"{pred_intent} {pred_slot}".strip(),
+            "prob": None if prob is None else round(prob, 3),
+            "wake_detected": end is not None,
+            "false_wake_on_negative": false_wake,
+            "intent_ok": intent_ok,
+            "command_ok": intent_ok and pred_slot == true_slot,
+            "slotted": bool(true_slot),
+            "oos": oos,
+            "infer_ms": None if infer_ms is None else round(infer_ms, 2),
+        })
+        if not trials[-1]["command_ok"]:
+            t = trials[-1]
+            print(f"  MISS {t['true']:<28} -> {t['pred']:<28} "
+                  f"p={t['prob']}  \"{t['transcript']}\"")
+
+    ins = [t for t in trials if not t["oos"]]
+    oos = [t for t in trials if t["oos"]]
+    n = len(trials)
+    fired = lambda t: not t["pred"].startswith(REJECT)
+    infer = [t["infer_ms"] for t in trials if t["infer_ms"] is not None]
+    window_ms = COMMAND_WINDOW_SAMPLES / SAMPLE_RATE * 1000
+    misses = {}
+    for t in trials:
+        if not t["command_ok"]:
+            key = f"{t['true']} -> {t['pred']}"
+            misses[key] = misses.get(key, 0) + 1
+    slotted = [t for t in ins if t["slotted"] and t["intent_ok"]]
+    return {
+        "dir": str(vcm_dir), "n": n, "n_in_scope": len(ins), "n_out_of_scope": len(oos),
+        "command_threshold": COMMAND_THRESHOLD,
+        "wake_detected": rate(sum(t["wake_detected"] for t in trials), n),
+        "intent_accuracy": rate(sum(t["intent_ok"] for t in trials), n),
+        "command_accuracy": rate(sum(t["command_ok"] for t in trials), n),
+        # out-of-scope commands the model accepted as some command
+        "false_accept": rate(sum(fired(t) for t in oos), len(oos)),
+        # in-scope commands rejected (low prob) or never heard (no wake)
+        "false_reject": rate(sum(not fired(t) for t in ins), len(ins)),
+        # in-scope commands answered with the wrong intent / wrong command
+        "misfire_intent": rate(sum(fired(t) and not t["intent_ok"] for t in ins), len(ins)),
+        "misfire_command": rate(sum(fired(t) and not t["command_ok"] for t in ins), len(ins)),
+        "slot_exact": rate(sum(t["command_ok"] for t in slotted), len(slotted)),
+        # wake word fired on the same command WITHOUT "Alexa"
+        "false_wake": rate(sum(t["false_wake_on_negative"] for t in trials), n),
+        "infer_ms": {"n": len(infer),
+                     "p50": round(pct(infer, 50), 2) if infer else None,
+                     "p95": round(pct(infer, 95), 2) if infer else None},
+        # vcm-benchmark's definition: infer_ms / audio_ms (lower is faster)
+        "rtf_p95": round(pct(infer, 95) / window_ms, 5) if infer else None,
+        "errors": dict(sorted(misses.items(), key=lambda kv: -kv[1])),
+        "trials": trials,
+    }
+
+
 # ── main ─────────────────────────────────────────────────────────────────────
 
 def main():
@@ -308,6 +453,10 @@ def main():
     parser.add_argument("--far-dir", default=ROOT / "data" / "wake_tests" / "negatives",
                         help="folder of WAVs WITHOUT the wake word "
                              "(default: data/wake_tests/negatives)")
+    parser.add_argument("--vcm-dir", default=ROOT / "data" / "wake_tests",
+                        help="VCM holdout set: positives/, negatives/, manifest.csv "
+                             "(default: data/wake_tests; run when it has a manifest.csv, "
+                             "\"\" to skip)")
     parser.add_argument("--accuracy", type=int, default=0, metavar="N",
                         help="also run the ONNX model on N held-out test "
                              "utterances (needs data/manifest.csv)")
@@ -399,6 +548,13 @@ def main():
         print(f"\nrunning ONNX model on {args.accuracy} held-out test utterances")
         report["accuracy_onnx"] = bench_accuracy(cmd, ROOT / "data", args.accuracy)
 
+    # ── VCM holdout, wake word + command (when the folder exists) ─────────
+    if args.vcm_dir and (Path(args.vcm_dir) / "manifest.csv").exists():
+        print(f"\nVCM holdout — Alexa + command, end to end ({args.vcm_dir})")
+        report["vcm_holdout"] = run_vcm_holdout(cmd, detector, args.vcm_dir)
+    elif args.vcm_dir:
+        print(f"\nnote: {args.vcm_dir}/manifest.csv not found — VCM holdout skipped")
+
     out = results / "pi_report.json"
     out.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
 
@@ -423,6 +579,22 @@ def main():
         acc = report["accuracy_onnx"]
         print(f"  ONNX accuracy (test set):   label {acc['label_accuracy_pct']}%  "
               f"intent {acc['intent_accuracy_pct']}%  (n={acc['n']})")
+    if "vcm_holdout" in report:
+        v = report["vcm_holdout"]
+        line = lambda r: (f"{r['rate_pct']:.2f}%  ({r['count']}/{r['n']}, "
+                          f"95% CI {r['ci95_pct'][0]}–{r['ci95_pct'][1]}%)")
+        print(f"  VCM holdout (n={v['n']}: {v['n_in_scope']} in scope, "
+              f"{v['n_out_of_scope']} out of scope, threshold {v['command_threshold']})")
+        print(f"    wake detected:            {line(v['wake_detected'])}")
+        print(f"    intent accuracy:          {line(v['intent_accuracy'])}")
+        print(f"    command accuracy:         {line(v['command_accuracy'])}")
+        print(f"    false accept (FAR):       {line(v['false_accept'])}")
+        print(f"    false reject (FRR):       {line(v['false_reject'])}")
+        print(f"    misfire (wrong command):  {line(v['misfire_command'])}")
+        print(f"    slot exact (intent ok):   {line(v['slot_exact'])}")
+        print(f"    false wake (no Alexa):    {line(v['false_wake'])}")
+        print(f"    infer p95:                {v['infer_ms']['p95']} ms  "
+              f"(RTF {v['rtf_p95']})")
     print("\nnext: copy results/pi_report.json + results/gpu_report.json to one")
     print("machine and run  python src/dashboard.py  to fill the dashboard table")
 

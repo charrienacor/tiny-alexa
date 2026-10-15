@@ -1,7 +1,7 @@
 test utterances: 1789
 
 best epoch: 29   val acc: 99.61%   group-balanced: 99.09%   (from history.csv)
-training time: 324 s (0 hr 05 min 23.9 s / 0.09 hr)
+training time: 557 s (0 hr 09 min 16.9 s / 0.15 hr)
 
 intent accuracy: 0.9966   macro P/R/F1: 0.995/0.994/0.994
 slot accuracy:   1.0000   macro P/R/F1: 1.000/1.000/1.000

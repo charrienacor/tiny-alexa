@@ -16,7 +16,8 @@ is no speech-to-text, no LLM and no cloud: everything runs on the device.
 | **Command model** | Two-head TCN, 0.23 M parameters, 0.92 MB ONNX |
 | **Understands** | 19 intents, 31 commands (e.g. `ALARM` + `6 AM`) |
 | **Test accuracy** | 99.66 % on 1,789 held-out clips from 10 unseen voices (6 errors) |
-| **Model latency** | 0.6 ms per command on an Apple M-series CPU core (Pi 4 figures pending, see [Benchmarks](#5-benchmarks)) |
+| **End-to-end (Pi 4)** | 86.1 % command accuracy on the 202-clip VCM holdout, through the real wake word ([Benchmarks](#5-benchmarks)) |
+| **Model latency** | 6.8 ms per command on the Raspberry Pi 4 (1-thread ONNX, see [Benchmarks](#5-benchmarks)) |
 | **Training data** | 17,851 **synthetic** utterances, 100 synthetic voices ([details](#3-the-dataset)) |
 | **Talks back** | Spoken replies through on-device text-to-speech (Piper / espeak-ng / macOS `say`) |
 
@@ -275,36 +276,64 @@ was 100 % correct.
 Raw numbers: [results/metrics.txt](results/metrics.txt).
 </details>
 
-### Speed and wake word
+### Speed and wake word (measured on the Raspberry Pi 4)
 
 > [!NOTE]
-> The numbers below come from `bench_pi.py` run on a **MacBook Air
-> (Apple silicon, arm64)**, not a Raspberry Pi 4. A Pi 4's Cortex-A72 is
-> several times slower, so expect higher latencies there. Run
-> `python3 src/bench_pi.py` on the Pi to replace them; the report says which
-> machine it came from.
+> These numbers come from `bench_pi.py` run on **`ai231`, a Raspberry Pi 4
+> (Cortex-A72, aarch64)**, Python 3.13.5, onnxruntime 1.31.0, 1 thread. The
+> report says which machine it came from — regenerate with
+> `python3 src/bench_pi.py` to refresh them.
 
 | Measurement | Result |
 |---|---|
-| TCN inference, 1 thread | p50 0.58 ms · p95 0.61 ms (n = 200) |
-| Real-time factor | ~7,800× (4.8 s of audio in 0.6 ms) |
-| Wake word, per 80 ms chunk | p50 1.47 ms |
-| Features + TCN per command | p50 1.48 ms · p95 1.64 ms |
-| Wake word hit rate | 4 / 5 test clips (80 %) |
-| Wake word false accepts | 0 / 8 clips of non-wake audio |
+| TCN inference, 1 thread | p50 6.78 ms · p95 6.89 ms (n = 200) |
+| Real-time factor | ~700× (4.8 s of audio in 6.8 ms) |
+| Wake word, per 80 ms chunk | p50 20.5 ms · p95 22.2 ms (n = 100) |
+| Features + TCN per command | p50 29.3 ms · p95 30.2 ms (n = 50) |
+| Wake word hit rate | 202 / 202 holdout clips (100 %) |
+| Wake word false accepts | 0 / 202 clips of non-wake audio |
 | Model size | 898 KB (`TCN.onnx`, fp32) |
 
-What you notice as a user is mostly **endpointing time**, not compute. The
+What you notice as a user is mostly **endpointing time**, not compute: the
 reply comes 0.16 s after you stop speaking for most commands, and at most
-0.56 s after. The wake-word test set is tiny (13 clips), so treat those two
-rates as a sanity check, not a measurement. Add your own 16 kHz mono WAVs to
-`data/wake_tests/positives/` and `negatives/` to make them meaningful.
+0.56 s after.
+
+### End-to-end on the Pi 4: the VCM holdout
+
+`bench_pi.py` also runs the class holdout set (the same 202 "Alexa + command"
+clips the [vcm-benchmark](https://github.com/airimonda/vcm-benchmark) harness
+uses) **through the real pipeline on the Pi**: streaming wake word → 4.8 s
+window → TCN. Positives are "Alexa" + pause + command; negatives are the same
+commands with no wake word.
+
+| Metric | Result |
+|---|---:|
+| Wake word fired | 202 / 202 (100 %, CI 98.1–100) |
+| **Command accuracy** (intent + slot both right) | **86.1 %** (174 / 202, CI 80.7–90.2) |
+| False accepts (out-of-scope commands obeyed) | 10 / 16 (62.5 %) |
+| False rejects (in-scope commands refused) | 5 / 186 (2.7 %) |
+| Misfires (wrong intent or slot) | 13 / 186 (7.0 %) |
+| Slot exact (where a slot was expected) | 101 / 101 (100 %) |
+| False wakes (wake word fired on negatives) | 0 / 202 (0 %) |
+| Inference latency, end-to-end | p50 22.9 ms · p95 29.7 ms (RTF p95 ≈ 0.006) |
+
+The gap between the 99.66 % test-split accuracy and the 86.1 % end-to-end
+number is the honest cost of the full chain: the holdout clips carry real
+room noise and speaker variation the synthetic test split doesn't, the model
+has to survive a 0.8 s gap after the wake word, and the 16 out-of-scope
+commands (e.g. "play some music" said *without* "Alexa") are the ones it
+still obeys. That is the known weak spot — out-of-scope rejection — and the
+one the next iteration targets.
+
+The wake-word clips themselves aren't in the repo (audio stays local); only
+[`data/wake_tests/manifest.csv`](data/wake_tests/manifest.csv) ships, with the
+expected label, slot and transcript for every clip.
 
 ### Reproduce
 
 ```bash
 python src/bench_gpu.py              # training report  → results/gpu_report.json
-python3 src/bench_pi.py              # on the Pi: wake word + latency → results/pi_report.json
+python3 src/bench_pi.py              # on the Pi: wake word + latency + VCM holdout → results/pi_report.json
 python3 src/bench_pi.py --accuracy 200   # + ONNX accuracy on 200 test clips (needs scipy)
 python src/dashboard.py              # merge both → results/dashboard.md
 ```
@@ -374,17 +403,17 @@ say the command. Saying "Alexa" again while it's talking interrupts the reply.
 
 ## 7. Limitations
 
-- **Synthetic data only.** Accuracy on real human speech, accents, distance
-  and room echo hasn't been measured. Expect it to be lower than 99.66 %.
-- **No unknown class.** Out-of-scope speech is only filtered by a confidence
+- **Synthetic training data.** The model was trained on synthetic speech;
+  real-room holdout testing on the Pi 4 measures the gap at 86.1 % command
+  accuracy vs 99.66 % on the synthetic test split.
+- **Out-of-scope rejection is the weak spot.** On the 202-clip VCM holdout
+  the model obeyed 10 of 16 out-of-scope commands (e.g. "play some music"
+  without the wake word). Unknown speech is only filtered by a confidence
   threshold, so it can trigger the closest command (see
   [the dataset](#3-the-dataset)).
 - **Closed vocabulary.** Only the slot values above are understood. "Set a
   timer for 5 minutes" may be rejected or mapped to a similar-sounding
   command.
-- **Pi 4 numbers pending.** The latency figures were measured on a MacBook
-  Air.
-- **Small wake-word test** (5 positive, 8 negative clips).
 - **Short pause after "Alexa".** The spoken "Yes?" makes the mic deaf for
   about 0.5 s. Use `--no-wake-ack` if you prefer saying it all in one breath.
 

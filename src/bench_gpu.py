@@ -38,6 +38,10 @@ def parse_metrics(text):
         m = re.search(pat, text, flags=re.MULTILINE)
         if m:
             out[key] = float(m.group(1))
+    # the readable form too: "324 s (0 hr 05 min 23.9 s / 0.09 hr)"
+    m = re.search(r"^training time:\s*(\d+ s \(.*\))\s*$", text, flags=re.MULTILINE)
+    if m:
+        out["training_time_text"] = m.group(1)
     return out
 
 

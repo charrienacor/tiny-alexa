@@ -1,11 +1,12 @@
 {
   "stage": "pi_inference",
-  "timestamp": "2026-10-14T17:18:16+08:00",
+  "timestamp": "2026-10-15T17:55:32+08:00",
   "machine": {
-    "hostname": "Charries-MacBook-Air.local",
-    "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
-    "python": "3.13.9",
-    "arch": "arm64"
+    "hostname": "ai231",
+    "platform": "Linux-6.18.50+rpt-rpi-v8-aarch64-with-glibc2.41",
+    "python": "3.13.5",
+    "arch": "aarch64",
+    "cpu": "0"
   },
   "software": {
     "onnxruntime": "1.31.0",
@@ -22,91 +23,2437 @@
     "threshold": 0.5,
     "patience_chunks": 2,
     "true_accept": {
-      "files": 5,
-      "detected": 4,
-      "rate_pct": 80.0,
+      "files": 202,
+      "detected": 202,
+      "rate_pct": 100.0,
       "per_file": [
         {
-          "file": "pos1.wav",
+          "file": "alexa_holdout_000000_real_voice_PLAY_MUSIC_V2_t2.wav",
           "expected": true,
           "detected": true,
-          "detection_s": 0.56
+          "detection_s": 1.12
         },
         {
-          "file": "pos2.wav",
+          "file": "alexa_holdout_000001_group_synthetic_PLAY_MUSIC_s10_v1_clean.wav",
           "expected": true,
           "detected": true,
-          "detection_s": 0.56
+          "detection_s": 1.12
         },
         {
-          "file": "pos3.wav",
+          "file": "alexa_holdout_000002_real_voice_PLAY_MUSIC_V3_t2.wav",
           "expected": true,
           "detected": true,
-          "detection_s": 0.64
+          "detection_s": 1.12
         },
         {
-          "file": "pos4.wav",
-          "expected": true,
-          "detected": false,
-          "detection_s": null
-        },
-        {
-          "file": "pos5.wav",
+          "file": "alexa_holdout_000003_group_synthetic_PLAY_MUSIC_s10_v2_clean.wav",
           "expected": true,
           "detected": true,
-          "detection_s": 0.56
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000004_FluentSpeechCommands_c5d5f9c0-4547-11e9-aa52-bf2189a03a60.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000005_group_synthetic_PLAY_MUSIC_s10_v3_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000006_real_voice_WEATHER_V1_t2.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000007_group_synthetic_WEATHER_s10_v1_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000008_real_voice_WEATHER_V2_t2.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000009_group_synthetic_WEATHER_s10_v2_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000010_real_voice_WEATHER_V3_t1.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000011_group_synthetic_WEATHER_s10_v3_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000012_real_voice_TIME_V1_t1.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000013_group_synthetic_TIME_s10_v1_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000014_real_voice_TIME_V2_t1.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000015_group_synthetic_TIME_s10_v2_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000016_real_voice_TIME_V3_t1.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000017_group_synthetic_TIME_s10_v3_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000018_real_voice_LIGHT_ON_V1_t2.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000019_group_synthetic_LIGHT_ON_s10_v1_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000020_real_voice_LIGHT_ON_V2_t2.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000021_group_synthetic_LIGHT_ON_s10_v2_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000022_real_voice_LIGHT_ON_V3_t1.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000023_group_synthetic_LIGHT_ON_s10_v3_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000024_real_voice_LIGHT_OFF_V1_t1.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000025_group_synthetic_LIGHT_OFF_s10_v1_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000026_real_voice_LIGHT_OFF_V2_t2.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000027_group_synthetic_LIGHT_OFF_s10_v2_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000028_real_voice_LIGHT_OFF_V3_t2.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000029_group_synthetic_LIGHT_OFF_s10_v3_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000030_real_voice_PAUSE_V1_t1.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000031_group_synthetic_PAUSE_s10_v1_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000032_real_voice_PAUSE_V2_t1.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000033_group_synthetic_PAUSE_s10_v2_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000034_real_voice_PAUSE_V3_t1.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000035_group_synthetic_PAUSE_s10_v3_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000036_real_voice_STOP_V2_t1.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000037_group_synthetic_STOP_s10_v1_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000038_real_voice_STOP_V3_t1.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000039_group_synthetic_STOP_s10_v2_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000040_FluentSpeechCommands_5986cc10-454f-11e9-aa52-bf2189a03a60.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000041_group_synthetic_STOP_s10_v3_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000042_real_voice_NEXT_V2_t2.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000043_group_synthetic_NEXT_s10_v1_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000044_real_voice_NEXT_V1_t2.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000045_group_synthetic_NEXT_s10_v2_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000046_real_voice_NEXT_V3_t2.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000047_group_synthetic_NEXT_s10_v3_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000048_real_voice_VOLUME_UP_V1_t2.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000049_group_synthetic_VOLUME_UP_s10_v1_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000050_real_voice_VOLUME_UP_V2_t1.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000051_group_synthetic_VOLUME_UP_s10_v2_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000052_real_voice_VOLUME_UP_V3_t1.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000053_group_synthetic_VOLUME_UP_s10_v3_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000054_real_voice_VOLUME_DOWN_V1_t2.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000055_group_synthetic_VOLUME_DOWN_s10_v1_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000056_real_voice_VOLUME_DOWN_V2_t1.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000057_group_synthetic_VOLUME_DOWN_s10_v2_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000058_real_voice_VOLUME_DOWN_V3_t1.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000059_group_synthetic_VOLUME_DOWN_s10_v3_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000060_real_voice_CALL_V1_t2.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000061_group_synthetic_CALL_s10_v1_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000062_real_voice_CALL_V2_t1.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000063_group_synthetic_CALL_s10_v2_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000064_real_voice_CALL_V3_t1.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000065_group_synthetic_CALL_s10_v3_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000066_real_voice_MESSAGE_V1_t2.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000067_group_synthetic_MESSAGE_s10_v1_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000068_real_voice_MESSAGE_V2_t1.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000069_group_synthetic_MESSAGE_s10_v2_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000070_real_voice_MESSAGE_V3_t2.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000071_group_synthetic_MESSAGE_s10_v3_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000072_real_voice_LIST_REMINDERS_V1_t2.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000073_group_synthetic_LIST_REMINDERS_s10_v1_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000074_real_voice_LIST_REMINDERS_V2_t2.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000075_group_synthetic_LIST_REMINDERS_s10_v2_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000076_real_voice_LIST_REMINDERS_V3_t1.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000077_group_synthetic_LIST_REMINDERS_s10_v3_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000078_real_voice_TIMER_V1_1_t1.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000079_group_synthetic_TIMER_10s_s10_v1_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000080_real_voice_TIMER_V1_2_t1.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000081_group_synthetic_TIMER_30s_s10_v1_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000082_real_voice_TIMER_V1_3_t2.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000083_group_synthetic_TIMER_1m_s10_v1_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000084_real_voice_TIMER_V2_1_t2.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000085_group_synthetic_TIMER_10s_s10_v2_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000086_real_voice_TIMER_V2_2_t2.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000087_group_synthetic_TIMER_30s_s10_v2_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000088_real_voice_TIMER_V2_3_t1.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000089_group_synthetic_TIMER_1m_s10_v2_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000090_real_voice_TIMER_V3_1_t2.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000091_group_synthetic_TIMER_10s_s10_v3_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000092_real_voice_TIMER_V3_2_t1.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000093_group_synthetic_TIMER_30s_s10_v3_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000094_real_voice_TIMER_V3_3_t2.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000095_group_synthetic_TIMER_1m_s10_v3_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000096_real_voice_ALARM_V1_1_t1.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000097_group_synthetic_ALARM_6_00AM_s10_v1_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000098_real_voice_ALARM_V1_2_t2.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000099_group_synthetic_ALARM_8_00AM_s10_v1_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000100_group_synthetic_ALARM_9_00PM_s10_v1_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000101_group_synthetic_ALARM_9_00PM_s100_v1_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000102_real_voice_ALARM_V2_1_t1.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000103_group_synthetic_ALARM_6_00AM_s10_v2_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000104_real_voice_ALARM_V2_2_t1.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000105_group_synthetic_ALARM_8_00AM_s10_v2_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000106_real_voice_ALARM_V2_3_t2.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000107_group_synthetic_ALARM_9_00PM_s10_v2_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000108_real_voice_ALARM_V3_1_t2.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000109_group_synthetic_ALARM_6_00AM_s10_v3_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000110_real_voice_ALARM_V3_2_t2.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000111_group_synthetic_ALARM_8_00AM_s10_v3_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000112_real_voice_ALARM_V3_3_t2.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000113_group_synthetic_ALARM_9_00PM_s10_v3_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000114_real_voice_TEMPERATURE_V1_1_t1.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000115_group_synthetic_TEMPERATURE_18_s10_v1_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000116_real_voice_TEMPERATURE_V1_2_t1.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000117_group_synthetic_TEMPERATURE_22_s10_v1_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000118_real_voice_TEMPERATURE_V1_3_t1.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000119_group_synthetic_TEMPERATURE_26_s10_v1_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000120_real_voice_TEMPERATURE_V2_1_t2.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000121_group_synthetic_TEMPERATURE_18_s10_v2_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000122_real_voice_TEMPERATURE_V2_2_t1.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000123_group_synthetic_TEMPERATURE_22_s10_v2_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000124_real_voice_TEMPERATURE_V2_3_t1.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000125_group_synthetic_TEMPERATURE_26_s10_v2_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000126_real_voice_TEMPERATURE_V3_1_t1.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000127_group_synthetic_TEMPERATURE_18_s10_v3_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000128_real_voice_TEMPERATURE_V3_2_t2.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000129_group_synthetic_TEMPERATURE_22_s10_v3_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000130_real_voice_TEMPERATURE_V3_3_t2.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000131_group_synthetic_TEMPERATURE_26_s10_v3_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000132_real_voice_BRIGHTNESS_V1_1_t2.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000133_group_synthetic_BRIGHTNESS_20_s10_v1_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000134_real_voice_BRIGHTNESS_V1_2_t1.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000135_group_synthetic_BRIGHTNESS_60_s10_v1_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000136_real_voice_BRIGHTNESS_V1_3_t1.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000137_group_synthetic_BRIGHTNESS_100_s10_v1_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000138_real_voice_BRIGHTNESS_V3_1_t2.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000139_group_synthetic_BRIGHTNESS_20_s10_v2_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000140_real_voice_BRIGHTNESS_V3_2_t2.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000141_group_synthetic_BRIGHTNESS_60_s10_v2_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000142_real_voice_BRIGHTNESS_V2_3_t1.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000143_group_synthetic_BRIGHTNESS_100_s10_v2_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000144_group_synthetic_BRIGHTNESS_20_s10_v3_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000145_group_synthetic_BRIGHTNESS_20_s100_v3_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000146_group_synthetic_BRIGHTNESS_60_s10_v3_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000147_group_synthetic_BRIGHTNESS_60_s100_v3_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000148_group_synthetic_BRIGHTNESS_100_s10_v3_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000149_group_synthetic_BRIGHTNESS_100_s100_v3_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000150_real_voice_COLOR_V2_1_t2.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000151_group_synthetic_COLOR_RED_s10_v1_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000152_real_voice_COLOR_V2_2_t2.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000153_group_synthetic_COLOR_BLUE_s10_v1_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000154_real_voice_COLOR_V2_3_t2.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000155_group_synthetic_COLOR_GREEN_s10_v1_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000156_group_synthetic_COLOR_RED_s10_v2_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000157_group_synthetic_COLOR_RED_s100_v2_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000158_group_synthetic_COLOR_BLUE_s10_v2_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000159_group_synthetic_COLOR_BLUE_s100_v2_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000160_group_synthetic_COLOR_GREEN_s10_v2_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000161_group_synthetic_COLOR_GREEN_s100_v2_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000162_real_voice_COLOR_V1_1_t2.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000163_group_synthetic_COLOR_RED_s10_v3_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000164_real_voice_COLOR_V1_2_t2.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000165_group_synthetic_COLOR_BLUE_s10_v3_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000166_real_voice_COLOR_V3_3_t2.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000167_group_synthetic_COLOR_GREEN_s10_v3_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000168_real_voice_CREATE_REMINDER_V1_1_t2.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000169_group_synthetic_CREATE_REMINDER_DRINK_WATER_s10_v1_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000170_real_voice_CREATE_REMINDER_V1_2_t2.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000171_group_synthetic_CREATE_REMINDER_STUDY_s10_v1_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000172_real_voice_CREATE_REMINDER_V1_3_t2.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000173_group_synthetic_CREATE_REMINDER_EXERCISE_s10_v1_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000174_real_voice_CREATE_REMINDER_V2_1_t2.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000175_group_synthetic_CREATE_REMINDER_DRINK_WATER_s10_v2_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000176_real_voice_CREATE_REMINDER_V2_2_t2.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000177_group_synthetic_CREATE_REMINDER_STUDY_s10_v2_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000178_real_voice_CREATE_REMINDER_V2_3_t2.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000179_group_synthetic_CREATE_REMINDER_EXERCISE_s10_v2_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000180_real_voice_CREATE_REMINDER_V3_1_t2.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000181_group_synthetic_CREATE_REMINDER_DRINK_WATER_s10_v3_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000182_real_voice_CREATE_REMINDER_V3_2_t1.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000183_group_synthetic_CREATE_REMINDER_STUDY_s10_v3_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000184_real_voice_CREATE_REMINDER_V3_3_t2.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000185_group_synthetic_CREATE_REMINDER_EXERCISE_s10_v3_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000186_CommonVoice_en_common_voice_en_36827091.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000187_CommonVoice_en_common_voice_en_36827090.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000188_CommonVoice_en_common_voice_en_36827090.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000189_FluentSpeechCommands_2f3a53d0-4551-11e9-aa52-bf2189a03a60.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000190_FluentSpeechCommands_b47bcab0-4551-11e9-aa52-bf2189a03a60.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000191_FluentSpeechCommands_ed52eb60-4552-11e9-aa52-bf2189a03a60.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000192_FluentSpeechCommands_2d281d00-454e-11e9-aa52-bf2189a03a60.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000193_FluentSpeechCommands_ae8530f0-4552-11e9-aa52-bf2189a03a60.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000194_FluentSpeechCommands_26c856a0-454e-11e9-aa52-bf2189a03a60.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000195_FluentSpeechCommands_27f33ee0-454a-11e9-aa52-bf2189a03a60.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000196_group_synthetic_oos_OOS_s10_098_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000197_group_synthetic_oos_OOS_s10_099_noisy.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000198_group_synthetic_oos_OOS_s10_100_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000199_group_synthetic_oos_OOS_s100_101_noisy.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000200_group_synthetic_oos_OOS_s100_102_clean.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
+        },
+        {
+          "file": "alexa_holdout_000201_group_synthetic_oos_OOS_s100_103_noisy.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 1.12
         }
       ]
     },
     "false_accept": {
-      "files": 8,
+      "files": 202,
       "detected": 0,
       "rate_pct": 0.0,
       "per_file": [
         {
-          "file": "neg1.wav",
+          "file": "holdout_000000_real_voice_PLAY_MUSIC_V2_t2.wav",
           "expected": false,
           "detected": false,
           "detection_s": null
         },
         {
-          "file": "neg2.wav",
+          "file": "holdout_000001_group_synthetic_PLAY_MUSIC_s10_v1_clean.wav",
           "expected": false,
           "detected": false,
           "detection_s": null
         },
         {
-          "file": "neg3.wav",
+          "file": "holdout_000002_real_voice_PLAY_MUSIC_V3_t2.wav",
           "expected": false,
           "detected": false,
           "detection_s": null
         },
         {
-          "file": "neg4.wav",
+          "file": "holdout_000003_group_synthetic_PLAY_MUSIC_s10_v2_clean.wav",
           "expected": false,
           "detected": false,
           "detection_s": null
         },
         {
-          "file": "neg5.wav",
+          "file": "holdout_000004_FluentSpeechCommands_c5d5f9c0-4547-11e9-aa52-bf2189a03a60.wav",
           "expected": false,
           "detected": false,
           "detection_s": null
         },
         {
-          "file": "neg6.wav",
+          "file": "holdout_000005_group_synthetic_PLAY_MUSIC_s10_v3_clean.wav",
           "expected": false,
           "detected": false,
           "detection_s": null
         },
         {
-          "file": "neg7.wav",
+          "file": "holdout_000006_real_voice_WEATHER_V1_t2.wav",
           "expected": false,
           "detected": false,
           "detection_s": null
         },
         {
-          "file": "neg8.wav",
+          "file": "holdout_000007_group_synthetic_WEATHER_s10_v1_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000008_real_voice_WEATHER_V2_t2.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000009_group_synthetic_WEATHER_s10_v2_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000010_real_voice_WEATHER_V3_t1.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000011_group_synthetic_WEATHER_s10_v3_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000012_real_voice_TIME_V1_t1.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000013_group_synthetic_TIME_s10_v1_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000014_real_voice_TIME_V2_t1.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000015_group_synthetic_TIME_s10_v2_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000016_real_voice_TIME_V3_t1.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000017_group_synthetic_TIME_s10_v3_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000018_real_voice_LIGHT_ON_V1_t2.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000019_group_synthetic_LIGHT_ON_s10_v1_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000020_real_voice_LIGHT_ON_V2_t2.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000021_group_synthetic_LIGHT_ON_s10_v2_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000022_real_voice_LIGHT_ON_V3_t1.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000023_group_synthetic_LIGHT_ON_s10_v3_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000024_real_voice_LIGHT_OFF_V1_t1.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000025_group_synthetic_LIGHT_OFF_s10_v1_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000026_real_voice_LIGHT_OFF_V2_t2.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000027_group_synthetic_LIGHT_OFF_s10_v2_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000028_real_voice_LIGHT_OFF_V3_t2.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000029_group_synthetic_LIGHT_OFF_s10_v3_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000030_real_voice_PAUSE_V1_t1.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000031_group_synthetic_PAUSE_s10_v1_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000032_real_voice_PAUSE_V2_t1.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000033_group_synthetic_PAUSE_s10_v2_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000034_real_voice_PAUSE_V3_t1.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000035_group_synthetic_PAUSE_s10_v3_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000036_real_voice_STOP_V2_t1.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000037_group_synthetic_STOP_s10_v1_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000038_real_voice_STOP_V3_t1.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000039_group_synthetic_STOP_s10_v2_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000040_FluentSpeechCommands_5986cc10-454f-11e9-aa52-bf2189a03a60.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000041_group_synthetic_STOP_s10_v3_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000042_real_voice_NEXT_V2_t2.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000043_group_synthetic_NEXT_s10_v1_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000044_real_voice_NEXT_V1_t2.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000045_group_synthetic_NEXT_s10_v2_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000046_real_voice_NEXT_V3_t2.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000047_group_synthetic_NEXT_s10_v3_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000048_real_voice_VOLUME_UP_V1_t2.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000049_group_synthetic_VOLUME_UP_s10_v1_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000050_real_voice_VOLUME_UP_V2_t1.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000051_group_synthetic_VOLUME_UP_s10_v2_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000052_real_voice_VOLUME_UP_V3_t1.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000053_group_synthetic_VOLUME_UP_s10_v3_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000054_real_voice_VOLUME_DOWN_V1_t2.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000055_group_synthetic_VOLUME_DOWN_s10_v1_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000056_real_voice_VOLUME_DOWN_V2_t1.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000057_group_synthetic_VOLUME_DOWN_s10_v2_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000058_real_voice_VOLUME_DOWN_V3_t1.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000059_group_synthetic_VOLUME_DOWN_s10_v3_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000060_real_voice_CALL_V1_t2.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000061_group_synthetic_CALL_s10_v1_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000062_real_voice_CALL_V2_t1.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000063_group_synthetic_CALL_s10_v2_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000064_real_voice_CALL_V3_t1.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000065_group_synthetic_CALL_s10_v3_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000066_real_voice_MESSAGE_V1_t2.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000067_group_synthetic_MESSAGE_s10_v1_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000068_real_voice_MESSAGE_V2_t1.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000069_group_synthetic_MESSAGE_s10_v2_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000070_real_voice_MESSAGE_V3_t2.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000071_group_synthetic_MESSAGE_s10_v3_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000072_real_voice_LIST_REMINDERS_V1_t2.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000073_group_synthetic_LIST_REMINDERS_s10_v1_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000074_real_voice_LIST_REMINDERS_V2_t2.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000075_group_synthetic_LIST_REMINDERS_s10_v2_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000076_real_voice_LIST_REMINDERS_V3_t1.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000077_group_synthetic_LIST_REMINDERS_s10_v3_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000078_real_voice_TIMER_V1_1_t1.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000079_group_synthetic_TIMER_10s_s10_v1_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000080_real_voice_TIMER_V1_2_t1.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000081_group_synthetic_TIMER_30s_s10_v1_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000082_real_voice_TIMER_V1_3_t2.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000083_group_synthetic_TIMER_1m_s10_v1_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000084_real_voice_TIMER_V2_1_t2.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000085_group_synthetic_TIMER_10s_s10_v2_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000086_real_voice_TIMER_V2_2_t2.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000087_group_synthetic_TIMER_30s_s10_v2_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000088_real_voice_TIMER_V2_3_t1.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000089_group_synthetic_TIMER_1m_s10_v2_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000090_real_voice_TIMER_V3_1_t2.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000091_group_synthetic_TIMER_10s_s10_v3_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000092_real_voice_TIMER_V3_2_t1.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000093_group_synthetic_TIMER_30s_s10_v3_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000094_real_voice_TIMER_V3_3_t2.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000095_group_synthetic_TIMER_1m_s10_v3_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000096_real_voice_ALARM_V1_1_t1.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000097_group_synthetic_ALARM_6_00AM_s10_v1_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000098_real_voice_ALARM_V1_2_t2.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000099_group_synthetic_ALARM_8_00AM_s10_v1_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000100_group_synthetic_ALARM_9_00PM_s10_v1_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000101_group_synthetic_ALARM_9_00PM_s100_v1_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000102_real_voice_ALARM_V2_1_t1.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000103_group_synthetic_ALARM_6_00AM_s10_v2_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000104_real_voice_ALARM_V2_2_t1.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000105_group_synthetic_ALARM_8_00AM_s10_v2_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000106_real_voice_ALARM_V2_3_t2.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000107_group_synthetic_ALARM_9_00PM_s10_v2_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000108_real_voice_ALARM_V3_1_t2.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000109_group_synthetic_ALARM_6_00AM_s10_v3_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000110_real_voice_ALARM_V3_2_t2.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000111_group_synthetic_ALARM_8_00AM_s10_v3_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000112_real_voice_ALARM_V3_3_t2.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000113_group_synthetic_ALARM_9_00PM_s10_v3_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000114_real_voice_TEMPERATURE_V1_1_t1.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000115_group_synthetic_TEMPERATURE_18_s10_v1_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000116_real_voice_TEMPERATURE_V1_2_t1.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000117_group_synthetic_TEMPERATURE_22_s10_v1_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000118_real_voice_TEMPERATURE_V1_3_t1.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000119_group_synthetic_TEMPERATURE_26_s10_v1_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000120_real_voice_TEMPERATURE_V2_1_t2.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000121_group_synthetic_TEMPERATURE_18_s10_v2_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000122_real_voice_TEMPERATURE_V2_2_t1.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000123_group_synthetic_TEMPERATURE_22_s10_v2_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000124_real_voice_TEMPERATURE_V2_3_t1.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000125_group_synthetic_TEMPERATURE_26_s10_v2_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000126_real_voice_TEMPERATURE_V3_1_t1.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000127_group_synthetic_TEMPERATURE_18_s10_v3_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000128_real_voice_TEMPERATURE_V3_2_t2.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000129_group_synthetic_TEMPERATURE_22_s10_v3_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000130_real_voice_TEMPERATURE_V3_3_t2.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000131_group_synthetic_TEMPERATURE_26_s10_v3_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000132_real_voice_BRIGHTNESS_V1_1_t2.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000133_group_synthetic_BRIGHTNESS_20_s10_v1_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000134_real_voice_BRIGHTNESS_V1_2_t1.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000135_group_synthetic_BRIGHTNESS_60_s10_v1_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000136_real_voice_BRIGHTNESS_V1_3_t1.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000137_group_synthetic_BRIGHTNESS_100_s10_v1_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000138_real_voice_BRIGHTNESS_V3_1_t2.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000139_group_synthetic_BRIGHTNESS_20_s10_v2_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000140_real_voice_BRIGHTNESS_V3_2_t2.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000141_group_synthetic_BRIGHTNESS_60_s10_v2_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000142_real_voice_BRIGHTNESS_V2_3_t1.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000143_group_synthetic_BRIGHTNESS_100_s10_v2_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000144_group_synthetic_BRIGHTNESS_20_s10_v3_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000145_group_synthetic_BRIGHTNESS_20_s100_v3_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000146_group_synthetic_BRIGHTNESS_60_s10_v3_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000147_group_synthetic_BRIGHTNESS_60_s100_v3_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000148_group_synthetic_BRIGHTNESS_100_s10_v3_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000149_group_synthetic_BRIGHTNESS_100_s100_v3_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000150_real_voice_COLOR_V2_1_t2.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000151_group_synthetic_COLOR_RED_s10_v1_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000152_real_voice_COLOR_V2_2_t2.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000153_group_synthetic_COLOR_BLUE_s10_v1_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000154_real_voice_COLOR_V2_3_t2.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000155_group_synthetic_COLOR_GREEN_s10_v1_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000156_group_synthetic_COLOR_RED_s10_v2_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000157_group_synthetic_COLOR_RED_s100_v2_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000158_group_synthetic_COLOR_BLUE_s10_v2_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000159_group_synthetic_COLOR_BLUE_s100_v2_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000160_group_synthetic_COLOR_GREEN_s10_v2_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000161_group_synthetic_COLOR_GREEN_s100_v2_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000162_real_voice_COLOR_V1_1_t2.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000163_group_synthetic_COLOR_RED_s10_v3_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000164_real_voice_COLOR_V1_2_t2.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000165_group_synthetic_COLOR_BLUE_s10_v3_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000166_real_voice_COLOR_V3_3_t2.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000167_group_synthetic_COLOR_GREEN_s10_v3_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000168_real_voice_CREATE_REMINDER_V1_1_t2.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000169_group_synthetic_CREATE_REMINDER_DRINK_WATER_s10_v1_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000170_real_voice_CREATE_REMINDER_V1_2_t2.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000171_group_synthetic_CREATE_REMINDER_STUDY_s10_v1_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000172_real_voice_CREATE_REMINDER_V1_3_t2.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000173_group_synthetic_CREATE_REMINDER_EXERCISE_s10_v1_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000174_real_voice_CREATE_REMINDER_V2_1_t2.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000175_group_synthetic_CREATE_REMINDER_DRINK_WATER_s10_v2_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000176_real_voice_CREATE_REMINDER_V2_2_t2.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000177_group_synthetic_CREATE_REMINDER_STUDY_s10_v2_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000178_real_voice_CREATE_REMINDER_V2_3_t2.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000179_group_synthetic_CREATE_REMINDER_EXERCISE_s10_v2_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000180_real_voice_CREATE_REMINDER_V3_1_t2.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000181_group_synthetic_CREATE_REMINDER_DRINK_WATER_s10_v3_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000182_real_voice_CREATE_REMINDER_V3_2_t1.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000183_group_synthetic_CREATE_REMINDER_STUDY_s10_v3_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000184_real_voice_CREATE_REMINDER_V3_3_t2.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000185_group_synthetic_CREATE_REMINDER_EXERCISE_s10_v3_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000186_CommonVoice_en_common_voice_en_36827091.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000187_CommonVoice_en_common_voice_en_36827090.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000188_CommonVoice_en_common_voice_en_36827090.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000189_FluentSpeechCommands_2f3a53d0-4551-11e9-aa52-bf2189a03a60.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000190_FluentSpeechCommands_b47bcab0-4551-11e9-aa52-bf2189a03a60.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000191_FluentSpeechCommands_ed52eb60-4552-11e9-aa52-bf2189a03a60.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000192_FluentSpeechCommands_2d281d00-454e-11e9-aa52-bf2189a03a60.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000193_FluentSpeechCommands_ae8530f0-4552-11e9-aa52-bf2189a03a60.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000194_FluentSpeechCommands_26c856a0-454e-11e9-aa52-bf2189a03a60.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000195_FluentSpeechCommands_27f33ee0-454a-11e9-aa52-bf2189a03a60.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000196_group_synthetic_oos_OOS_s10_098_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000197_group_synthetic_oos_OOS_s10_099_noisy.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000198_group_synthetic_oos_OOS_s10_100_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000199_group_synthetic_oos_OOS_s100_101_noisy.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000200_group_synthetic_oos_OOS_s100_102_clean.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "holdout_000201_group_synthetic_oos_OOS_s100_103_noisy.wav",
           "expected": false,
           "detected": false,
           "detection_s": null
@@ -117,21 +2464,3172 @@
   "latency_ms": {
     "tcn": {
       "n": 200,
-      "p50": 0.58,
-      "p95": 0.61,
-      "p99": 0.67,
-      "mean": 0.59
+      "p50": 6.78,
+      "p95": 6.89,
+      "p99": 6.94,
+      "mean": 6.79
     },
-    "rtf": 7809.6,
+    "rtf": 696.7,
     "wake_chunk": {
       "n": 100,
-      "p50": 1.47,
-      "p95": 1.53
+      "p50": 20.51,
+      "p95": 22.21
     },
     "command_total": {
       "n": 50,
-      "p50": 1.48,
-      "p95": 1.64
+      "p50": 29.33,
+      "p95": 30.23
     }
+  },
+  "vcm_holdout": {
+    "dir": "/home/ruaya/Documents/Charrie/tiny-alexa/data/wake_tests",
+    "n": 202,
+    "n_in_scope": 186,
+    "n_out_of_scope": 16,
+    "command_threshold": 0.4,
+    "wake_detected": {
+      "count": 202,
+      "n": 202,
+      "rate_pct": 100.0,
+      "ci95_pct": [
+        98.13,
+        100.0
+      ]
+    },
+    "intent_accuracy": {
+      "count": 174,
+      "n": 202,
+      "rate_pct": 86.14,
+      "ci95_pct": [
+        80.7,
+        90.23
+      ]
+    },
+    "command_accuracy": {
+      "count": 174,
+      "n": 202,
+      "rate_pct": 86.14,
+      "ci95_pct": [
+        80.7,
+        90.23
+      ]
+    },
+    "false_accept": {
+      "count": 10,
+      "n": 16,
+      "rate_pct": 62.5,
+      "ci95_pct": [
+        38.64,
+        81.52
+      ]
+    },
+    "false_reject": {
+      "count": 5,
+      "n": 186,
+      "rate_pct": 2.69,
+      "ci95_pct": [
+        1.15,
+        6.14
+      ]
+    },
+    "misfire_intent": {
+      "count": 13,
+      "n": 186,
+      "rate_pct": 6.99,
+      "ci95_pct": [
+        4.13,
+        11.59
+      ]
+    },
+    "misfire_command": {
+      "count": 13,
+      "n": 186,
+      "rate_pct": 6.99,
+      "ci95_pct": [
+        4.13,
+        11.59
+      ]
+    },
+    "slot_exact": {
+      "count": 101,
+      "n": 101,
+      "rate_pct": 100.0,
+      "ci95_pct": [
+        96.34,
+        100.0
+      ]
+    },
+    "false_wake": {
+      "count": 0,
+      "n": 202,
+      "rate_pct": 0.0,
+      "ci95_pct": [
+        0.0,
+        1.87
+      ]
+    },
+    "infer_ms": {
+      "n": 202,
+      "p50": 22.91,
+      "p95": 29.71
+    },
+    "rtf_p95": 0.00619,
+    "errors": {
+      "REJECT -> BRIGHTNESS 100 percent": 3,
+      "LIGHT_OFF -> LIGHT_ON": 2,
+      "STOP -> PLAY_MUSIC": 2,
+      "REJECT -> TIMER 30 seconds": 2,
+      "PLAY_MUSIC -> NEXT": 1,
+      "PLAY_MUSIC -> REJECT": 1,
+      "LIGHT_OFF -> REJECT": 1,
+      "PAUSE -> PLAY_MUSIC": 1,
+      "STOP -> MESSAGE": 1,
+      "CALL -> TIME": 1,
+      "CALL -> REJECT": 1,
+      "ALARM 6 am -> REJECT": 1,
+      "COLOR red -> LIGHT_ON": 1,
+      "COLOR blue -> VOLUME_UP": 1,
+      "COLOR green -> VOLUME_UP": 1,
+      "COLOR red -> REJECT": 1,
+      "COLOR blue -> TIME": 1,
+      "COLOR green -> LIGHT_ON": 1,
+      "REJECT -> VOLUME_UP": 1,
+      "REJECT -> CREATE_REMINDER exercise": 1,
+      "REJECT -> BRIGHTNESS 20 percent": 1,
+      "REJECT -> TEMPERATURE 18 degrees": 1,
+      "REJECT -> LIGHT_OFF": 1
+    },
+    "trials": [
+      {
+        "file": "positives/alexa_holdout_000000_real_voice_PLAY_MUSIC_V2_t2.wav",
+        "transcript": "Play a song",
+        "source": "real_voice",
+        "true": "PLAY_MUSIC",
+        "pred": "NEXT",
+        "prob": 0.777,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": false,
+        "command_ok": false,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 22.22
+      },
+      {
+        "file": "positives/alexa_holdout_000001_group_synthetic_PLAY_MUSIC_s10_v1_clean.wav",
+        "transcript": "Play music",
+        "source": "group_synthetic",
+        "true": "PLAY_MUSIC",
+        "pred": "PLAY_MUSIC",
+        "prob": 0.955,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 18.23
+      },
+      {
+        "file": "positives/alexa_holdout_000002_real_voice_PLAY_MUSIC_V3_t2.wav",
+        "transcript": "Start the music",
+        "source": "real_voice",
+        "true": "PLAY_MUSIC",
+        "pred": "REJECT",
+        "prob": 0.252,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": false,
+        "command_ok": false,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 23.41
+      },
+      {
+        "file": "positives/alexa_holdout_000003_group_synthetic_PLAY_MUSIC_s10_v2_clean.wav",
+        "transcript": "Start music",
+        "source": "group_synthetic",
+        "true": "PLAY_MUSIC",
+        "pred": "PLAY_MUSIC",
+        "prob": 0.978,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 18.98
+      },
+      {
+        "file": "positives/alexa_holdout_000004_FluentSpeechCommands_c5d5f9c0-4547-11e9-aa52-bf2189a03a60.wav",
+        "transcript": "Put on the music",
+        "source": "FluentSpeechCommands",
+        "true": "PLAY_MUSIC",
+        "pred": "PLAY_MUSIC",
+        "prob": 0.647,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 51.9
+      },
+      {
+        "file": "positives/alexa_holdout_000005_group_synthetic_PLAY_MUSIC_s10_v3_clean.wav",
+        "transcript": "Play some music",
+        "source": "group_synthetic",
+        "true": "PLAY_MUSIC",
+        "pred": "PLAY_MUSIC",
+        "prob": 0.974,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 18.64
+      },
+      {
+        "file": "positives/alexa_holdout_000006_real_voice_WEATHER_V1_t2.wav",
+        "transcript": "Weather",
+        "source": "real_voice",
+        "true": "WEATHER",
+        "pred": "WEATHER",
+        "prob": 0.488,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 21.4
+      },
+      {
+        "file": "positives/alexa_holdout_000007_group_synthetic_WEATHER_s10_v1_clean.wav",
+        "transcript": "Weather",
+        "source": "group_synthetic",
+        "true": "WEATHER",
+        "pred": "WEATHER",
+        "prob": 0.928,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 15.75
+      },
+      {
+        "file": "positives/alexa_holdout_000008_real_voice_WEATHER_V2_t2.wav",
+        "transcript": "What's the weather?",
+        "source": "real_voice",
+        "true": "WEATHER",
+        "pred": "WEATHER",
+        "prob": 0.765,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 22.83
+      },
+      {
+        "file": "positives/alexa_holdout_000009_group_synthetic_WEATHER_s10_v2_clean.wav",
+        "transcript": "What's the weather?",
+        "source": "group_synthetic",
+        "true": "WEATHER",
+        "pred": "WEATHER",
+        "prob": 0.97,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 16.95
+      },
+      {
+        "file": "positives/alexa_holdout_000010_real_voice_WEATHER_V3_t1.wav",
+        "transcript": "Tell me the weather",
+        "source": "real_voice",
+        "true": "WEATHER",
+        "pred": "WEATHER",
+        "prob": 0.814,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 21.26
+      },
+      {
+        "file": "positives/alexa_holdout_000011_group_synthetic_WEATHER_s10_v3_clean.wav",
+        "transcript": "Tell me the weather",
+        "source": "group_synthetic",
+        "true": "WEATHER",
+        "pred": "WEATHER",
+        "prob": 0.941,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 17.34
+      },
+      {
+        "file": "positives/alexa_holdout_000012_real_voice_TIME_V1_t1.wav",
+        "transcript": "Time",
+        "source": "real_voice",
+        "true": "TIME",
+        "pred": "TIME",
+        "prob": 0.936,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 24.3
+      },
+      {
+        "file": "positives/alexa_holdout_000013_group_synthetic_TIME_s10_v1_clean.wav",
+        "transcript": "Time",
+        "source": "group_synthetic",
+        "true": "TIME",
+        "pred": "TIME",
+        "prob": 0.941,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 15.11
+      },
+      {
+        "file": "positives/alexa_holdout_000014_real_voice_TIME_V2_t1.wav",
+        "transcript": "What time is it?",
+        "source": "real_voice",
+        "true": "TIME",
+        "pred": "TIME",
+        "prob": 0.624,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 22.47
+      },
+      {
+        "file": "positives/alexa_holdout_000015_group_synthetic_TIME_s10_v2_clean.wav",
+        "transcript": "What time is it?",
+        "source": "group_synthetic",
+        "true": "TIME",
+        "pred": "TIME",
+        "prob": 0.947,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 17.98
+      },
+      {
+        "file": "positives/alexa_holdout_000016_real_voice_TIME_V3_t1.wav",
+        "transcript": "Tell me the time",
+        "source": "real_voice",
+        "true": "TIME",
+        "pred": "TIME",
+        "prob": 0.845,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 22.66
+      },
+      {
+        "file": "positives/alexa_holdout_000017_group_synthetic_TIME_s10_v3_clean.wav",
+        "transcript": "Tell me the time",
+        "source": "group_synthetic",
+        "true": "TIME",
+        "pred": "TIME",
+        "prob": 0.919,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 17.7
+      },
+      {
+        "file": "positives/alexa_holdout_000018_real_voice_LIGHT_ON_V1_t2.wav",
+        "transcript": "Lights on",
+        "source": "real_voice",
+        "true": "LIGHT_ON",
+        "pred": "LIGHT_ON",
+        "prob": 0.899,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 22.61
+      },
+      {
+        "file": "positives/alexa_holdout_000019_group_synthetic_LIGHT_ON_s10_v1_clean.wav",
+        "transcript": "Lights on",
+        "source": "group_synthetic",
+        "true": "LIGHT_ON",
+        "pred": "LIGHT_ON",
+        "prob": 0.971,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 18.11
+      },
+      {
+        "file": "positives/alexa_holdout_000020_real_voice_LIGHT_ON_V2_t2.wav",
+        "transcript": "Power on the lights",
+        "source": "real_voice",
+        "true": "LIGHT_ON",
+        "pred": "LIGHT_ON",
+        "prob": 0.847,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 28.01
+      },
+      {
+        "file": "positives/alexa_holdout_000021_group_synthetic_LIGHT_ON_s10_v2_clean.wav",
+        "transcript": "Power on the lights",
+        "source": "group_synthetic",
+        "true": "LIGHT_ON",
+        "pred": "LIGHT_ON",
+        "prob": 0.952,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 20.44
+      },
+      {
+        "file": "positives/alexa_holdout_000022_real_voice_LIGHT_ON_V3_t1.wav",
+        "transcript": "Turn on the lights",
+        "source": "real_voice",
+        "true": "LIGHT_ON",
+        "pred": "LIGHT_ON",
+        "prob": 0.882,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 23.29
+      },
+      {
+        "file": "positives/alexa_holdout_000023_group_synthetic_LIGHT_ON_s10_v3_clean.wav",
+        "transcript": "Turn on the lights",
+        "source": "group_synthetic",
+        "true": "LIGHT_ON",
+        "pred": "LIGHT_ON",
+        "prob": 0.95,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 18.03
+      },
+      {
+        "file": "positives/alexa_holdout_000024_real_voice_LIGHT_OFF_V1_t1.wav",
+        "transcript": "Lights off",
+        "source": "real_voice",
+        "true": "LIGHT_OFF",
+        "pred": "REJECT",
+        "prob": 0.364,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": false,
+        "command_ok": false,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 22.91
+      },
+      {
+        "file": "positives/alexa_holdout_000025_group_synthetic_LIGHT_OFF_s10_v1_clean.wav",
+        "transcript": "Lights out",
+        "source": "group_synthetic",
+        "true": "LIGHT_OFF",
+        "pred": "LIGHT_OFF",
+        "prob": 0.828,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 18.41
+      },
+      {
+        "file": "positives/alexa_holdout_000026_real_voice_LIGHT_OFF_V2_t2.wav",
+        "transcript": "Kill the lights",
+        "source": "real_voice",
+        "true": "LIGHT_OFF",
+        "pred": "LIGHT_ON",
+        "prob": 0.703,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": false,
+        "command_ok": false,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 23.59
+      },
+      {
+        "file": "positives/alexa_holdout_000027_group_synthetic_LIGHT_OFF_s10_v2_clean.wav",
+        "transcript": "Kill the lights",
+        "source": "group_synthetic",
+        "true": "LIGHT_OFF",
+        "pred": "LIGHT_OFF",
+        "prob": 0.94,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 19.52
+      },
+      {
+        "file": "positives/alexa_holdout_000028_real_voice_LIGHT_OFF_V3_t2.wav",
+        "transcript": "Turn off the lights",
+        "source": "real_voice",
+        "true": "LIGHT_OFF",
+        "pred": "LIGHT_ON",
+        "prob": 0.845,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": false,
+        "command_ok": false,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 28.09
+      },
+      {
+        "file": "positives/alexa_holdout_000029_group_synthetic_LIGHT_OFF_s10_v3_clean.wav",
+        "transcript": "Shut off the lights",
+        "source": "group_synthetic",
+        "true": "LIGHT_OFF",
+        "pred": "LIGHT_OFF",
+        "prob": 0.838,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 20.58
+      },
+      {
+        "file": "positives/alexa_holdout_000030_real_voice_PAUSE_V1_t1.wav",
+        "transcript": "Pause",
+        "source": "real_voice",
+        "true": "PAUSE",
+        "pred": "PAUSE",
+        "prob": 0.812,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 20.61
+      },
+      {
+        "file": "positives/alexa_holdout_000031_group_synthetic_PAUSE_s10_v1_clean.wav",
+        "transcript": "Pause",
+        "source": "group_synthetic",
+        "true": "PAUSE",
+        "pred": "PAUSE",
+        "prob": 0.896,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 16.41
+      },
+      {
+        "file": "positives/alexa_holdout_000032_real_voice_PAUSE_V2_t1.wav",
+        "transcript": "Pause the music",
+        "source": "real_voice",
+        "true": "PAUSE",
+        "pred": "PLAY_MUSIC",
+        "prob": 0.692,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": false,
+        "command_ok": false,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 22.86
+      },
+      {
+        "file": "positives/alexa_holdout_000033_group_synthetic_PAUSE_s10_v2_clean.wav",
+        "transcript": "Pause audio",
+        "source": "group_synthetic",
+        "true": "PAUSE",
+        "pred": "PAUSE",
+        "prob": 0.959,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 19.16
+      },
+      {
+        "file": "positives/alexa_holdout_000034_real_voice_PAUSE_V3_t1.wav",
+        "transcript": "Pause this song",
+        "source": "real_voice",
+        "true": "PAUSE",
+        "pred": "PAUSE",
+        "prob": 0.524,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 23.12
+      },
+      {
+        "file": "positives/alexa_holdout_000035_group_synthetic_PAUSE_s10_v3_clean.wav",
+        "transcript": "Pause song",
+        "source": "group_synthetic",
+        "true": "PAUSE",
+        "pred": "PAUSE",
+        "prob": 0.96,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 18.16
+      },
+      {
+        "file": "positives/alexa_holdout_000036_real_voice_STOP_V2_t1.wav",
+        "transcript": "Stop music",
+        "source": "real_voice",
+        "true": "STOP",
+        "pred": "PLAY_MUSIC",
+        "prob": 0.518,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": false,
+        "command_ok": false,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 27.43
+      },
+      {
+        "file": "positives/alexa_holdout_000037_group_synthetic_STOP_s10_v1_clean.wav",
+        "transcript": "Stop",
+        "source": "group_synthetic",
+        "true": "STOP",
+        "pred": "STOP",
+        "prob": 0.96,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 15.76
+      },
+      {
+        "file": "positives/alexa_holdout_000038_real_voice_STOP_V3_t1.wav",
+        "transcript": "Stop playing music",
+        "source": "real_voice",
+        "true": "STOP",
+        "pred": "MESSAGE",
+        "prob": 0.484,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": false,
+        "command_ok": false,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 23.75
+      },
+      {
+        "file": "positives/alexa_holdout_000039_group_synthetic_STOP_s10_v2_clean.wav",
+        "transcript": "Stop playing",
+        "source": "group_synthetic",
+        "true": "STOP",
+        "pred": "STOP",
+        "prob": 0.964,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 19.81
+      },
+      {
+        "file": "positives/alexa_holdout_000040_FluentSpeechCommands_5986cc10-454f-11e9-aa52-bf2189a03a60.wav",
+        "transcript": "Turn off the music",
+        "source": "FluentSpeechCommands",
+        "true": "STOP",
+        "pred": "PLAY_MUSIC",
+        "prob": 0.421,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": false,
+        "command_ok": false,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 20.96
+      },
+      {
+        "file": "positives/alexa_holdout_000041_group_synthetic_STOP_s10_v3_clean.wav",
+        "transcript": "End playback",
+        "source": "group_synthetic",
+        "true": "STOP",
+        "pred": "STOP",
+        "prob": 0.832,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 20.1
+      },
+      {
+        "file": "positives/alexa_holdout_000042_real_voice_NEXT_V2_t2.wav",
+        "transcript": "Next song",
+        "source": "real_voice",
+        "true": "NEXT",
+        "pred": "NEXT",
+        "prob": 0.661,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 26.65
+      },
+      {
+        "file": "positives/alexa_holdout_000043_group_synthetic_NEXT_s10_v1_clean.wav",
+        "transcript": "Next song",
+        "source": "group_synthetic",
+        "true": "NEXT",
+        "pred": "NEXT",
+        "prob": 0.932,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 18.29
+      },
+      {
+        "file": "positives/alexa_holdout_000044_real_voice_NEXT_V1_t2.wav",
+        "transcript": "Skip song",
+        "source": "real_voice",
+        "true": "NEXT",
+        "pred": "NEXT",
+        "prob": 0.528,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 23.39
+      },
+      {
+        "file": "positives/alexa_holdout_000045_group_synthetic_NEXT_s10_v2_clean.wav",
+        "transcript": "Skip song",
+        "source": "group_synthetic",
+        "true": "NEXT",
+        "pred": "NEXT",
+        "prob": 0.958,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 17.4
+      },
+      {
+        "file": "positives/alexa_holdout_000046_real_voice_NEXT_V3_t2.wav",
+        "transcript": "Play next song",
+        "source": "real_voice",
+        "true": "NEXT",
+        "pred": "NEXT",
+        "prob": 0.865,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 23.04
+      },
+      {
+        "file": "positives/alexa_holdout_000047_group_synthetic_NEXT_s10_v3_clean.wav",
+        "transcript": "Play next song",
+        "source": "group_synthetic",
+        "true": "NEXT",
+        "pred": "NEXT",
+        "prob": 0.944,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 17.34
+      },
+      {
+        "file": "positives/alexa_holdout_000048_real_voice_VOLUME_UP_V1_t2.wav",
+        "transcript": "Volume up",
+        "source": "real_voice",
+        "true": "VOLUME_UP",
+        "pred": "VOLUME_UP",
+        "prob": 0.832,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 29.72
+      },
+      {
+        "file": "positives/alexa_holdout_000049_group_synthetic_VOLUME_UP_s10_v1_clean.wav",
+        "transcript": "Volume up",
+        "source": "group_synthetic",
+        "true": "VOLUME_UP",
+        "pred": "VOLUME_UP",
+        "prob": 0.948,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 17.11
+      },
+      {
+        "file": "positives/alexa_holdout_000050_real_voice_VOLUME_UP_V2_t1.wav",
+        "transcript": "Increase the volume",
+        "source": "real_voice",
+        "true": "VOLUME_UP",
+        "pred": "VOLUME_UP",
+        "prob": 0.822,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 31.22
+      },
+      {
+        "file": "positives/alexa_holdout_000051_group_synthetic_VOLUME_UP_s10_v2_clean.wav",
+        "transcript": "Increase the volume",
+        "source": "group_synthetic",
+        "true": "VOLUME_UP",
+        "pred": "VOLUME_UP",
+        "prob": 0.944,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 21.75
+      },
+      {
+        "file": "positives/alexa_holdout_000052_real_voice_VOLUME_UP_V3_t1.wav",
+        "transcript": "Turn the volume up",
+        "source": "real_voice",
+        "true": "VOLUME_UP",
+        "pred": "VOLUME_UP",
+        "prob": 0.959,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 22.68
+      },
+      {
+        "file": "positives/alexa_holdout_000053_group_synthetic_VOLUME_UP_s10_v3_clean.wav",
+        "transcript": "Turn the volume up",
+        "source": "group_synthetic",
+        "true": "VOLUME_UP",
+        "pred": "VOLUME_UP",
+        "prob": 0.958,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 18.22
+      },
+      {
+        "file": "positives/alexa_holdout_000054_real_voice_VOLUME_DOWN_V1_t2.wav",
+        "transcript": "Volume down",
+        "source": "real_voice",
+        "true": "VOLUME_DOWN",
+        "pred": "VOLUME_DOWN",
+        "prob": 0.815,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 27.79
+      },
+      {
+        "file": "positives/alexa_holdout_000055_group_synthetic_VOLUME_DOWN_s10_v1_clean.wav",
+        "transcript": "Volume down",
+        "source": "group_synthetic",
+        "true": "VOLUME_DOWN",
+        "pred": "VOLUME_DOWN",
+        "prob": 0.958,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 18.57
+      },
+      {
+        "file": "positives/alexa_holdout_000056_real_voice_VOLUME_DOWN_V2_t1.wav",
+        "transcript": "Lower the volume",
+        "source": "real_voice",
+        "true": "VOLUME_DOWN",
+        "pred": "VOLUME_DOWN",
+        "prob": 0.474,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 24.67
+      },
+      {
+        "file": "positives/alexa_holdout_000057_group_synthetic_VOLUME_DOWN_s10_v2_clean.wav",
+        "transcript": "Lower the volume",
+        "source": "group_synthetic",
+        "true": "VOLUME_DOWN",
+        "pred": "VOLUME_DOWN",
+        "prob": 0.895,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 17.24
+      },
+      {
+        "file": "positives/alexa_holdout_000058_real_voice_VOLUME_DOWN_V3_t1.wav",
+        "transcript": "Turn the volume down",
+        "source": "real_voice",
+        "true": "VOLUME_DOWN",
+        "pred": "VOLUME_DOWN",
+        "prob": 0.704,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 24.22
+      },
+      {
+        "file": "positives/alexa_holdout_000059_group_synthetic_VOLUME_DOWN_s10_v3_clean.wav",
+        "transcript": "Turn the volume down",
+        "source": "group_synthetic",
+        "true": "VOLUME_DOWN",
+        "pred": "VOLUME_DOWN",
+        "prob": 0.936,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 18.77
+      },
+      {
+        "file": "positives/alexa_holdout_000060_real_voice_CALL_V1_t2.wav",
+        "transcript": "Call",
+        "source": "real_voice",
+        "true": "CALL",
+        "pred": "TIME",
+        "prob": 0.579,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": false,
+        "command_ok": false,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 19.97
+      },
+      {
+        "file": "positives/alexa_holdout_000061_group_synthetic_CALL_s10_v1_clean.wav",
+        "transcript": "Call",
+        "source": "group_synthetic",
+        "true": "CALL",
+        "pred": "CALL",
+        "prob": 0.808,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 16.29
+      },
+      {
+        "file": "positives/alexa_holdout_000062_real_voice_CALL_V2_t1.wav",
+        "transcript": "Make a call",
+        "source": "real_voice",
+        "true": "CALL",
+        "pred": "CALL",
+        "prob": 0.54,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 22.92
+      },
+      {
+        "file": "positives/alexa_holdout_000063_group_synthetic_CALL_s10_v2_clean.wav",
+        "transcript": "Make a call",
+        "source": "group_synthetic",
+        "true": "CALL",
+        "pred": "CALL",
+        "prob": 0.93,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 18.32
+      },
+      {
+        "file": "positives/alexa_holdout_000064_real_voice_CALL_V3_t1.wav",
+        "transcript": "Make a phone call",
+        "source": "real_voice",
+        "true": "CALL",
+        "pred": "REJECT",
+        "prob": 0.305,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": false,
+        "command_ok": false,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 27.8
+      },
+      {
+        "file": "positives/alexa_holdout_000065_group_synthetic_CALL_s10_v3_clean.wav",
+        "transcript": "Make a phone call",
+        "source": "group_synthetic",
+        "true": "CALL",
+        "pred": "CALL",
+        "prob": 0.944,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 18.8
+      },
+      {
+        "file": "positives/alexa_holdout_000066_real_voice_MESSAGE_V1_t2.wav",
+        "transcript": "Message",
+        "source": "real_voice",
+        "true": "MESSAGE",
+        "pred": "MESSAGE",
+        "prob": 0.417,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 24.46
+      },
+      {
+        "file": "positives/alexa_holdout_000067_group_synthetic_MESSAGE_s10_v1_clean.wav",
+        "transcript": "Message",
+        "source": "group_synthetic",
+        "true": "MESSAGE",
+        "pred": "MESSAGE",
+        "prob": 0.963,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 16.21
+      },
+      {
+        "file": "positives/alexa_holdout_000068_real_voice_MESSAGE_V2_t1.wav",
+        "transcript": "Send a message",
+        "source": "real_voice",
+        "true": "MESSAGE",
+        "pred": "MESSAGE",
+        "prob": 0.459,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 25.4
+      },
+      {
+        "file": "positives/alexa_holdout_000069_group_synthetic_MESSAGE_s10_v2_clean.wav",
+        "transcript": "Send a message",
+        "source": "group_synthetic",
+        "true": "MESSAGE",
+        "pred": "MESSAGE",
+        "prob": 0.958,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 18.61
+      },
+      {
+        "file": "positives/alexa_holdout_000070_real_voice_MESSAGE_V3_t2.wav",
+        "transcript": "Send my message",
+        "source": "real_voice",
+        "true": "MESSAGE",
+        "pred": "MESSAGE",
+        "prob": 0.488,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 23.16
+      },
+      {
+        "file": "positives/alexa_holdout_000071_group_synthetic_MESSAGE_s10_v3_clean.wav",
+        "transcript": "Send my message",
+        "source": "group_synthetic",
+        "true": "MESSAGE",
+        "pred": "MESSAGE",
+        "prob": 0.952,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 18.92
+      },
+      {
+        "file": "positives/alexa_holdout_000072_real_voice_LIST_REMINDERS_V1_t2.wav",
+        "transcript": "Reminders",
+        "source": "real_voice",
+        "true": "LIST_REMINDERS",
+        "pred": "LIST_REMINDERS",
+        "prob": 0.608,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 26.45
+      },
+      {
+        "file": "positives/alexa_holdout_000073_group_synthetic_LIST_REMINDERS_s10_v1_clean.wav",
+        "transcript": "Reminders",
+        "source": "group_synthetic",
+        "true": "LIST_REMINDERS",
+        "pred": "LIST_REMINDERS",
+        "prob": 0.955,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 18.28
+      },
+      {
+        "file": "positives/alexa_holdout_000074_real_voice_LIST_REMINDERS_V2_t2.wav",
+        "transcript": "Show my reminders",
+        "source": "real_voice",
+        "true": "LIST_REMINDERS",
+        "pred": "LIST_REMINDERS",
+        "prob": 0.792,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 22.93
+      },
+      {
+        "file": "positives/alexa_holdout_000075_group_synthetic_LIST_REMINDERS_s10_v2_clean.wav",
+        "transcript": "Show my reminders",
+        "source": "group_synthetic",
+        "true": "LIST_REMINDERS",
+        "pred": "LIST_REMINDERS",
+        "prob": 0.891,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 20.17
+      },
+      {
+        "file": "positives/alexa_holdout_000076_real_voice_LIST_REMINDERS_V3_t1.wav",
+        "transcript": "List my reminders",
+        "source": "real_voice",
+        "true": "LIST_REMINDERS",
+        "pred": "LIST_REMINDERS",
+        "prob": 0.816,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 23.43
+      },
+      {
+        "file": "positives/alexa_holdout_000077_group_synthetic_LIST_REMINDERS_s10_v3_clean.wav",
+        "transcript": "List my reminders",
+        "source": "group_synthetic",
+        "true": "LIST_REMINDERS",
+        "pred": "LIST_REMINDERS",
+        "prob": 0.896,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": false,
+        "infer_ms": 19.0
+      },
+      {
+        "file": "positives/alexa_holdout_000078_real_voice_TIMER_V1_1_t1.wav",
+        "transcript": "Timer 10 seconds",
+        "source": "real_voice",
+        "true": "TIMER 10 seconds",
+        "pred": "TIMER 10 seconds",
+        "prob": 0.796,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 24.12
+      },
+      {
+        "file": "positives/alexa_holdout_000079_group_synthetic_TIMER_10s_s10_v1_clean.wav",
+        "transcript": "Timer 10 seconds",
+        "source": "group_synthetic",
+        "true": "TIMER 10 seconds",
+        "pred": "TIMER 10 seconds",
+        "prob": 0.989,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 18.54
+      },
+      {
+        "file": "positives/alexa_holdout_000080_real_voice_TIMER_V1_2_t1.wav",
+        "transcript": "Timer 30 seconds",
+        "source": "real_voice",
+        "true": "TIMER 30 seconds",
+        "pred": "TIMER 30 seconds",
+        "prob": 0.996,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 22.66
+      },
+      {
+        "file": "positives/alexa_holdout_000081_group_synthetic_TIMER_30s_s10_v1_clean.wav",
+        "transcript": "Timer 30 seconds",
+        "source": "group_synthetic",
+        "true": "TIMER 30 seconds",
+        "pred": "TIMER 30 seconds",
+        "prob": 0.995,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 21.9
+      },
+      {
+        "file": "positives/alexa_holdout_000082_real_voice_TIMER_V1_3_t2.wav",
+        "transcript": "Timer 1 minute",
+        "source": "real_voice",
+        "true": "TIMER 1 minute",
+        "pred": "TIMER 1 minute",
+        "prob": 0.982,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 21.24
+      },
+      {
+        "file": "positives/alexa_holdout_000083_group_synthetic_TIMER_1m_s10_v1_clean.wav",
+        "transcript": "Timer 1 minute",
+        "source": "group_synthetic",
+        "true": "TIMER 1 minute",
+        "pred": "TIMER 1 minute",
+        "prob": 0.99,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 19.04
+      },
+      {
+        "file": "positives/alexa_holdout_000084_real_voice_TIMER_V2_1_t2.wav",
+        "transcript": "Countdown for 10 seconds",
+        "source": "real_voice",
+        "true": "TIMER 10 seconds",
+        "pred": "TIMER 10 seconds",
+        "prob": 0.961,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 24.54
+      },
+      {
+        "file": "positives/alexa_holdout_000085_group_synthetic_TIMER_10s_s10_v2_clean.wav",
+        "transcript": "Countdown for 10 seconds",
+        "source": "group_synthetic",
+        "true": "TIMER 10 seconds",
+        "pred": "TIMER 10 seconds",
+        "prob": 0.981,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 21.12
+      },
+      {
+        "file": "positives/alexa_holdout_000086_real_voice_TIMER_V2_2_t2.wav",
+        "transcript": "Countdown for 30 seconds",
+        "source": "real_voice",
+        "true": "TIMER 30 seconds",
+        "pred": "TIMER 30 seconds",
+        "prob": 0.991,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 25.59
+      },
+      {
+        "file": "positives/alexa_holdout_000087_group_synthetic_TIMER_30s_s10_v2_clean.wav",
+        "transcript": "Countdown for 30 seconds",
+        "source": "group_synthetic",
+        "true": "TIMER 30 seconds",
+        "pred": "TIMER 30 seconds",
+        "prob": 0.986,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 23.85
+      },
+      {
+        "file": "positives/alexa_holdout_000088_real_voice_TIMER_V2_3_t1.wav",
+        "transcript": "Countdown for 1 minute",
+        "source": "real_voice",
+        "true": "TIMER 1 minute",
+        "pred": "TIMER 1 minute",
+        "prob": 0.987,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 22.63
+      },
+      {
+        "file": "positives/alexa_holdout_000089_group_synthetic_TIMER_1m_s10_v2_clean.wav",
+        "transcript": "Countdown for 1 minute",
+        "source": "group_synthetic",
+        "true": "TIMER 1 minute",
+        "pred": "TIMER 1 minute",
+        "prob": 0.985,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 20.41
+      },
+      {
+        "file": "positives/alexa_holdout_000090_real_voice_TIMER_V3_1_t2.wav",
+        "transcript": "Start a timer for 10 seconds",
+        "source": "real_voice",
+        "true": "TIMER 10 seconds",
+        "pred": "TIMER 10 seconds",
+        "prob": 0.901,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 28.56
+      },
+      {
+        "file": "positives/alexa_holdout_000091_group_synthetic_TIMER_10s_s10_v3_clean.wav",
+        "transcript": "Start a timer for 10 seconds",
+        "source": "group_synthetic",
+        "true": "TIMER 10 seconds",
+        "pred": "TIMER 10 seconds",
+        "prob": 0.985,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 22.84
+      },
+      {
+        "file": "positives/alexa_holdout_000092_real_voice_TIMER_V3_2_t1.wav",
+        "transcript": "Start a timer for 30 seconds",
+        "source": "real_voice",
+        "true": "TIMER 30 seconds",
+        "pred": "TIMER 30 seconds",
+        "prob": 0.977,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 28.26
+      },
+      {
+        "file": "positives/alexa_holdout_000093_group_synthetic_TIMER_30s_s10_v3_clean.wav",
+        "transcript": "Start a timer for 30 seconds",
+        "source": "group_synthetic",
+        "true": "TIMER 30 seconds",
+        "pred": "TIMER 30 seconds",
+        "prob": 0.993,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 22.99
+      },
+      {
+        "file": "positives/alexa_holdout_000094_real_voice_TIMER_V3_3_t2.wav",
+        "transcript": "Start a timer for 1 minute",
+        "source": "real_voice",
+        "true": "TIMER 1 minute",
+        "pred": "TIMER 1 minute",
+        "prob": 0.918,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 29.09
+      },
+      {
+        "file": "positives/alexa_holdout_000095_group_synthetic_TIMER_1m_s10_v3_clean.wav",
+        "transcript": "Start a timer for 1 minute",
+        "source": "group_synthetic",
+        "true": "TIMER 1 minute",
+        "pred": "TIMER 1 minute",
+        "prob": 0.987,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 19.48
+      },
+      {
+        "file": "positives/alexa_holdout_000096_real_voice_ALARM_V1_1_t1.wav",
+        "transcript": "Alarm 6:00 AM",
+        "source": "real_voice",
+        "true": "ALARM 6 am",
+        "pred": "REJECT",
+        "prob": 0.214,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": false,
+        "command_ok": false,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 29.98
+      },
+      {
+        "file": "positives/alexa_holdout_000097_group_synthetic_ALARM_6_00AM_s10_v1_clean.wav",
+        "transcript": "Alarm 6 AM",
+        "source": "group_synthetic",
+        "true": "ALARM 6 am",
+        "pred": "ALARM 6 am",
+        "prob": 0.979,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 20.14
+      },
+      {
+        "file": "positives/alexa_holdout_000098_real_voice_ALARM_V1_2_t2.wav",
+        "transcript": "Alarm 8:00 AM",
+        "source": "real_voice",
+        "true": "ALARM 8 am",
+        "pred": "ALARM 8 am",
+        "prob": 0.975,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 22.55
+      },
+      {
+        "file": "positives/alexa_holdout_000099_group_synthetic_ALARM_8_00AM_s10_v1_clean.wav",
+        "transcript": "Alarm 8 AM",
+        "source": "group_synthetic",
+        "true": "ALARM 8 am",
+        "pred": "ALARM 8 am",
+        "prob": 0.992,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 20.33
+      },
+      {
+        "file": "positives/alexa_holdout_000100_group_synthetic_ALARM_9_00PM_s10_v1_clean.wav",
+        "transcript": "Alarm 9 PM",
+        "source": "group_synthetic",
+        "true": "ALARM 9 pm",
+        "pred": "ALARM 9 pm",
+        "prob": 0.995,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 23.97
+      },
+      {
+        "file": "positives/alexa_holdout_000101_group_synthetic_ALARM_9_00PM_s100_v1_clean.wav",
+        "transcript": "Alarm 9 PM",
+        "source": "group_synthetic",
+        "true": "ALARM 9 pm",
+        "pred": "ALARM 9 pm",
+        "prob": 0.98,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 26.22
+      },
+      {
+        "file": "positives/alexa_holdout_000102_real_voice_ALARM_V2_1_t1.wav",
+        "transcript": "Wake me up at 6:00 AM",
+        "source": "real_voice",
+        "true": "ALARM 6 am",
+        "pred": "ALARM 6 am",
+        "prob": 0.958,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 26.14
+      },
+      {
+        "file": "positives/alexa_holdout_000103_group_synthetic_ALARM_6_00AM_s10_v2_clean.wav",
+        "transcript": "Wake me up at 6 AM",
+        "source": "group_synthetic",
+        "true": "ALARM 6 am",
+        "pred": "ALARM 6 am",
+        "prob": 0.984,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 23.29
+      },
+      {
+        "file": "positives/alexa_holdout_000104_real_voice_ALARM_V2_2_t1.wav",
+        "transcript": "Wake me up at 8:00 AM",
+        "source": "real_voice",
+        "true": "ALARM 8 am",
+        "pred": "ALARM 8 am",
+        "prob": 0.795,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 28.74
+      },
+      {
+        "file": "positives/alexa_holdout_000105_group_synthetic_ALARM_8_00AM_s10_v2_clean.wav",
+        "transcript": "Wake me up at 8 AM",
+        "source": "group_synthetic",
+        "true": "ALARM 8 am",
+        "pred": "ALARM 8 am",
+        "prob": 0.993,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 27.75
+      },
+      {
+        "file": "positives/alexa_holdout_000106_real_voice_ALARM_V2_3_t2.wav",
+        "transcript": "Wake me up at 9:00 PM",
+        "source": "real_voice",
+        "true": "ALARM 9 pm",
+        "pred": "ALARM 9 pm",
+        "prob": 0.992,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 28.08
+      },
+      {
+        "file": "positives/alexa_holdout_000107_group_synthetic_ALARM_9_00PM_s10_v2_clean.wav",
+        "transcript": "Wake me up at 9 PM",
+        "source": "group_synthetic",
+        "true": "ALARM 9 pm",
+        "pred": "ALARM 9 pm",
+        "prob": 0.993,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 20.3
+      },
+      {
+        "file": "positives/alexa_holdout_000108_real_voice_ALARM_V3_1_t2.wav",
+        "transcript": "Set an alarm for 6:00 AM",
+        "source": "real_voice",
+        "true": "ALARM 6 am",
+        "pred": "ALARM 6 am",
+        "prob": 0.957,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 26.55
+      },
+      {
+        "file": "positives/alexa_holdout_000109_group_synthetic_ALARM_6_00AM_s10_v3_clean.wav",
+        "transcript": "Set an alarm for 6 AM",
+        "source": "group_synthetic",
+        "true": "ALARM 6 am",
+        "pred": "ALARM 6 am",
+        "prob": 0.985,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 22.75
+      },
+      {
+        "file": "positives/alexa_holdout_000110_real_voice_ALARM_V3_2_t2.wav",
+        "transcript": "Set an alarm for 8:00 AM",
+        "source": "real_voice",
+        "true": "ALARM 8 am",
+        "pred": "ALARM 8 am",
+        "prob": 0.987,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 24.55
+      },
+      {
+        "file": "positives/alexa_holdout_000111_group_synthetic_ALARM_8_00AM_s10_v3_clean.wav",
+        "transcript": "Set an alarm for 8 AM",
+        "source": "group_synthetic",
+        "true": "ALARM 8 am",
+        "pred": "ALARM 8 am",
+        "prob": 0.971,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 24.14
+      },
+      {
+        "file": "positives/alexa_holdout_000112_real_voice_ALARM_V3_3_t2.wav",
+        "transcript": "Set an alarm for 9:00 PM",
+        "source": "real_voice",
+        "true": "ALARM 9 pm",
+        "pred": "ALARM 9 pm",
+        "prob": 0.961,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 27.13
+      },
+      {
+        "file": "positives/alexa_holdout_000113_group_synthetic_ALARM_9_00PM_s10_v3_clean.wav",
+        "transcript": "Set an alarm for 9 PM",
+        "source": "group_synthetic",
+        "true": "ALARM 9 pm",
+        "pred": "ALARM 9 pm",
+        "prob": 0.995,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 21.99
+      },
+      {
+        "file": "positives/alexa_holdout_000114_real_voice_TEMPERATURE_V1_1_t1.wav",
+        "transcript": "Temperature 18 degrees",
+        "source": "real_voice",
+        "true": "TEMPERATURE 18 degrees",
+        "pred": "TEMPERATURE 18 degrees",
+        "prob": 0.829,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 24.13
+      },
+      {
+        "file": "positives/alexa_holdout_000115_group_synthetic_TEMPERATURE_18_s10_v1_clean.wav",
+        "transcript": "Temperature 18 degrees",
+        "source": "group_synthetic",
+        "true": "TEMPERATURE 18 degrees",
+        "pred": "TEMPERATURE 18 degrees",
+        "prob": 0.993,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 23.47
+      },
+      {
+        "file": "positives/alexa_holdout_000116_real_voice_TEMPERATURE_V1_2_t1.wav",
+        "transcript": "Temperature 22 degrees",
+        "source": "real_voice",
+        "true": "TEMPERATURE 22 degrees",
+        "pred": "TEMPERATURE 22 degrees",
+        "prob": 0.861,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 25.65
+      },
+      {
+        "file": "positives/alexa_holdout_000117_group_synthetic_TEMPERATURE_22_s10_v1_clean.wav",
+        "transcript": "Temperature 22 degrees",
+        "source": "group_synthetic",
+        "true": "TEMPERATURE 22 degrees",
+        "pred": "TEMPERATURE 22 degrees",
+        "prob": 0.991,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 23.7
+      },
+      {
+        "file": "positives/alexa_holdout_000118_real_voice_TEMPERATURE_V1_3_t1.wav",
+        "transcript": "Temperature 26 degrees",
+        "source": "real_voice",
+        "true": "TEMPERATURE 26 degrees",
+        "pred": "TEMPERATURE 26 degrees",
+        "prob": 0.802,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 29.39
+      },
+      {
+        "file": "positives/alexa_holdout_000119_group_synthetic_TEMPERATURE_26_s10_v1_clean.wav",
+        "transcript": "Temperature 26 degrees",
+        "source": "group_synthetic",
+        "true": "TEMPERATURE 26 degrees",
+        "pred": "TEMPERATURE 26 degrees",
+        "prob": 0.995,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 22.75
+      },
+      {
+        "file": "positives/alexa_holdout_000120_real_voice_TEMPERATURE_V2_1_t2.wav",
+        "transcript": "Change the temperature to 18 degrees",
+        "source": "real_voice",
+        "true": "TEMPERATURE 18 degrees",
+        "pred": "TEMPERATURE 18 degrees",
+        "prob": 0.973,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 27.84
+      },
+      {
+        "file": "positives/alexa_holdout_000121_group_synthetic_TEMPERATURE_18_s10_v2_clean.wav",
+        "transcript": "Change the temperature to 18 degrees",
+        "source": "group_synthetic",
+        "true": "TEMPERATURE 18 degrees",
+        "pred": "TEMPERATURE 18 degrees",
+        "prob": 0.997,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 27.26
+      },
+      {
+        "file": "positives/alexa_holdout_000122_real_voice_TEMPERATURE_V2_2_t1.wav",
+        "transcript": "Change the temperature to 22 degrees",
+        "source": "real_voice",
+        "true": "TEMPERATURE 22 degrees",
+        "pred": "TEMPERATURE 22 degrees",
+        "prob": 0.836,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 27.42
+      },
+      {
+        "file": "positives/alexa_holdout_000123_group_synthetic_TEMPERATURE_22_s10_v2_clean.wav",
+        "transcript": "Change the temperature to 22 degrees",
+        "source": "group_synthetic",
+        "true": "TEMPERATURE 22 degrees",
+        "pred": "TEMPERATURE 22 degrees",
+        "prob": 0.978,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 24.91
+      },
+      {
+        "file": "positives/alexa_holdout_000124_real_voice_TEMPERATURE_V2_3_t1.wav",
+        "transcript": "Change the temperature to 26 degrees",
+        "source": "real_voice",
+        "true": "TEMPERATURE 26 degrees",
+        "pred": "TEMPERATURE 26 degrees",
+        "prob": 0.975,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 27.33
+      },
+      {
+        "file": "positives/alexa_holdout_000125_group_synthetic_TEMPERATURE_26_s10_v2_clean.wav",
+        "transcript": "Change the temperature to 26 degrees",
+        "source": "group_synthetic",
+        "true": "TEMPERATURE 26 degrees",
+        "pred": "TEMPERATURE 26 degrees",
+        "prob": 0.988,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 26.01
+      },
+      {
+        "file": "positives/alexa_holdout_000126_real_voice_TEMPERATURE_V3_1_t1.wav",
+        "transcript": "Set the temperature to 18 degrees",
+        "source": "real_voice",
+        "true": "TEMPERATURE 18 degrees",
+        "pred": "TEMPERATURE 18 degrees",
+        "prob": 0.824,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 26.25
+      },
+      {
+        "file": "positives/alexa_holdout_000127_group_synthetic_TEMPERATURE_18_s10_v3_clean.wav",
+        "transcript": "Set the temperature to 18 degrees",
+        "source": "group_synthetic",
+        "true": "TEMPERATURE 18 degrees",
+        "pred": "TEMPERATURE 18 degrees",
+        "prob": 0.996,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 25.75
+      },
+      {
+        "file": "positives/alexa_holdout_000128_real_voice_TEMPERATURE_V3_2_t2.wav",
+        "transcript": "Set the temperature to 22 degrees",
+        "source": "real_voice",
+        "true": "TEMPERATURE 22 degrees",
+        "pred": "TEMPERATURE 22 degrees",
+        "prob": 0.919,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 30.89
+      },
+      {
+        "file": "positives/alexa_holdout_000129_group_synthetic_TEMPERATURE_22_s10_v3_clean.wav",
+        "transcript": "Set the temperature to 22 degrees",
+        "source": "group_synthetic",
+        "true": "TEMPERATURE 22 degrees",
+        "pred": "TEMPERATURE 22 degrees",
+        "prob": 0.991,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 22.29
+      },
+      {
+        "file": "positives/alexa_holdout_000130_real_voice_TEMPERATURE_V3_3_t2.wav",
+        "transcript": "Set the temperature to 26 degrees",
+        "source": "real_voice",
+        "true": "TEMPERATURE 26 degrees",
+        "pred": "TEMPERATURE 26 degrees",
+        "prob": 0.98,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 29.27
+      },
+      {
+        "file": "positives/alexa_holdout_000131_group_synthetic_TEMPERATURE_26_s10_v3_clean.wav",
+        "transcript": "Set the temperature to 26 degrees",
+        "source": "group_synthetic",
+        "true": "TEMPERATURE 26 degrees",
+        "pred": "TEMPERATURE 26 degrees",
+        "prob": 0.987,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 25.2
+      },
+      {
+        "file": "positives/alexa_holdout_000132_real_voice_BRIGHTNESS_V1_1_t2.wav",
+        "transcript": "Brightness 20 percent",
+        "source": "real_voice",
+        "true": "BRIGHTNESS 20 percent",
+        "pred": "BRIGHTNESS 20 percent",
+        "prob": 0.98,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 30.46
+      },
+      {
+        "file": "positives/alexa_holdout_000133_group_synthetic_BRIGHTNESS_20_s10_v1_clean.wav",
+        "transcript": "Brightness 20 percent",
+        "source": "group_synthetic",
+        "true": "BRIGHTNESS 20 percent",
+        "pred": "BRIGHTNESS 20 percent",
+        "prob": 0.988,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 22.99
+      },
+      {
+        "file": "positives/alexa_holdout_000134_real_voice_BRIGHTNESS_V1_2_t1.wav",
+        "transcript": "Brightness 60 percent",
+        "source": "real_voice",
+        "true": "BRIGHTNESS 60 percent",
+        "pred": "BRIGHTNESS 60 percent",
+        "prob": 0.965,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 26.15
+      },
+      {
+        "file": "positives/alexa_holdout_000135_group_synthetic_BRIGHTNESS_60_s10_v1_clean.wav",
+        "transcript": "Brightness 60 percent",
+        "source": "group_synthetic",
+        "true": "BRIGHTNESS 60 percent",
+        "pred": "BRIGHTNESS 60 percent",
+        "prob": 0.993,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 20.84
+      },
+      {
+        "file": "positives/alexa_holdout_000136_real_voice_BRIGHTNESS_V1_3_t1.wav",
+        "transcript": "Brightness 100 percent",
+        "source": "real_voice",
+        "true": "BRIGHTNESS 100 percent",
+        "pred": "BRIGHTNESS 100 percent",
+        "prob": 0.944,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 24.81
+      },
+      {
+        "file": "positives/alexa_holdout_000137_group_synthetic_BRIGHTNESS_100_s10_v1_clean.wav",
+        "transcript": "Brightness 100 percent",
+        "source": "group_synthetic",
+        "true": "BRIGHTNESS 100 percent",
+        "pred": "BRIGHTNESS 100 percent",
+        "prob": 0.973,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 21.15
+      },
+      {
+        "file": "positives/alexa_holdout_000138_real_voice_BRIGHTNESS_V3_1_t2.wav",
+        "transcript": "Change the brightness to 20 percent",
+        "source": "real_voice",
+        "true": "BRIGHTNESS 20 percent",
+        "pred": "BRIGHTNESS 20 percent",
+        "prob": 0.958,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 24.89
+      },
+      {
+        "file": "positives/alexa_holdout_000139_group_synthetic_BRIGHTNESS_20_s10_v2_clean.wav",
+        "transcript": "Adjust brightness to 20 percent",
+        "source": "group_synthetic",
+        "true": "BRIGHTNESS 20 percent",
+        "pred": "BRIGHTNESS 20 percent",
+        "prob": 0.995,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 25.17
+      },
+      {
+        "file": "positives/alexa_holdout_000140_real_voice_BRIGHTNESS_V3_2_t2.wav",
+        "transcript": "Change the brightness to 60 percent",
+        "source": "real_voice",
+        "true": "BRIGHTNESS 60 percent",
+        "pred": "BRIGHTNESS 60 percent",
+        "prob": 0.966,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 27.2
+      },
+      {
+        "file": "positives/alexa_holdout_000141_group_synthetic_BRIGHTNESS_60_s10_v2_clean.wav",
+        "transcript": "Adjust brightness to 60 percent",
+        "source": "group_synthetic",
+        "true": "BRIGHTNESS 60 percent",
+        "pred": "BRIGHTNESS 60 percent",
+        "prob": 0.989,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 23.38
+      },
+      {
+        "file": "positives/alexa_holdout_000142_real_voice_BRIGHTNESS_V2_3_t1.wav",
+        "transcript": "Set the brightness to 100 percent",
+        "source": "real_voice",
+        "true": "BRIGHTNESS 100 percent",
+        "pred": "BRIGHTNESS 100 percent",
+        "prob": 0.969,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 24.64
+      },
+      {
+        "file": "positives/alexa_holdout_000143_group_synthetic_BRIGHTNESS_100_s10_v2_clean.wav",
+        "transcript": "Adjust brightness to 100 percent",
+        "source": "group_synthetic",
+        "true": "BRIGHTNESS 100 percent",
+        "pred": "BRIGHTNESS 100 percent",
+        "prob": 0.992,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 24.4
+      },
+      {
+        "file": "positives/alexa_holdout_000144_group_synthetic_BRIGHTNESS_20_s10_v3_clean.wav",
+        "transcript": "Brightness level 20 percent",
+        "source": "group_synthetic",
+        "true": "BRIGHTNESS 20 percent",
+        "pred": "BRIGHTNESS 20 percent",
+        "prob": 0.993,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 22.72
+      },
+      {
+        "file": "positives/alexa_holdout_000145_group_synthetic_BRIGHTNESS_20_s100_v3_clean.wav",
+        "transcript": "Brightness level 20 percent",
+        "source": "group_synthetic",
+        "true": "BRIGHTNESS 20 percent",
+        "pred": "BRIGHTNESS 20 percent",
+        "prob": 0.983,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 23.61
+      },
+      {
+        "file": "positives/alexa_holdout_000146_group_synthetic_BRIGHTNESS_60_s10_v3_clean.wav",
+        "transcript": "Brightness level 60 percent",
+        "source": "group_synthetic",
+        "true": "BRIGHTNESS 60 percent",
+        "pred": "BRIGHTNESS 60 percent",
+        "prob": 0.992,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 22.4
+      },
+      {
+        "file": "positives/alexa_holdout_000147_group_synthetic_BRIGHTNESS_60_s100_v3_clean.wav",
+        "transcript": "Brightness level 60 percent",
+        "source": "group_synthetic",
+        "true": "BRIGHTNESS 60 percent",
+        "pred": "BRIGHTNESS 60 percent",
+        "prob": 0.98,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 24.08
+      },
+      {
+        "file": "positives/alexa_holdout_000148_group_synthetic_BRIGHTNESS_100_s10_v3_clean.wav",
+        "transcript": "Brightness level 100 percent",
+        "source": "group_synthetic",
+        "true": "BRIGHTNESS 100 percent",
+        "pred": "BRIGHTNESS 100 percent",
+        "prob": 0.994,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 25.17
+      },
+      {
+        "file": "positives/alexa_holdout_000149_group_synthetic_BRIGHTNESS_100_s100_v3_clean.wav",
+        "transcript": "Brightness level 100 percent",
+        "source": "group_synthetic",
+        "true": "BRIGHTNESS 100 percent",
+        "pred": "BRIGHTNESS 100 percent",
+        "prob": 0.995,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 26.91
+      },
+      {
+        "file": "positives/alexa_holdout_000150_real_voice_COLOR_V2_1_t2.wav",
+        "transcript": "Change the lights to Red",
+        "source": "real_voice",
+        "true": "COLOR red",
+        "pred": "LIGHT_ON",
+        "prob": 0.486,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": false,
+        "command_ok": false,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 22.49
+      },
+      {
+        "file": "positives/alexa_holdout_000151_group_synthetic_COLOR_RED_s10_v1_clean.wav",
+        "transcript": "Change color to red",
+        "source": "group_synthetic",
+        "true": "COLOR red",
+        "pred": "COLOR red",
+        "prob": 0.996,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 20.24
+      },
+      {
+        "file": "positives/alexa_holdout_000152_real_voice_COLOR_V2_2_t2.wav",
+        "transcript": "Change the lights to Blue",
+        "source": "real_voice",
+        "true": "COLOR blue",
+        "pred": "VOLUME_UP",
+        "prob": 0.769,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": false,
+        "command_ok": false,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 23.85
+      },
+      {
+        "file": "positives/alexa_holdout_000153_group_synthetic_COLOR_BLUE_s10_v1_clean.wav",
+        "transcript": "Change color to blue",
+        "source": "group_synthetic",
+        "true": "COLOR blue",
+        "pred": "COLOR blue",
+        "prob": 0.997,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 20.81
+      },
+      {
+        "file": "positives/alexa_holdout_000154_real_voice_COLOR_V2_3_t2.wav",
+        "transcript": "Change the lights to Green",
+        "source": "real_voice",
+        "true": "COLOR green",
+        "pred": "VOLUME_UP",
+        "prob": 0.699,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": false,
+        "command_ok": false,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 25.83
+      },
+      {
+        "file": "positives/alexa_holdout_000155_group_synthetic_COLOR_GREEN_s10_v1_clean.wav",
+        "transcript": "Change color to green",
+        "source": "group_synthetic",
+        "true": "COLOR green",
+        "pred": "COLOR green",
+        "prob": 0.991,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 20.76
+      },
+      {
+        "file": "positives/alexa_holdout_000156_group_synthetic_COLOR_RED_s10_v2_clean.wav",
+        "transcript": "Switch color to red",
+        "source": "group_synthetic",
+        "true": "COLOR red",
+        "pred": "COLOR red",
+        "prob": 0.994,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 22.03
+      },
+      {
+        "file": "positives/alexa_holdout_000157_group_synthetic_COLOR_RED_s100_v2_clean.wav",
+        "transcript": "Switch color to red",
+        "source": "group_synthetic",
+        "true": "COLOR red",
+        "pred": "COLOR red",
+        "prob": 0.986,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 19.87
+      },
+      {
+        "file": "positives/alexa_holdout_000158_group_synthetic_COLOR_BLUE_s10_v2_clean.wav",
+        "transcript": "Switch color to blue",
+        "source": "group_synthetic",
+        "true": "COLOR blue",
+        "pred": "COLOR blue",
+        "prob": 0.995,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 20.41
+      },
+      {
+        "file": "positives/alexa_holdout_000159_group_synthetic_COLOR_BLUE_s100_v2_clean.wav",
+        "transcript": "Switch color to blue",
+        "source": "group_synthetic",
+        "true": "COLOR blue",
+        "pred": "COLOR blue",
+        "prob": 0.976,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 22.53
+      },
+      {
+        "file": "positives/alexa_holdout_000160_group_synthetic_COLOR_GREEN_s10_v2_clean.wav",
+        "transcript": "Switch color to green",
+        "source": "group_synthetic",
+        "true": "COLOR green",
+        "pred": "COLOR green",
+        "prob": 0.983,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 20.32
+      },
+      {
+        "file": "positives/alexa_holdout_000161_group_synthetic_COLOR_GREEN_s100_v2_clean.wav",
+        "transcript": "Switch color to green",
+        "source": "group_synthetic",
+        "true": "COLOR green",
+        "pred": "COLOR green",
+        "prob": 0.978,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 21.03
+      },
+      {
+        "file": "positives/alexa_holdout_000162_real_voice_COLOR_V1_1_t2.wav",
+        "transcript": "Color Red",
+        "source": "real_voice",
+        "true": "COLOR red",
+        "pred": "REJECT",
+        "prob": 0.373,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": false,
+        "command_ok": false,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 25.84
+      },
+      {
+        "file": "positives/alexa_holdout_000163_group_synthetic_COLOR_RED_s10_v3_clean.wav",
+        "transcript": "Set color to red",
+        "source": "group_synthetic",
+        "true": "COLOR red",
+        "pred": "COLOR red",
+        "prob": 0.994,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 21.18
+      },
+      {
+        "file": "positives/alexa_holdout_000164_real_voice_COLOR_V1_2_t2.wav",
+        "transcript": "Color Blue",
+        "source": "real_voice",
+        "true": "COLOR blue",
+        "pred": "TIME",
+        "prob": 0.43,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": false,
+        "command_ok": false,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 18.65
+      },
+      {
+        "file": "positives/alexa_holdout_000165_group_synthetic_COLOR_BLUE_s10_v3_clean.wav",
+        "transcript": "Set color to blue",
+        "source": "group_synthetic",
+        "true": "COLOR blue",
+        "pred": "COLOR blue",
+        "prob": 0.995,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 18.85
+      },
+      {
+        "file": "positives/alexa_holdout_000166_real_voice_COLOR_V3_3_t2.wav",
+        "transcript": "Set the lights to Green",
+        "source": "real_voice",
+        "true": "COLOR green",
+        "pred": "LIGHT_ON",
+        "prob": 0.419,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": false,
+        "command_ok": false,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 21.75
+      },
+      {
+        "file": "positives/alexa_holdout_000167_group_synthetic_COLOR_GREEN_s10_v3_clean.wav",
+        "transcript": "Set color to green",
+        "source": "group_synthetic",
+        "true": "COLOR green",
+        "pred": "COLOR green",
+        "prob": 0.993,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 18.0
+      },
+      {
+        "file": "positives/alexa_holdout_000168_real_voice_CREATE_REMINDER_V1_1_t2.wav",
+        "transcript": "Reminder Drink water",
+        "source": "real_voice",
+        "true": "CREATE_REMINDER drink water",
+        "pred": "CREATE_REMINDER drink water",
+        "prob": 0.89,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 28.69
+      },
+      {
+        "file": "positives/alexa_holdout_000169_group_synthetic_CREATE_REMINDER_DRINK_WATER_s10_v1_clean.wav",
+        "transcript": "Reminder drink water",
+        "source": "group_synthetic",
+        "true": "CREATE_REMINDER drink water",
+        "pred": "CREATE_REMINDER drink water",
+        "prob": 0.994,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 18.97
+      },
+      {
+        "file": "positives/alexa_holdout_000170_real_voice_CREATE_REMINDER_V1_2_t2.wav",
+        "transcript": "Reminder Study",
+        "source": "real_voice",
+        "true": "CREATE_REMINDER study",
+        "pred": "CREATE_REMINDER study",
+        "prob": 0.988,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 21.54
+      },
+      {
+        "file": "positives/alexa_holdout_000171_group_synthetic_CREATE_REMINDER_STUDY_s10_v1_clean.wav",
+        "transcript": "Reminder study",
+        "source": "group_synthetic",
+        "true": "CREATE_REMINDER study",
+        "pred": "CREATE_REMINDER study",
+        "prob": 0.99,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 17.25
+      },
+      {
+        "file": "positives/alexa_holdout_000172_real_voice_CREATE_REMINDER_V1_3_t2.wav",
+        "transcript": "Reminder Exercise",
+        "source": "real_voice",
+        "true": "CREATE_REMINDER exercise",
+        "pred": "CREATE_REMINDER exercise",
+        "prob": 0.995,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 23.16
+      },
+      {
+        "file": "positives/alexa_holdout_000173_group_synthetic_CREATE_REMINDER_EXERCISE_s10_v1_clean.wav",
+        "transcript": "Reminder exercise",
+        "source": "group_synthetic",
+        "true": "CREATE_REMINDER exercise",
+        "pred": "CREATE_REMINDER exercise",
+        "prob": 0.991,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 20.38
+      },
+      {
+        "file": "positives/alexa_holdout_000174_real_voice_CREATE_REMINDER_V2_1_t2.wav",
+        "transcript": "Remind me to Drink water",
+        "source": "real_voice",
+        "true": "CREATE_REMINDER drink water",
+        "pred": "CREATE_REMINDER drink water",
+        "prob": 0.98,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 26.4
+      },
+      {
+        "file": "positives/alexa_holdout_000175_group_synthetic_CREATE_REMINDER_DRINK_WATER_s10_v2_clean.wav",
+        "transcript": "Remind me to drink water",
+        "source": "group_synthetic",
+        "true": "CREATE_REMINDER drink water",
+        "pred": "CREATE_REMINDER drink water",
+        "prob": 0.987,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 20.88
+      },
+      {
+        "file": "positives/alexa_holdout_000176_real_voice_CREATE_REMINDER_V2_2_t2.wav",
+        "transcript": "Remind me to Study",
+        "source": "real_voice",
+        "true": "CREATE_REMINDER study",
+        "pred": "CREATE_REMINDER study",
+        "prob": 0.977,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 23.92
+      },
+      {
+        "file": "positives/alexa_holdout_000177_group_synthetic_CREATE_REMINDER_STUDY_s10_v2_clean.wav",
+        "transcript": "Remind me to study",
+        "source": "group_synthetic",
+        "true": "CREATE_REMINDER study",
+        "pred": "CREATE_REMINDER study",
+        "prob": 0.989,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 20.01
+      },
+      {
+        "file": "positives/alexa_holdout_000178_real_voice_CREATE_REMINDER_V2_3_t2.wav",
+        "transcript": "Remind me to Exercise",
+        "source": "real_voice",
+        "true": "CREATE_REMINDER exercise",
+        "pred": "CREATE_REMINDER exercise",
+        "prob": 0.938,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 27.12
+      },
+      {
+        "file": "positives/alexa_holdout_000179_group_synthetic_CREATE_REMINDER_EXERCISE_s10_v2_clean.wav",
+        "transcript": "Remind me to exercise",
+        "source": "group_synthetic",
+        "true": "CREATE_REMINDER exercise",
+        "pred": "CREATE_REMINDER exercise",
+        "prob": 0.99,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 23.63
+      },
+      {
+        "file": "positives/alexa_holdout_000180_real_voice_CREATE_REMINDER_V3_1_t2.wav",
+        "transcript": "Create a reminder to Drink water",
+        "source": "real_voice",
+        "true": "CREATE_REMINDER drink water",
+        "pred": "CREATE_REMINDER drink water",
+        "prob": 0.977,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 29.62
+      },
+      {
+        "file": "positives/alexa_holdout_000181_group_synthetic_CREATE_REMINDER_DRINK_WATER_s10_v3_clean.wav",
+        "transcript": "Create a reminder to drink water",
+        "source": "group_synthetic",
+        "true": "CREATE_REMINDER drink water",
+        "pred": "CREATE_REMINDER drink water",
+        "prob": 0.99,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 26.12
+      },
+      {
+        "file": "positives/alexa_holdout_000182_real_voice_CREATE_REMINDER_V3_2_t1.wav",
+        "transcript": "Create a reminder to Study",
+        "source": "real_voice",
+        "true": "CREATE_REMINDER study",
+        "pred": "CREATE_REMINDER study",
+        "prob": 0.992,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 24.12
+      },
+      {
+        "file": "positives/alexa_holdout_000183_group_synthetic_CREATE_REMINDER_STUDY_s10_v3_clean.wav",
+        "transcript": "Create a reminder to study",
+        "source": "group_synthetic",
+        "true": "CREATE_REMINDER study",
+        "pred": "CREATE_REMINDER study",
+        "prob": 0.988,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 23.61
+      },
+      {
+        "file": "positives/alexa_holdout_000184_real_voice_CREATE_REMINDER_V3_3_t2.wav",
+        "transcript": "Create a reminder to Exercise",
+        "source": "real_voice",
+        "true": "CREATE_REMINDER exercise",
+        "pred": "CREATE_REMINDER exercise",
+        "prob": 0.968,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 23.69
+      },
+      {
+        "file": "positives/alexa_holdout_000185_group_synthetic_CREATE_REMINDER_EXERCISE_s10_v3_clean.wav",
+        "transcript": "Create a reminder to exercise",
+        "source": "group_synthetic",
+        "true": "CREATE_REMINDER exercise",
+        "pred": "CREATE_REMINDER exercise",
+        "prob": 0.989,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": true,
+        "oos": false,
+        "infer_ms": 26.8
+      },
+      {
+        "file": "positives/alexa_holdout_000186_CommonVoice_en_common_voice_en_36827091.wav",
+        "transcript": "They first met while both studying at University College Dublin.",
+        "source": "CommonVoice_en",
+        "true": "REJECT",
+        "pred": "BRIGHTNESS 100 percent",
+        "prob": 0.503,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": false,
+        "command_ok": false,
+        "slotted": false,
+        "oos": true,
+        "infer_ms": 31.54
+      },
+      {
+        "file": "positives/alexa_holdout_000187_CommonVoice_en_common_voice_en_36827090.wav",
+        "transcript": "Then they scrambled round the rocks to the other side of the house.",
+        "source": "CommonVoice_en",
+        "true": "REJECT",
+        "pred": "BRIGHTNESS 100 percent",
+        "prob": 0.868,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": false,
+        "command_ok": false,
+        "slotted": false,
+        "oos": true,
+        "infer_ms": 31.64
+      },
+      {
+        "file": "positives/alexa_holdout_000188_CommonVoice_en_common_voice_en_36827090.wav",
+        "transcript": "Then they scrambled round the rocks to the other side of the house.",
+        "source": "CommonVoice_en",
+        "true": "REJECT",
+        "pred": "BRIGHTNESS 100 percent",
+        "prob": 0.873,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": false,
+        "command_ok": false,
+        "slotted": false,
+        "oos": true,
+        "infer_ms": 31.44
+      },
+      {
+        "file": "positives/alexa_holdout_000189_FluentSpeechCommands_2f3a53d0-4551-11e9-aa52-bf2189a03a60.wav",
+        "transcript": "Kitchen heat up",
+        "source": "FluentSpeechCommands",
+        "true": "REJECT",
+        "pred": "VOLUME_UP",
+        "prob": 0.413,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": false,
+        "command_ok": false,
+        "slotted": false,
+        "oos": true,
+        "infer_ms": 21.4
+      },
+      {
+        "file": "positives/alexa_holdout_000190_FluentSpeechCommands_b47bcab0-4551-11e9-aa52-bf2189a03a60.wav",
+        "transcript": "Decrease the heating",
+        "source": "FluentSpeechCommands",
+        "true": "REJECT",
+        "pred": "REJECT",
+        "prob": 0.312,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": true,
+        "infer_ms": 21.96
+      },
+      {
+        "file": "positives/alexa_holdout_000191_FluentSpeechCommands_ed52eb60-4552-11e9-aa52-bf2189a03a60.wav",
+        "transcript": "Set language to Chinese",
+        "source": "FluentSpeechCommands",
+        "true": "REJECT",
+        "pred": "CREATE_REMINDER exercise",
+        "prob": 0.578,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": false,
+        "command_ok": false,
+        "slotted": false,
+        "oos": true,
+        "infer_ms": 24.97
+      },
+      {
+        "file": "positives/alexa_holdout_000192_FluentSpeechCommands_2d281d00-454e-11e9-aa52-bf2189a03a60.wav",
+        "transcript": "Go get me some juice",
+        "source": "FluentSpeechCommands",
+        "true": "REJECT",
+        "pred": "TIMER 30 seconds",
+        "prob": 0.675,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": false,
+        "command_ok": false,
+        "slotted": false,
+        "oos": true,
+        "infer_ms": 23.06
+      },
+      {
+        "file": "positives/alexa_holdout_000193_FluentSpeechCommands_ae8530f0-4552-11e9-aa52-bf2189a03a60.wav",
+        "transcript": "Fetch my socks",
+        "source": "FluentSpeechCommands",
+        "true": "REJECT",
+        "pred": "REJECT",
+        "prob": 0.255,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": true,
+        "infer_ms": 21.65
+      },
+      {
+        "file": "positives/alexa_holdout_000194_FluentSpeechCommands_26c856a0-454e-11e9-aa52-bf2189a03a60.wav",
+        "transcript": "Bring some juice",
+        "source": "FluentSpeechCommands",
+        "true": "REJECT",
+        "pred": "TIMER 30 seconds",
+        "prob": 0.529,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": false,
+        "command_ok": false,
+        "slotted": false,
+        "oos": true,
+        "infer_ms": 20.92
+      },
+      {
+        "file": "positives/alexa_holdout_000195_FluentSpeechCommands_27f33ee0-454a-11e9-aa52-bf2189a03a60.wav",
+        "transcript": "More heat",
+        "source": "FluentSpeechCommands",
+        "true": "REJECT",
+        "pred": "REJECT",
+        "prob": 0.321,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": true,
+        "infer_ms": 22.57
+      },
+      {
+        "file": "positives/alexa_holdout_000196_group_synthetic_oos_OOS_s10_098_clean.wav",
+        "transcript": "Open the garage door.",
+        "source": "group_synthetic_oos",
+        "true": "REJECT",
+        "pred": "REJECT",
+        "prob": 0.194,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": true,
+        "infer_ms": 20.41
+      },
+      {
+        "file": "positives/alexa_holdout_000197_group_synthetic_oos_OOS_s10_099_noisy.wav",
+        "transcript": "My sister is visiting next month.",
+        "source": "group_synthetic_oos",
+        "true": "REJECT",
+        "pred": "BRIGHTNESS 20 percent",
+        "prob": 0.408,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": false,
+        "command_ok": false,
+        "slotted": false,
+        "oos": true,
+        "infer_ms": 26.37
+      },
+      {
+        "file": "positives/alexa_holdout_000198_group_synthetic_oos_OOS_s10_100_clean.wav",
+        "transcript": "Book a table for two tonight.",
+        "source": "group_synthetic_oos",
+        "true": "REJECT",
+        "pred": "TEMPERATURE 18 degrees",
+        "prob": 0.669,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": false,
+        "command_ok": false,
+        "slotted": false,
+        "oos": true,
+        "infer_ms": 23.47
+      },
+      {
+        "file": "positives/alexa_holdout_000199_group_synthetic_oos_OOS_s100_101_noisy.wav",
+        "transcript": "Start the washing machine.",
+        "source": "group_synthetic_oos",
+        "true": "REJECT",
+        "pred": "LIGHT_OFF",
+        "prob": 0.882,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": false,
+        "command_ok": false,
+        "slotted": false,
+        "oos": true,
+        "infer_ms": 30.33
+      },
+      {
+        "file": "positives/alexa_holdout_000200_group_synthetic_oos_OOS_s100_102_clean.wav",
+        "transcript": "Find flights to Cebu.",
+        "source": "group_synthetic_oos",
+        "true": "REJECT",
+        "pred": "REJECT",
+        "prob": 0.163,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": true,
+        "infer_ms": 25.36
+      },
+      {
+        "file": "positives/alexa_holdout_000201_group_synthetic_oos_OOS_s100_103_noisy.wav",
+        "transcript": "We're going to the beach on Saturday.",
+        "source": "group_synthetic_oos",
+        "true": "REJECT",
+        "pred": "REJECT",
+        "prob": 0.31,
+        "wake_detected": true,
+        "false_wake_on_negative": false,
+        "intent_ok": true,
+        "command_ok": true,
+        "slotted": false,
+        "oos": true,
+        "infer_ms": 29.79
+      }
+    ]
   }
 }
