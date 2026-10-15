@@ -1,6 +1,6 @@
 # Project dashboard — auto-filled
 
-_generated from: /Users/charrieannenacor/sandbox/tiny-alexa/results/gpu_report.json (present), /Users/charrieannenacor/sandbox/tiny-alexa/results/pi_report.json (MISSING — run src/bench_pi.py on the Pi)_
+_generated from: /Users/charrieannenacor/sandbox/tiny-alexa/results/gpu_report.json (present), /Users/charrieannenacor/sandbox/tiny-alexa/results/pi_report.json (present)_
 
 | **Model** | |
 |---|---|
@@ -27,9 +27,9 @@ _generated from: /Users/charrieannenacor/sandbox/tiny-alexa/results/gpu_report.j
 
 | **Validation on RPi 4** | |
 |---|---|
-| Hardware | (TBD) |
-| Wake word | (TBD) |
-| Keyword / intent accuracy | (TBD) / 99.66% (full test set, n=1789) |
-| False-accept rate | (TBD) |
-| Latency p95 / RTF | (TBD) |
-| Runtime | (TBD) |
+| Hardware | Charries-MacBook-Air.local — arm64 |
+| Wake word | alexa_v0.1 (openwakeword 0.4.0), threshold 0.5, patience 2 chunks |
+| Keyword / intent accuracy | 80.00% (4/5 clips) / 99.66% (full test set, n=1789) |
+| False-accept rate | 0.00% (0/8 clips) |
+| Latency p95 / RTF | p95 0.61 ms / RTF 7809.6 (p50 0.58 ms, n=200) |
+| Runtime | onnxruntime 1.31.0 — 1 thread(s) (TCN.onnx, 898 KB) |

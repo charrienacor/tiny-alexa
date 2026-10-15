@@ -1,0 +1,137 @@
+{
+  "stage": "pi_inference",
+  "timestamp": "2026-10-14T17:18:16+08:00",
+  "machine": {
+    "hostname": "Charries-MacBook-Air.local",
+    "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+    "python": "3.13.9",
+    "arch": "arm64"
+  },
+  "software": {
+    "onnxruntime": "1.31.0",
+    "openwakeword": "0.4.0",
+    "numpy": "2.5.4"
+  },
+  "model": {
+    "path": "TCN.onnx",
+    "size_kb": 898,
+    "threads": 1
+  },
+  "wake_word": {
+    "model": "alexa_v0.1",
+    "threshold": 0.5,
+    "patience_chunks": 2,
+    "true_accept": {
+      "files": 5,
+      "detected": 4,
+      "rate_pct": 80.0,
+      "per_file": [
+        {
+          "file": "pos1.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 0.56
+        },
+        {
+          "file": "pos2.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 0.56
+        },
+        {
+          "file": "pos3.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 0.64
+        },
+        {
+          "file": "pos4.wav",
+          "expected": true,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "pos5.wav",
+          "expected": true,
+          "detected": true,
+          "detection_s": 0.56
+        }
+      ]
+    },
+    "false_accept": {
+      "files": 8,
+      "detected": 0,
+      "rate_pct": 0.0,
+      "per_file": [
+        {
+          "file": "neg1.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "neg2.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "neg3.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "neg4.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "neg5.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "neg6.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "neg7.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        },
+        {
+          "file": "neg8.wav",
+          "expected": false,
+          "detected": false,
+          "detection_s": null
+        }
+      ]
+    }
+  },
+  "latency_ms": {
+    "tcn": {
+      "n": 200,
+      "p50": 0.58,
+      "p95": 0.61,
+      "p99": 0.67,
+      "mean": 0.59
+    },
+    "rtf": 7809.6,
+    "wake_chunk": {
+      "n": 100,
+      "p50": 1.47,
+      "p95": 1.53
+    },
+    "command_total": {
+      "n": 50,
+      "p50": 1.48,
+      "p95": 1.64
+    }
+  }
+}

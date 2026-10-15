@@ -3002,6 +3002,7 @@
     const CHUNK = 1280;            // 80 ms at 16 kHz (openWakeWord chunk size)
 
     /* ---- randomized spoken-style responses ---- */
+    // demo only; the live server picks its own (src/server.py WAKE_PHRASES)
     const WAKE_PHRASES = ["Uh-huh", "Yes", "Yeah?", "I’m here", "Go ahead", "I’m listening", "Here", "Yes?"];
     const CONFIRM_PHRASES = ["Got it", "Okay", "Sure", "On it", "Done", "Alright", "Will do", "No problem"];
 
@@ -3333,10 +3334,15 @@
       document.body.classList.add("busy");
     }
 
-    function onAwake() {
+    // m: the server's "awake" event — it picks the reply (src/server.py
+    // WAKE_PHRASES) and stays deaf while it plays. The demo passes nothing.
+    function onAwake(m) {
       state = "awake";
+      stopSpeaking();                // barge-in: don't record our own reply
       mDuck(true);                   // quieter music so the command is heard
-      setPhrase(rand(WAKE_PHRASES), "wake");
+      const phrase = (m && m.phrase) || rand(WAKE_PHRASES);
+      setPhrase(phrase, "wake");
+      if (m && m.speak) speak(phrase);
       hintEl.textContent = "listening…";
       // brief wake beat, then settle into listening
       setTimeout(() => { if (state === "awake") { state = "listening"; } }, 900);
@@ -3359,6 +3365,7 @@
       const confirm = rand(CONFIRM_PHRASES);
       let detail = "";
       let holdMs = 3200;
+      let spoken = confirm;
       if (r && r.intent) {
         let msg = INTENT_MESSAGES[r.intent] || r.intent;
         if (r.intent === "TIME") {
@@ -3411,9 +3418,12 @@
         const tag = r.slot && r.slot !== "NO_SLOT" ? `<span class="tag">${esc(r.intent)} · ${esc(r.slot)}</span>`
           : `<span class="tag">${esc(r.intent)}</span>`;
         detail = `${msg} ${tag}`;
+        // STOP's owner (timer, aircon, call, ...) shows its own line; just confirm
+        if (r.intent !== "STOP") spoken = `${confirm}. ${msg}`;
       }
       setPhrase(confirm, "confirm");
       if (detail) detailEl.innerHTML = detail, detailEl.classList.add("show");
+      speak(spoken);
       hintEl.textContent = "";
 
       // ---- timer: the ring owns the timing from here on ----
@@ -3528,6 +3538,7 @@
       state = "result";
       mDuck(false);
       setPhrase("Hmm?", "wake");
+      speak(msg || "I didn’t catch that");
       detailEl.innerHTML = msg ? `<span style="color:var(--muted)">${esc(msg)}</span>` : "I didn’t catch that";
       detailEl.classList.add("show");
       resultTimer = setTimeout(() => {
@@ -4811,6 +4822,59 @@
     }
 
     /* =====================================================================
+       SPEECH — replies are spoken as well as shown. server.py synthesizes
+       them on-device (GET /tts -> WAV: piper / espeak-ng / macOS say); when
+       it has no engine ("ready".tts === "browser", or the demo has no
+       server) the browser's own speechSynthesis voice is used instead.
+       "off" (server.py --tts off) or ?mute keeps it silent. Music is ducked
+       while speaking, and a new wake word cuts the reply off so it isn't
+       recorded as part of the next command.
+       ===================================================================== */
+    let ttsMode = new URLSearchParams(location.search).has("mute") ? "off"
+      : DEMO ? "browser" : "server";
+    const voice = new Audio();
+    let speakSeq = 0;
+    function speakable(s) {
+      const div = document.createElement("div");
+      div.innerHTML = s;                                    // drop tags, decode &amp; etc.
+      return div.textContent
+        .replace(/°C/g, " degrees Celsius").replace(/°/g, " degrees")
+        .replace(/\s*—\s*/g, ", ").replace(/…/g, ".")
+        .replace(/\b(\d+) (h|min)\b/g, (_, n, u) =>             // fmtIn: "1 h 5 min"
+          `${n} ${u === "h" ? "hour" : "minute"}${n === "1" ? "" : "s"}`)
+        .replace(/\s+/g, " ").trim();
+    }
+    function stopSpeaking() {
+      speakSeq++;
+      voice.pause(); voice.removeAttribute("src");
+      if (window.speechSynthesis) speechSynthesis.cancel();
+    }
+    function speechDone(seq) {
+      if (seq !== speakSeq) return;                         // superseded by newer speech
+      const busy = state === "awake" || state === "listening"
+        || (alarmActive && alarmPhase === "ringing");       // those own the duck
+      if (!busy) mDuck(false);
+    }
+    function speakBrowser(text, seq) {
+      if (!window.speechSynthesis || seq !== speakSeq) return speechDone(seq);
+      const u = new SpeechSynthesisUtterance(text);
+      u.onend = u.onerror = () => speechDone(seq);
+      speechSynthesis.speak(u);
+    }
+    function speak(text) {
+      text = speakable(text || "");
+      if (!text || ttsMode === "off") return;
+      stopSpeaking();
+      const seq = speakSeq;
+      mDuck(true);
+      if (ttsMode === "browser") return speakBrowser(text, seq);
+      voice.src = "tts?text=" + encodeURIComponent(text);
+      voice.onended = () => speechDone(seq);
+      voice.onerror = () => speakBrowser(text, seq);          // server engine failed
+      voice.play().catch(() => speakBrowser(text, seq));
+    }
+
+    /* =====================================================================
        WEBSOCKET  — talk to server.py
        ===================================================================== */
     // Reconnects with backoff (1 s -> 10 s), so restarting server.py on the Pi
@@ -4832,8 +4896,11 @@
         if (typeof ev.data !== "string") return;
         let m; try { m = JSON.parse(ev.data); } catch { return; }
         switch (m.type) {
-          case "ready": toast(`ready · ${m.models.join(", ")}`, 1200); break;
-          case "awake": onAwake(); break;
+          case "ready":
+            toast(`ready · ${m.models.join(", ")}`, 1200);
+            if (ttsMode !== "off" && m.tts) ttsMode = m.tts === "browser" || m.tts === "off" ? m.tts : "server";
+            break;
+          case "awake": onAwake(m); break;
           case "result": lastLatency = m.latency_ms || 0; onResult(m); break;
           case "rejected": onRejected(m.message); break;
           case "idle": mDuck(false); if (state !== "idle" && !timerActive) backToIdle(); break;

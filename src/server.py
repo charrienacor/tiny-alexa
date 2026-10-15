@@ -16,12 +16,22 @@ Run (from the project root):
     python3 src/server.py --port 9000
     python3 src/server.py --int8        # models/TCN_int8.onnx if present
     python3 src/server.py --debug       # print every event + latency
+    python3 src/server.py --tts espeak  # pick the voice engine (default: auto)
 
 On the Raspberry Pi 4:
     pip install numpy soundfile onnxruntime aiohttp openwakeword==0.4.0
     python3 src/server.py
 then open http://<pi-ip>:8321 in a browser (Chrome / Edge / Safari).
 Note: browsers only allow the microphone on https:// or http://localhost.
+
+Text-to-speech: replies are spoken as well as shown. The browser asks
+GET /tts?text=... and plays the WAV it gets back. Synthesis is local too:
+  piper     best quality; needs `pip install piper-tts` and a voice, e.g.
+            models/tts/en_US-lessac-medium.onnx (+ its .onnx.json)
+  espeak    `sudo apt install espeak-ng` -- robotic but tiny and fast
+  say       macOS built-in (handy when developing on a Mac)
+--tts auto picks the first one available. With none, the browser falls back
+to its own speechSynthesis voice; --tts off keeps Tiny-Alexa silent.
 
 Weather: the browser fetches it from open-meteo; GET /geo?lat=..&lon=..
 turns its GPS fix into a place name (OpenStreetMap Nominatim, cached), so
@@ -31,13 +41,22 @@ WebSocket protocol (/ws):
     browser -> server   text "16000" (sample rate), then binary int16 PCM
     server  -> browser  {"type": "ready" | "awake" | "result" | "rejected"
                                  | "idle" | "error", ...}
+    "awake" carries "phrase" (the reply to show) and "speak" (say it aloud)
+    "ready" carries "tts": "piper" | "espeak-ng" | "espeak" | "say"
+                           | "browser" (no local engine) | "off"
 """
 import argparse
 import asyncio
 import collections
 import json
+import math
 import queue
+import random
+import shutil
+import subprocess
+import struct
 import sys
+import tempfile
 import threading
 import time
 from pathlib import Path
@@ -103,10 +122,31 @@ GEO_MIN_INTERVAL_S = 1.0
 GEO_PLACE_KEYS = ("city", "town", "village", "municipality", "suburb",
                   "city_district", "county", "state_district", "state")
 
+# Text-to-speech. Each reply is synthesized once and cached (the same few
+# dozen phrases come up again and again), one synthesis at a time so the
+# Pi's CPU stays free for the wake word.
+TTS_DIR = ROOT / "models" / "tts"            # piper voices: *.onnx + *.onnx.json
+TTS_MAX_CHARS = 300
+TTS_CACHE_SIZE = 64
+TTS_TIMEOUT_S = 15
+
+# Spoken acknowledgement right after the wake word ("Yes?"). The browser
+# plays it while the server is already listening for the command, so the
+# worker ignores the mic for as long as it plays (+ margin for network and
+# audio start-up) -- otherwise the command recording would begin with our
+# own "Yes?". Short phrases keep that deaf window short; say the command
+# after the reply, like with a real Alexa.
+WAKE_PHRASES = ["Uh-huh", "Yes", "Yeah?", "I'm here", "Go ahead",
+                "I'm listening", "Here", "Yes?"]
+WAKE_ACK_MARGIN_S = 0.15
+WAKE_ACK_BROWSER_S = 0.8   # guess for the browser's own voice (can't measure it)
+ESPEAK_VOICE, ESPEAK_WPM = "en-us", 165
+
 ARGS = None
 CMD = None                # CommandModel: stateless, shared by all connections
 CMD_NAME = "TCN"
 CMD_LOCK = threading.Lock()
+TTS_ENGINE = None         # TTS, set in main()
 
 
 def classify(wav):
@@ -242,6 +282,106 @@ def build_tracks():
 
 
 # ---------------------------------------------------------------------------
+# Text-to-speech  (text -> WAV bytes, all on-device)
+# ---------------------------------------------------------------------------
+def wav_seconds(wav):
+    """Duration of a PCM WAV. Reads the fmt chunk and measures the data to the
+    end of the file, because espeak --stdout writes a placeholder data size."""
+    i, rate, block = 12, 0, 0
+    while i + 8 <= len(wav):
+        cid, size = wav[i:i + 4], struct.unpack("<I", wav[i + 4:i + 8])[0]
+        if cid == b"fmt ":
+            _, ch, rate, _, block = struct.unpack("<HHIIH", wav[i + 8:i + 22])
+        elif cid == b"data":
+            return (len(wav) - i - 8) / (rate * block) if rate and block else 0.0
+        i += 8 + size + (size & 1)
+    return 0.0
+
+
+class TTS:
+    """Wraps whichever local engine is installed. engine is "piper",
+    "espeak-ng", "espeak" or "say"; "browser" / "off" mean the server
+    doesn't synthesize (the page uses speechSynthesis, or stays silent)."""
+
+    def __init__(self, choice, voice=None):
+        self.voice = None
+        self.cache = collections.OrderedDict()
+        self.lock = threading.Lock()
+        self.engine = self._pick(choice, voice)
+
+    def _pick(self, choice, voice):
+        if choice in ("off", "browser"):
+            return choice
+        if choice in ("auto", "piper"):
+            exe = shutil.which("piper")
+            v = Path(voice) if voice else next(iter(sorted(TTS_DIR.glob("*.onnx"))), None)
+            if exe and v and v.is_file():
+                self.exe, self.voice = exe, v
+                return "piper"
+            if choice == "piper":
+                sys.exit("error: --tts piper needs the `piper` command (pip install piper-tts) "
+                         f"and a voice .onnx in {TTS_DIR} or given with --voice")
+        if choice in ("auto", "espeak"):
+            for name in ("espeak-ng", "espeak"):
+                if exe := shutil.which(name):
+                    self.exe = exe
+                    return name
+            if choice == "espeak":
+                sys.exit("error: --tts espeak needs espeak-ng (sudo apt install espeak-ng)")
+        if choice in ("auto", "say"):
+            if exe := shutil.which("say"):
+                self.exe = exe
+                return "say"
+            if choice == "say":
+                sys.exit("error: --tts say is only available on macOS")
+        return "browser"
+
+    def duration(self, text):
+        """Seconds the spoken text lasts (synthesizes it if not cached)."""
+        if not self.local:
+            return WAKE_ACK_BROWSER_S
+        try:
+            return wav_seconds(self.synth(text))
+        except (OSError, subprocess.SubprocessError):
+            return WAKE_ACK_BROWSER_S
+
+    @property
+    def local(self):
+        return self.engine not in ("off", "browser")
+
+    def synth(self, text):
+        """Text -> WAV bytes. Blocking: call it from a thread."""
+        with self.lock:
+            if text in self.cache:
+                self.cache.move_to_end(text)
+                return self.cache[text]
+            wav = self._run(text)
+            self.cache[text] = wav
+            if len(self.cache) > TTS_CACHE_SIZE:
+                self.cache.popitem(last=False)
+            return wav
+
+    def _run(self, text):
+        data = text.encode()
+        if self.engine.startswith("espeak"):
+            return subprocess.run(
+                [self.exe, "-v", ESPEAK_VOICE, "-s", str(ESPEAK_WPM), "--stdout"],
+                input=data, capture_output=True, check=True,
+                timeout=TTS_TIMEOUT_S).stdout
+        # piper and say write a file rather than stdout
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp) / "speech.wav"
+            if self.engine == "piper":
+                cmd = [self.exe, "--model", str(self.voice), "--output_file", str(out)]
+            else:
+                cmd = [self.exe, "-o", str(out), "--file-format=WAVE",
+                       "--data-format=LEI16@22050", "-f", "-"]
+            subprocess.run(cmd, input=data, capture_output=True, check=True,
+                           timeout=TTS_TIMEOUT_S)
+            return out.read_bytes()
+
+
+# ---------------------------------------------------------------------------
 # Per-connection worker (runs in a thread so blocking model calls never
 # stall the event loop). Each connection gets its own wake-word model:
 # openWakeWord keeps streaming state, so sharing one across tabs would mix
@@ -258,7 +398,8 @@ def worker(q, emit, debug):
         emit({"type": "error", "message": f"wake word failed to load: {e}"})
         emit(None)
         return
-    emit({"type": "ready", "models": ["alexa", CMD_NAME]})
+    emit({"type": "ready", "models": ["alexa", CMD_NAME], "tts": TTS_ENGINE.engine})
+    speak = TTS_ENGINE.engine != "off" and not ARGS.no_wake_ack
 
     rec = None                 # None while waiting for the wake word
     levels = collections.deque(maxlen=NOISE_HISTORY_CHUNKS)   # pre-wake chunk RMS
@@ -276,14 +417,22 @@ def worker(q, emit, debug):
         if rec is None:
             if woke:
                 nrms = float(np.percentile(levels, NOISE_PERCENTILE)) if levels else 0.0
-                rec = {"phase": "tail", "tail": 0, "buf": [], "silent": 0,
+                phrase = random.choice(WAKE_PHRASES)
+                ack_s = TTS_ENGINE.duration(phrase) if speak else 0.0
+                # deaf until "Alexa" has ended AND the spoken reply has played
+                tail = max(WAKE_TAIL_CHUNKS,
+                           math.ceil((ack_s + WAKE_ACK_MARGIN_S) * SAMPLE_RATE / WAKE_CHUNK)
+                           if ack_s else 0)
+                rec = {"phase": "tail", "tail": 0, "tail_chunks": tail,
+                       "buf": [], "silent": 0,
                        "preroll": collections.deque(maxlen=PREROLL_CHUNKS),
                        "t0": time.monotonic(),
                        "threshold": min(MAX_SPEECH_THRESHOLD,
                                      max(MIN_SPEECH_RMS, SPEECH_OVER_NOISE * nrms))}
-                emit({"type": "awake"})
+                emit({"type": "awake", "phrase": phrase, "speak": speak})
                 if debug:
-                    print(f"  [wake] noise rms={nrms:.4f} threshold={rec['threshold']:.4f}")
+                    print(f"  [wake] noise rms={nrms:.4f} threshold={rec['threshold']:.4f} "
+                          f"reply={phrase!r} deaf {tail * WAKE_CHUNK / SAMPLE_RATE:.2f}s")
             else:
                 levels.append(rms)
             continue
@@ -292,7 +441,7 @@ def worker(q, emit, debug):
             # Discard the end of the wake word so it isn't mistaken for the
             # start of the command (or for room noise).
             rec["tail"] += 1
-            if rec["tail"] >= WAKE_TAIL_CHUNKS:
+            if rec["tail"] >= rec["tail_chunks"]:
                 rec["phase"] = "wait_speech"
             continue
 
@@ -353,7 +502,7 @@ async def index(request):
 
 async def health(request):
     return web.json_response({"ok": True, "models": ["alexa", CMD_NAME],
-                              "labels": len(CMD.labels),
+                              "labels": len(CMD.labels), "tts": TTS_ENGINE.engine,
                               "clients": len(request.app["sockets"])})
 
 
@@ -422,6 +571,28 @@ async def geo(request):
                 if ARGS.debug:
                     print(f"  [geo] {key} -> {app['geo_cache'][key]}")
     return web.json_response(app["geo_cache"][key])
+
+
+async def tts(request):
+    """/tts?text=... -> audio/wav spoken by the local engine."""
+    text = " ".join(request.query.get("text", "").split())[:TTS_MAX_CHARS]
+    if not text:
+        raise web.HTTPBadRequest(text="text is required")
+    if not TTS_ENGINE.local:
+        return web.json_response({"error": f"no local tts engine ({TTS_ENGINE.engine})"},
+                                 status=503)
+    t0 = time.perf_counter()
+    try:
+        wav = await asyncio.to_thread(TTS_ENGINE.synth, text)
+    except (OSError, subprocess.SubprocessError) as e:
+        err = getattr(e, "stderr", None)
+        detail = err.decode(errors="replace").strip() if err else str(e)
+        print(f"[tiny-alexa] tts failed: {detail}")
+        return web.json_response({"error": f"tts failed: {detail}"}, status=500)
+    if ARGS.debug:
+        print(f"  [tts] {TTS_ENGINE.engine} {(time.perf_counter() - t0) * 1000:.0f} ms: {text!r}")
+    return web.Response(body=wav, content_type="audio/wav",
+                        headers={"Cache-Control": "max-age=3600"})
 
 
 async def ws_handler(request):
@@ -508,12 +679,13 @@ def make_app(tracks, covers):
     app.router.add_get("/music/{name}", music_file)
     app.router.add_get("/cover/{name}", cover_file)
     app.router.add_get("/geo", geo)
+    app.router.add_get("/tts", tts)
     app.router.add_get("/ws", ws_handler)
     return app
 
 
 def main():
-    global ARGS, CMD, CMD_NAME
+    global ARGS, CMD, CMD_NAME, TTS_ENGINE
     ap = argparse.ArgumentParser(description="tiny alexa browser server")
     ap.add_argument("--host", default="0.0.0.0")
     ap.add_argument("--port", type=int, default=8321)
@@ -522,6 +694,13 @@ def main():
                     help="use the _int8 variant of --model if present (faster on the Pi)")
     ap.add_argument("--threshold", type=float, default=0.5,
                     help="wake-word detection threshold")
+    ap.add_argument("--tts", default="auto",
+                    choices=["auto", "piper", "espeak", "say", "browser", "off"],
+                    help="voice engine for spoken replies (browser = the "
+                         "browser's own voice, off = silent)")
+    ap.add_argument("--voice", help=f"piper voice .onnx (default: first one in {TTS_DIR})")
+    ap.add_argument("--no-wake-ack", action="store_true",
+                    help="don't speak a reply (\"Yes?\") after the wake word")
     ap.add_argument("--debug", action="store_true")
     ARGS = ap.parse_args()
 
@@ -542,6 +721,22 @@ def main():
     print(f"[tiny-alexa] {CMD_NAME} + openWakeWord 'alexa' ready in "
           f"{(time.perf_counter() - t0) * 1000:.0f} ms "
           f"(command threshold {COMMAND_THRESHOLD})")
+
+    TTS_ENGINE = TTS(ARGS.tts, ARGS.voice)
+    if TTS_ENGINE.local:
+        try:
+            TTS_ENGINE.synth("Okay")                      # warm-up: catches a broken install
+            if not ARGS.no_wake_ack:                      # wake replies: instant from cache
+                for phrase in WAKE_PHRASES:
+                    TTS_ENGINE.synth(phrase)
+        except (OSError, subprocess.SubprocessError) as e:
+            print(f"[tiny-alexa] tts: {TTS_ENGINE.engine} failed ({e}); "
+                  "falling back to the browser's voice")
+            TTS_ENGINE.engine = "browser"
+    print(f"[tiny-alexa] tts: {TTS_ENGINE.engine}"
+          + (f" ({TTS_ENGINE.voice.name})" if TTS_ENGINE.voice else "")
+          + ("  (install espeak-ng or piper for an on-device voice)"
+             if TTS_ENGINE.engine == "browser" else ""))
 
     tracks, covers = build_tracks()
     if tracks:
