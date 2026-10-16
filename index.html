@@ -906,7 +906,7 @@
           <div class="spec reveal d4">
             <div class="ct">Validation on Raspberry Pi 4</div>
             <table>
-              <tr><td class="k">Hardware</td><td class="v">aarch64</td></tr>
+              <tr><td class="k">Hardware</td><td class="v">Raspberry Pi 4 4GB</td></tr>
               <tr><td class="k">Wake word</td><td class="v">alexa_v0.1 (openWakeWord 0.4.0)</td></tr>
               <tr><td class="k">Keyword / intent acc</td><td class="v"><b>100.00%</b> (202/202) / <b>86.14%</b> (174/202)</td></tr>
               <tr><td class="k">False-accept rate</td><td class="v"><b>0.00%</b> (0/202)</td></tr>
@@ -942,7 +942,7 @@
         <div class="spec reveal d6">
           <div class="ct">Training</div>
           <table>
-            <tr><td class="k">Cluster</td><td class="v">Apple MPS</td></tr>
+            <tr><td class="k">Device</td><td class="v">Apple MPS</td></tr>
             <tr><td class="k">Objective</td><td class="v">CE (intent) + CE (slot) · label smoothing 0.1<br>joint decode over 31 valid pairs</td></tr>
             <tr><td class="k">Optimizer</td><td class="v">AdamW (lr 1e-3, wd 0.01) · 2-ep warmup → cosine to 1e-5 over 40 ep</td></tr>
             <tr><td class="k">Steps / loss</td><td class="v"><b>8,697 steps</b> (39 ep × 223) · <b>9 min 17 s</b> · final loss 1.207</td></tr>
