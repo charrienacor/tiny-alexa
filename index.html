@@ -540,7 +540,7 @@
       display: flex; align-items: baseline; gap: 8px;
     }
     .lexpop h4 small { font-weight: 400; letter-spacing: .06em; color: var(--muted); text-transform: none; }
-    .lexpop h4 + h4 { margin-top: 14px; }
+    .lexpop h4:not(:first-child) { margin-top: 22px; }
     .lexgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(148px, 1fr)); gap: 5px; }
     .lexchip {
       display: flex; align-items: baseline; justify-content: space-between; gap: 8px;
@@ -550,7 +550,18 @@
       font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
     }
     .lexchip em { font-style: normal; font-size: 9px; letter-spacing: .08em; color: var(--muted); }
-    .lexchip.slot em { color: var(--pink-300); }
+    /* slot values — one compact row per intent group (label + inline values),
+       replaces 18 per-chip tags that overflowed the grid */
+    .lexslots { display: flex; flex-direction: column; gap: 3px; }
+    .lexslotrow {
+      display: flex; align-items: baseline; gap: 10px;
+      padding: 4px 9px; border-radius: 8px;
+      background: var(--card); border: 1px solid var(--line-soft);
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 11px; letter-spacing: .02em; color: var(--white);
+    }
+    .lexslotrow .g { flex: 0 0 106px; color: var(--pink-500); font-size: 9px; letter-spacing: .1em; }
+    .lexslotrow .vs i { font-style: normal; color: var(--muted); padding: 0 5px; }
     .lexfoot { margin-top: 12px; font-size: 10px; letter-spacing: .05em; color: var(--muted); line-height: 1.6; }
     .lexfoot b { color: var(--pink-300); font-weight: 500; }
 
@@ -1268,8 +1279,8 @@
       `<h4>Intents <small>${AV_INTENTS.length} — intent head classes</small></h4>` +
       `<div class="lexgrid">${AV_INTENTS.map(i => `<span class="lexchip"><span>${i}</span></span>`).join("")}</div>` +
       `<h4>Slot values <small>${AV_SLOTS.length - 1} — slot head classes (minus NO_SLOT)</small></h4>` +
-      `<div class="lexgrid">${SLOT_GROUPS.flatMap(([grp, vals]) =>
-           vals.map(s => `<span class="lexchip slot"><span>${s}</span><em>${grp}</em></span>`)
+      `<div class="lexslots">${SLOT_GROUPS.map(([grp, vals]) =>
+           `<div class="lexslotrow"><span class="g">${grp}</span><span class="vs">${vals.reduce((a, v, i) => a + (i ? "<i>·</i>" : "") + v, "")}</span></div>`
          ).join("")}</div>` +
       `<div class="lexfoot"><b>31 command labels</b> = the joint-decode pairs of intent × slot that actually occur (see <code>data/labels.json</code>). Slot head is ${AV_SLOTS.length}-way: 18 values + NO_SLOT for slot-less intents.</div>`;
     document.body.appendChild(lexPop);
