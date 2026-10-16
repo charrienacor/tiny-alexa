@@ -29,7 +29,8 @@ is no speech-to-text, no LLM and no cloud: everything runs on the device.
 [5. Benchmarks](#5-benchmarks) ·
 [6. Running it](#6-running-it) ·
 [7. Limitations](#7-limitations) ·
-[8. Project layout](#8-project-layout)
+[8. Project layout](#8-project-layout) ·
+[9. Licence](#9-licence)
 
 > **Run it in one command** — `./run.sh`
 > Sets up a virtualenv, installs the runtime dependencies (**no torch**) and
@@ -453,3 +454,17 @@ say the command. Saying "Alexa" again while it's talking interrupts the reply.
 | `data/` | Manifest and class tables (audio kept locally), `wake_tests/`, `music/` |
 | `results/` | Metrics, charts, training history, benchmark reports |
 | `docs/media/` | Screenshots and the demo animation used in this README |
+
+---
+
+## 9. Licence
+
+Code and model weights are released under the **MIT licence** — see
+[`LICENSE`](LICENSE). The weights in [`models/`](models/README.md)
+(`TCN.onnx`, `TCN.pt`) are covered by the same licence.
+
+**Data caveat:** the weights were trained on the synthetic command corpus at
+[`github.com/markandrian30/AI231/MEX2/Data`](https://github.com/markandrian30/AI231/tree/main/MEX2/Data).
+That corpus is derived audio built from source recordings under their own
+(restrictive) licences; it is **not** redistributed here and remains subject
+to its own terms before commercial use.
