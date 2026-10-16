@@ -42,7 +42,7 @@ is no speech-to-text, no LLM and no cloud: everything runs on the device.
 > the end of the address and click. It plays a scripted conversation through
 > every scene, with no mic, server or Pi needed.
 >
-> **See the project story?** Open [`presentation.html`](presentation.html) — a
+> **See the project story?** Open [`index.html`](index.html) — a
 > 4-slide deck (title · architecture · model &amp; results · next steps) with
 > the animated pipeline walkthrough, training curves and confusion matrices.
 > Also live at <https://charrienacor.github.io/tiny-alexa/>.
@@ -448,7 +448,7 @@ say the command. Saying "Alexa" again while it's talking interrupts the reply.
 | Path | What |
 |---|---|
 | `tiny-alexa.html` | The whole browser UI: mic capture, scenes, music player, speech (one file, no build step) |
-| `presentation.html` | The 4-slide project deck: animated architecture walkthrough, training curves, confusion matrices (self-contained, served by GitHub Pages) |
+| `index.html` | The 4-slide project deck: animated architecture walkthrough, training curves, confusion matrices (self-contained, served by GitHub Pages) |
 | `src/server.py` | Pi server: wake word, endpointing, TCN, text-to-speech, music and geo endpoints |
 | `src/infer.py` | Wake-word detector and command model classes, plus a terminal version of the assistant |
 | `src/features.py` | NumPy log-mel front end, shared by training and the Pi |

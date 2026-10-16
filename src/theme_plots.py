@@ -12,7 +12,7 @@ black / hot-pink theme of tiny-alexa.html:
     results/class_metrics_slot.png    per-class P/R/F1 bars
 
 and dumps results/deck_data.json (history + confusion matrices + class
-names) so presentation.html can animate the same data natively.
+names) so index.html can animate the same data natively.
 """
 
 import csv
@@ -249,7 +249,7 @@ def main():
     class_metrics_chart(cm_s, slots, "slot class metrics",
                         results / "class_metrics_slot.png")
 
-    # native data for presentation.html
+    # native data for index.html
     deck = {
         "history": history,
         "best_epoch": best_epoch,

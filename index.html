@@ -1,22 +1,2261 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Tiny Alexa — presentation</title>
-<meta http-equiv="refresh" content="0; url=presentation.html">
-<style>
-  body { margin: 0; background: #0b0b12; color: #9a9ab0;
-         font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
-  a { color: #ff9ecb; }
-  .wrap { min-height: 100vh; display: grid; place-items: center; }
-  p { font-size: 14px; }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tiny alexa — presentation</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='6' fill='%23ff3d9e'/%3E%3C/svg%3E" />
+  <style>
+    /* ============================================================
+       tiny alexa — presentation deck
+       Same visual language as tiny-alexa.html:
+       black / hot-pink / white, minimalist, self-contained.
+       ============================================================ */
+    :root {
+      --bg: #050506;
+      --bg-soft: #0b0b0e;
+      --white: #f6f6f8;
+      --muted: #8b8b93;
+
+      --pink-100: #ffe1ef;
+      --pink-200: #ffc2e0;
+      --pink-300: #ff9ecb;
+      --pink-400: #ff6fb5;
+      --pink-500: #ff3d9e;
+      --pink-600: #f0128a;
+      --pink-700: #c4006e;
+
+      --accent-rgb: 255, 61, 158;
+      --glow: rgba(var(--accent-rgb), .55);
+      --line: rgba(255, 255, 255, .10);
+      --line-soft: rgba(255, 255, 255, .055);
+      --card: rgba(255, 255, 255, .022);
+      --card-hi: rgba(var(--accent-rgb), .05);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body { height: 100%; }
+
+    body {
+      background: var(--bg);
+      color: var(--white);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+      position: relative;
+    }
+
+    /* faint radial vignette so pure black feels less flat (same as app) */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background: radial-gradient(120% 90% at 50% 40%, rgba(var(--accent-rgb), .06), transparent 60%);
+      z-index: 0;
+    }
+
+    /* ---------- wordmark (identical treatment to the app front page) ---------- */
+    .wordmark {
+      font-weight: 200;
+      letter-spacing: .42em;
+      line-height: 1;
+      padding-left: .42em;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    .wordmark .tiny { color: var(--white); }
+    .wordmark .alexa { color: var(--pink-500); font-weight: 300; }
+    .wordmark .dot {
+      display: inline-block;
+      width: .28em; height: .28em;
+      border-radius: 50%;
+      background: var(--pink-500);
+      margin-left: .18em;
+      vertical-align: baseline;
+      box-shadow: 0 0 14px var(--glow);
+    }
+
+    /* ---------- deck layout ---------- */
+    /* On screens larger than the 1440×900 design size the whole deck scales up
+       uniformly (--s set by fitDeck); below that the layout stays responsive.
+       Inner sizes use container units (cqw/cqh) so they follow the deck's own box. */
+    .deck {
+      position: fixed; left: 0; top: 0; z-index: 1;
+      width: calc(100vw / var(--s, 1)); height: calc(100vh / var(--s, 1));
+      transform: scale(var(--s, 1)); transform-origin: 0 0;
+      container-type: size;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      padding: clamp(24px, 4.2cqh, 54px) clamp(24px, 5cqw, 84px) clamp(58px, 8cqh, 84px);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(14px);
+      transition: opacity .6s cubic-bezier(.2, .7, .2, 1),
+                  transform .6s cubic-bezier(.2, .7, .2, 1),
+                  visibility 0s .6s;
+      will-change: opacity, transform;
+    }
+    .slide.active {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+      transition: opacity .6s cubic-bezier(.2, .7, .2, 1),
+                  transform .6s cubic-bezier(.2, .7, .2, 1);
+    }
+
+    /* staggered reveal for children once a slide is active */
+    .reveal {
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity .6s ease, transform .6s cubic-bezier(.2, .7, .2, 1);
+    }
+    .slide.active .reveal { opacity: 1; transform: translateY(0); }
+    .slide.active .reveal.d1 { transition-delay: .12s; }
+    .slide.active .reveal.d2 { transition-delay: .22s; }
+    .slide.active .reveal.d3 { transition-delay: .32s; }
+    .slide.active .reveal.d4 { transition-delay: .42s; }
+    .slide.active .reveal.d5 { transition-delay: .52s; }
+    .slide.active .reveal.d6 { transition-delay: .62s; }
+    .slide.active .reveal.d7 { transition-delay: .72s; }
+
+    /* ---------- shared bits ---------- */
+    .eyebrow {
+      font-size: clamp(11px, 1.5cqw, 13px);
+      letter-spacing: .34em;
+      text-transform: uppercase;
+      color: var(--pink-400);
+      font-weight: 500;
+    }
+    .hairline {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--line) 18%, var(--line) 82%, transparent);
+    }
+    .num {
+      font-variant-numeric: tabular-nums;
+      font-feature-settings: "tnum" 1;
+    }
+
+    /* ============================================================
+       SLIDE 1 — hero
+       ============================================================ */
+    .s1 { align-items: center; justify-content: center; text-align: center; gap: clamp(18px, 3.4cqh, 34px); }
+
+    .s1 .wordmark { font-size: clamp(40px, 11cqw, 96px); }
+
+    .s1 .tagline {
+      font-weight: 300;
+      font-size: clamp(15px, 2.5cqw, 22px);
+      letter-spacing: .06em;
+      color: var(--muted);
+      max-width: 46ch;
+      line-height: 1.5;
+    }
+    .s1 .tagline b { color: var(--white); font-weight: 400; }
+    .s1 .tagline em { color: var(--pink-300); font-style: normal; }
+
+    .s1 .wave-wrap {
+      width: min(90cqw, 720px);
+      height: clamp(150px, 26cqh, 240px);
+      position: relative;
+    }
+    .s1 canvas#wave { width: 100%; height: 100%; display: block; }
+
+    .s1 .pill-row { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+    .pill {
+      font-size: clamp(11px, 1.5cqw, 13px);
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--pink-200);
+      border: 1px solid var(--line);
+      background: var(--card);
+      padding: 8px 16px;
+      border-radius: 999px;
+      backdrop-filter: blur(6px);
+    }
+
+    /* ============================================================
+       SLIDE 2 — model & performance
+       ============================================================ */
+    .s2 .head { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; }
+    .s2 h2 {
+      font-weight: 200;
+      font-size: clamp(28px, 5cqw, 52px);
+      letter-spacing: -.01em;
+      line-height: 1;
+      margin-top: 10px;
+    }
+    .s2 h2 span { color: var(--pink-500); font-weight: 300; }
+
+    .s2 .body {
+      flex: 1;
+      min-height: 0;
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      grid-template-rows: minmax(0, .95fr) minmax(0, 1fr) auto;
+      gap: clamp(12px, 1.8cqh, 20px);
+      margin-top: clamp(14px, 2cqh, 24px);
+    }
+
+    .panel {
+      background: linear-gradient(180deg, var(--card), rgba(255,255,255,.008));
+      border: 1px solid var(--line-soft);
+      border-radius: 18px;
+      padding: clamp(14px, 1.8cqh, 22px);
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .panel .ptitle {
+      font-size: clamp(10px, 1.3cqw, 12px);
+      letter-spacing: .28em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 12px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .panel .ptitle::before {
+      content: ""; width: 6px; height: 6px; border-radius: 50%;
+      background: var(--pink-500); box-shadow: 0 0 10px var(--glow);
+    }
+    .panel .ptitle b { color: var(--pink-300); font-weight: 500; letter-spacing: .22em; }
+
+    .chart-card { grid-column: 1; grid-row: 1 / span 2; }
+    .chart-stage { position: relative; flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; }
+    .chart-stage img {
+      max-width: 100%; max-height: 100%;
+      border-radius: 10px;
+      object-fit: contain;
+      /* progressive left→right reveal = "being drawn epoch by epoch" */
+      clip-path: inset(0 100% 0 0);
+      transition: clip-path 2.4s cubic-bezier(.25, .6, .2, 1);
+    }
+    .slide.active .chart-stage img { clip-path: inset(0 0 0 0); }
+    .scan {
+      position: absolute; top: 0; bottom: 0; width: 2px;
+      background: linear-gradient(180deg, transparent, var(--pink-400), transparent);
+      box-shadow: 0 0 18px 2px var(--glow);
+      left: 0; opacity: 0;
+      pointer-events: none;
+    }
+    .slide.active .scan { animation: scan 2.4s cubic-bezier(.25, .6, .2, 1) forwards; }
+    @keyframes scan { 0% { left: 0; opacity: 1; } 92% { opacity: 1; } 100% { left: 100%; opacity: 0; } }
+
+    .cm-grid { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(12px, 1.6cqw, 20px); grid-column: 2; grid-row: 1; grid-template-rows: minmax(0, 1fr); min-height: 0; }
+    .cm-cell {
+      background: var(--card);
+      border: 1px solid var(--line-soft);
+      border-radius: 14px;
+      padding: 12px;
+      display: flex; flex-direction: column;
+      min-height: 0;
+    }
+    .cm-cell .lbl { font-size: clamp(10px, 1.2cqw, 12px); letter-spacing: .18em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; display:flex; justify-content:space-between; }
+    .cm-cell .lbl b { color: var(--pink-300); font-weight: 500; }
+    .cm-cell .frame { flex: 1; min-height: 0; position: relative; display: flex; align-items: center; justify-content: center; border-radius: 8px; overflow: hidden; }
+    .cm-cell img {
+      position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; border-radius: 6px;
+      opacity: 0; transform: scale(.96);
+      transition: opacity .8s ease, transform .8s cubic-bezier(.2,.7,.2,1);
+    }
+    .slide.active .cm-cell img { opacity: 1; transform: scale(1); }
+    .slide.active .cm-cell:nth-child(2) img { transition-delay: .18s; }
+
+    /* stat strip */
+    .stats { grid-column: 2; grid-row: 2; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: clamp(10px, 1.4cqh, 16px); }
+    .stat {
+      background: linear-gradient(180deg, var(--card-hi), rgba(255,255,255,.01));
+      border: 1px solid var(--line-soft);
+      border-radius: 14px;
+      padding: clamp(12px, 1.6cqh, 18px);
+      display: flex; flex-direction: column; justify-content: center; gap: 6px;
+      position: relative; overflow: hidden;
+    }
+    .stat::after {
+      content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+      background: linear-gradient(180deg, var(--pink-400), var(--pink-700));
+      opacity: .85;
+    }
+    .stat .k { font-size: clamp(10px, 1.2cqw, 12px); letter-spacing: .2em; text-transform: uppercase; color: var(--muted); }
+    .stat .v { font-weight: 200; font-size: clamp(22px, 3.4cqw, 40px); line-height: 1; color: var(--white); letter-spacing: -.01em; }
+    .stat .v small { font-size: .42em; color: var(--pink-300); font-weight: 400; margin-left: 4px; letter-spacing: .04em; }
+    .stat .sub { font-size: clamp(10px, 1.2cqw, 12px); color: var(--muted); letter-spacing: .03em; }
+
+    /* ------------------------------------------------------------
+       SLIDE 2 — TCN ARCHITECTURE (inline SVG, theme-styled).
+       Boxes fade up in sequence (staggered, like the .reveal system);
+       the signal pulse rides the flow line input → heads → decode.
+       ------------------------------------------------------------ */
+    .s4 .head { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; }
+    .s4 h2 { font-weight: 200; font-size: clamp(28px, 5cqw, 52px); letter-spacing: -.01em; line-height: 1; margin-top: 10px; }
+    .s4 h2 span { color: var(--pink-500); font-weight: 300; }
+    .s4 .ctx { font-size: clamp(11px, 1.4cqw, 13px); color: var(--muted); letter-spacing: .04em; text-align: right; line-height: 1.7; }
+    .s4 .ctx b { color: var(--pink-300); font-weight: 500; }
+    .s4 .stage { flex: none; display: flex; align-items: center; justify-content: center; }
+    .s4 .stage svg { width: 100%; height: auto; max-height: 40cqh; display: block; }
+
+    /* key model facts — moved here from the Model & Performance slide */
+    .s4 .astats { display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(10px, 1.2cqw, 16px); margin-top: clamp(12px, 1.6cqh, 18px); }
+    .s4 .astat {
+      background: linear-gradient(180deg, var(--card-hi), rgba(255,255,255,.01));
+      border: 1px solid var(--line-soft);
+      border-radius: 14px;
+      padding: clamp(8px, 1.1cqh, 13px) clamp(12px, 1.4cqw, 18px);
+      display: flex; flex-direction: column; justify-content: center; gap: 4px;
+      position: relative; overflow: hidden;
+    }
+    .s4 .astat::after {
+      content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+      background: linear-gradient(180deg, var(--pink-400), var(--pink-700));
+      opacity: .85;
+    }
+    .s4 .astat .k { font-size: clamp(9px, 1.1cqw, 11px); letter-spacing: .2em; text-transform: uppercase; color: var(--muted); }
+    .s4 .astat .v { font-weight: 200; font-size: clamp(18px, 2.3cqw, 28px); line-height: 1; color: var(--white); letter-spacing: -.01em; }
+    .s4 .astat .v small { font-size: .42em; color: var(--pink-300); font-weight: 400; margin-left: 4px; letter-spacing: .04em; }
+    .s4 .astat .sub { font-size: clamp(9px, 1.1cqw, 11px); color: var(--muted); letter-spacing: .03em; }
+
+    /* ---------- centered popup lightbox for the charts (image fits, no zoom) ---------- */
+    .zoomable { cursor: pointer; }
+    .lightbox {
+      position: fixed; inset: 0; z-index: 50;
+      background: rgba(3, 3, 5, .88);
+      backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity .35s ease;
+    }
+    .lightbox.open { opacity: 1; pointer-events: auto; }
+    .lb-stage {
+      max-width: min(94cqw, 1500px); max-height: 88cqh;
+      display: flex; flex-direction: column; gap: 10px;
+      transform: scale(.94); transition: transform .35s cubic-bezier(.2, .7, .2, 1);
+    }
+    .lightbox.open .lb-stage { transform: scale(1); }
+    .lb-imgwrap { max-width: min(94cqw, 1500px); max-height: calc(88cqh - 34px); border-radius: 14px; border: 1px solid var(--line);
+                  background: #0a0a0d; box-shadow: 0 30px 90px rgba(0,0,0,.6), 0 0 60px rgba(var(--accent-rgb), .08); }
+    .lb-imgwrap img { display: block; width: 100%; height: auto; max-height: calc(88cqh - 34px); object-fit: contain; }
+    .lb-cap { display: flex; align-items: center; justify-content: space-between; gap: 16px;
+              font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+    .lb-cap b { color: var(--pink-300); font-weight: 500; }
+    .lb-cap .tip { letter-spacing: .1em; opacity: .6; text-transform: none; }
+
+    .ab { fill: #0d0d11; stroke: rgba(255, 255, 255, .13); stroke-width: 1; }
+    .ab.in { fill: rgba(255, 61, 158, .07); stroke: rgba(255, 61, 158, .55); }
+    .ab.out { fill: rgba(255, 61, 158, .13); stroke: #ff3d9e; stroke-width: 1.4; }
+    .at { font-family: inherit; font-size: 16px; font-weight: 500; fill: #f6f6f8; letter-spacing: .01em; }
+    .as { font-family: inherit; font-size: 12px; font-weight: 400; fill: #8b8b93; letter-spacing: .08em; }
+    .am { font-family: inherit; font-size: 14px; font-weight: 500; fill: #ff9ecb; letter-spacing: .02em; }
+    .al { font-family: inherit; font-size: 10px; font-weight: 400; fill: #8b8b93; letter-spacing: .18em; }
+    .flow { stroke: #ff3d9e; stroke-width: 2; fill: none; opacity: .85; }
+    .res { stroke: rgba(255, 158, 203, .5); stroke-width: 1.2; fill: none; stroke-dasharray: 5 5; }
+    .pulse { fill: #ff9ecb; }
+
+    .abox { opacity: 0; transform: translateY(10px); transition: opacity .6s ease, transform .6s ease; }
+    .slide.active .abox { opacity: 1; transform: none; }
+    .slide.active .abox:nth-of-type(1)  { transition-delay: .25s; }
+    .slide.active .abox:nth-of-type(2)  { transition-delay: .40s; }
+    .slide.active .abox:nth-of-type(3)  { transition-delay: .55s; }
+    .slide.active .abox:nth-of-type(4)  { transition-delay: .70s; }
+    .slide.active .abox:nth-of-type(5)  { transition-delay: .85s; }
+    .slide.active .abox:nth-of-type(6)  { transition-delay: 1.00s; }
+    .slide.active .abox:nth-of-type(7)  { transition-delay: 1.15s; }
+    .slide.active .abox:nth-of-type(8)  { transition-delay: 1.30s; }
+    .slide.active .abox:nth-of-type(9)  { transition-delay: 1.50s; }
+    .slide.active .abox:nth-of-type(10) { transition-delay: 1.65s; }
+    .slide.active .abox:nth-of-type(11) { transition-delay: 1.80s; }
+    .slide.active .abox:nth-of-type(12) { transition-delay: 1.95s; }
+    /* flow arrows fade in once the boxes have landed */
+    .flow { opacity: 0; transition: opacity .6s ease; }
+    .slide.active .flow { opacity: .85; transition-delay: 1.1s; }
+
+    /* ---------- live sync: the diagram mirrors what the inspector is playing ---------- */
+    .ab, .ag, .cell { transition: fill .35s ease, stroke .35s ease; }
+    .apart.live .ab, .apart.live .ag { fill: rgba(255, 61, 158, .10); stroke: #ff3d9e; stroke-width: 1.6; }
+    .apart.done .ab, .apart.done .ag { stroke: rgba(255, 61, 158, .38); }
+    .cell.live { fill: rgba(255, 61, 158, .28); stroke: #ff3d9e; stroke-width: 1.6; }
+    .cell.done { fill: rgba(255, 61, 158, .10); stroke: rgba(255, 61, 158, .45); }
+    .skip.live { stroke: #ff9ecb; animation: skipflow .7s linear infinite; }
+    @keyframes skipflow { to { stroke-dashoffset: -6; } }
+
+    /* progress rail + stepper under the boxes */
+    .rail { opacity: 0; transition: opacity .6s ease; }
+    .slide.active .rail { opacity: 1; transition-delay: 1.3s; }
+    .rail-bg { stroke: rgba(255, 255, 255, .09); stroke-width: 2; stroke-linecap: round; }
+    .rail-fill { stroke: #ff3d9e; stroke-width: 2.4; stroke-linecap: round; filter: drop-shadow(0 0 4px rgba(255, 61, 158, .7)); }
+    .rail-tick { fill: #0b0b0e; stroke: rgba(255, 255, 255, .22); stroke-width: 1.2; transition: fill .3s ease, stroke .3s ease; }
+    .rail-tick.done { fill: #ff3d9e; stroke: #ff3d9e; }
+    .rail-step { cursor: pointer; }
+    .rail-step text { font-size: 11px; font-weight: 600; letter-spacing: .24em; fill: #8b8b93; transition: fill .3s ease; }
+    .rail-step:hover text { fill: #ff9ecb; }
+    .rail-step.live text { fill: #ff3d9e; }
+    .rail-head { fill: #ffe1ef; filter: drop-shadow(0 0 6px rgba(255, 61, 158, .95)); }
+    .aphase { font-size: 10px; font-weight: 600; fill: #8b8b93; letter-spacing: .3em; }
+    .aphase tspan { fill: #ff3d9e; }
+    .ag { fill: rgba(255, 255, 255, .015); stroke: rgba(255, 255, 255, .09); stroke-width: 1; }
+    .agt { font-size: 13px; font-weight: 600; fill: #f6f6f8; letter-spacing: .06em; }
+    .ags { font-size: 11px; font-weight: 400; fill: #8b8b93; letter-spacing: .1em; }
+    .cell { fill: #101015; stroke: rgba(255, 255, 255, .13); stroke-width: 1; }
+    .wave { stroke: #ff3d9e; stroke-width: 2; fill: none; opacity: .9; stroke-linecap: round; }
+    .skip { stroke: rgba(255, 158, 203, .55); stroke-width: 1.2; fill: none; stroke-dasharray: 3 3; stroke-linecap: round; }
+
+    /* ---------- interactive stage inspector (click a stage to watch it work) ---------- */
+    .abox[data-stage] { cursor: pointer; }
+    .abox[data-stage]:hover .ab, .abox[data-stage]:hover .ag { stroke: rgba(255, 61, 158, .75); }
+    .abox[data-stage].sel .ab, .abox[data-stage].sel .ag { stroke: #ff3d9e; stroke-width: 1.6; }
+    .abox[data-stage].sel { filter: drop-shadow(0 0 7px rgba(255, 61, 158, .45)); }
+    .archview {
+      flex: 1; min-height: 0;
+      margin-top: clamp(8px, 1.2cqh, 14px);
+      border: 1px solid var(--line-soft);
+      border-radius: 14px;
+      background: rgba(5, 5, 7, .55);
+      overflow: hidden;
+      display: flex; flex-direction: column;
+    }
+    .avstage { position: relative; flex: 1; min-height: 120px; }
+    .avstage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+    .avcap {
+      display: flex; align-items: baseline; gap: 12px;
+      padding: 8px 14px; border-top: 1px solid var(--line-soft);
+      font-size: clamp(11px, min(1.1cqw, 1.7cqh), 14px); letter-spacing: .03em; color: var(--muted);
+      min-height: 34px;
+    }
+    .avtag {
+      flex: none; font-size: clamp(9px, 1cqw, 10.5px); font-weight: 600; letter-spacing: .22em;
+      color: var(--pink-500); text-transform: uppercase;
+    }
+    .avtext b { color: var(--pink-300); font-weight: 500; }
+    .avbar {
+      display: flex; align-items: center; gap: 10px;
+      padding: 7px 14px; border-top: 1px solid var(--line-soft);
+      background: rgba(255, 255, 255, .015);
+    }
+    .avbtn {
+      flex: none; min-width: 28px; height: 26px; padding: 0 8px;
+      display: flex; align-items: center; justify-content: center;
+      border: 1px solid var(--line); border-radius: 8px;
+      background: rgba(255, 255, 255, .03); color: var(--muted);
+      font-size: 11px; line-height: 1; cursor: pointer; font-family: inherit;
+      transition: color .25s ease, border-color .25s ease, background .25s ease;
+    }
+    .avbtn:hover { color: var(--pink-300); border-color: rgba(255, 61, 158, .55); background: rgba(255, 61, 158, .06); }
+    .avscrub {
+      -webkit-appearance: none; appearance: none; flex: 1; height: 4px;
+      border-radius: 999px; background: rgba(255, 255, 255, .14); outline: none; cursor: pointer;
+    }
+    .avscrub::-webkit-slider-thumb {
+      -webkit-appearance: none; appearance: none; width: 12px; height: 12px; border-radius: 50%;
+      background: var(--pink-500); box-shadow: 0 0 8px var(--glow); cursor: grab;
+    }
+    .avscrub::-moz-range-thumb { width: 12px; height: 12px; border: 0; border-radius: 50%; background: var(--pink-500); box-shadow: 0 0 8px var(--glow); }
+    .avtime { flex: none; font-size: 10px; letter-spacing: .04em; color: var(--muted); font-variant-numeric: tabular-nums; }
+    /* ---------- expanded stage inspector (popup) ---------- */
+    .avmodal {
+      position: fixed; inset: 0; z-index: 60;
+      background: rgba(3, 3, 5, .9);
+      backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity .3s ease;
+    }
+    .avmodal.open { opacity: 1; pointer-events: auto; }
+    .avm-panel {
+      width: min(1100px, 94cqw);
+      background: linear-gradient(180deg, var(--card), rgba(255, 255, 255, .008));
+      border: 1px solid var(--line); border-radius: 16px; overflow: hidden;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, .6);
+      transform: scale(.96); transition: transform .3s ease;
+    }
+    .avmodal.open .avm-panel { transform: none; }
+    .avm-head { display: flex; align-items: center; justify-content: space-between; padding: 12px 18px; border-bottom: 1px solid var(--line-soft); }
+    .avm-head .t { font-size: 11px; font-weight: 600; letter-spacing: .22em; color: var(--pink-500); text-transform: uppercase; }
+    .avm-body canvas { width: 100%; height: 52cqh; display: block; }
+    .avm-cap { padding: 12px 18px 4px; font-size: 13px; letter-spacing: .02em; color: var(--muted); }
+    .avm-cap b { color: var(--pink-300); font-weight: 500; }
+    .avm-bar { padding: 10px 18px 14px; }
+
+    /* spec tables — dashboard tables, restyled to fit the deck */
+    .spec {
+      background: linear-gradient(180deg, var(--card), rgba(255,255,255,.006));
+      border: 1px solid var(--line-soft);
+      border-radius: 14px;
+      padding: clamp(10px, 1.4cqh, 16px) clamp(12px, 1.4cqw, 18px);
+    }
+    .spec .ct {
+      font-size: clamp(9px, 1.1cqw, 11px); letter-spacing: .24em; text-transform: uppercase;
+      color: var(--muted); display: flex; align-items: center; gap: 8px; margin-bottom: 8px;
+    }
+    .spec .ct::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: var(--pink-500); box-shadow: 0 0 8px var(--glow); }
+    .spec table { width: 100%; border-collapse: collapse; }
+    .spec td {
+      padding: clamp(3px, .5cqh, 6px) 0; vertical-align: top;
+      font-size: clamp(10px, 1.25cqw, 12.5px); line-height: 1.45; letter-spacing: .01em;
+      border-top: 1px solid var(--line-soft);
+    }
+    .spec tr:first-child td { border-top: 0; }
+    .spec td.k { width: 31%; padding-right: 12px; color: var(--muted); letter-spacing: .1em; text-transform: uppercase; font-size: clamp(9px, 1.05cqw, 10.5px); padding-top: clamp(5px, .7cqh, 8px); }
+    .spec td.v { color: var(--white); }
+    .spec td.v b { color: var(--pink-300); font-weight: 500; }
+
+    /* ---------- vocabulary lexicon — hover/click "19 intents · 18 slot values" ---------- */
+    .lexwrap { display: inline-flex; align-items: baseline; gap: 5px; }
+    .lex {
+      display: inline-flex; align-items: baseline; gap: 5px;
+      cursor: help; white-space: nowrap;
+      border-bottom: 1px dashed rgba(255, 255, 255, .28);
+      transition: border-color .25s ease, color .25s ease;
+    }
+    .lex:hover, .lexwrap.pin .lex { border-color: var(--pink-400); }
+    .lex .n { color: var(--pink-300); font-weight: 500; }
+    .lex .sep { color: var(--muted); }
+    .lexwrap .pin-dot {
+      width: 4px; height: 4px; border-radius: 50%; align-self: center;
+      background: var(--pink-500); box-shadow: 0 0 6px var(--glow);
+      opacity: 0; transition: opacity .25s ease;
+    }
+    .lexwrap.pin .pin-dot { opacity: 1; }
+    .lexpop {
+      position: fixed; z-index: 55;
+      width: min(560px, 92cqw); max-height: min(70cqh, 560px); overflow: auto;
+      background: rgba(10, 10, 13, .97);
+      border: 1px solid rgba(255, 61, 158, .35); border-radius: 14px;
+      box-shadow: 0 24px 70px rgba(0, 0, 0, .65), 0 0 30px rgba(var(--accent-rgb), .12);
+      padding: 14px 16px 12px;
+      opacity: 0; pointer-events: none; transform: translateY(6px);
+      transition: opacity .22s ease, transform .22s ease;
+    }
+    .lexpop.open { opacity: 1; pointer-events: auto; transform: none; }
+    .lexpop h4 {
+      font-size: 10px; font-weight: 600; letter-spacing: .22em; text-transform: uppercase;
+      color: var(--pink-500); margin: 0 0 8px;
+      display: flex; align-items: baseline; gap: 8px;
+    }
+    .lexpop h4 small { font-weight: 400; letter-spacing: .06em; color: var(--muted); text-transform: none; }
+    .lexpop h4 + h4 { margin-top: 14px; }
+    .lexgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(148px, 1fr)); gap: 5px; }
+    .lexchip {
+      display: flex; align-items: baseline; justify-content: space-between; gap: 8px;
+      padding: 5px 9px; border-radius: 8px;
+      background: var(--card); border: 1px solid var(--line-soft);
+      font-size: 11px; letter-spacing: .02em; color: var(--white);
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+    .lexchip em { font-style: normal; font-size: 9px; letter-spacing: .08em; color: var(--muted); }
+    .lexchip.slot em { color: var(--pink-300); }
+    .lexfoot { margin-top: 12px; font-size: 10px; letter-spacing: .05em; color: var(--muted); line-height: 1.6; }
+    .lexfoot b { color: var(--pink-300); font-weight: 500; }
+
+    /* ============================================================
+       SLIDE 3 — benchmark dashboard
+       ============================================================ */
+    .s3 .head { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; }
+    .s3 h2 { font-weight: 200; font-size: clamp(28px, 5cqw, 52px); letter-spacing: -.01em; line-height: 1; margin-top: 10px; }
+    .s3 h2 span { color: var(--pink-500); font-weight: 300; }
+    .s3 .ctx { font-size: clamp(11px, 1.4cqw, 13px); color: var(--muted); letter-spacing: .04em; text-align: right; line-height: 1.7; }
+    .s3 .ctx b { color: var(--pink-300); font-weight: 500; }
+
+    /* result panels — r2.jpg format (titled key/value panels), reusing .spec */
+    /* Validation on RPi 4 sits in the right column, below the confusion matrices */
+    .dashv { grid-column: 2; grid-row: 2; min-height: 0; display: flex; }
+    .dashv .spec { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+
+    /* Dataset + Training panels — full-width bottom row */
+    .dash {
+      grid-column: 1 / -1; grid-row: 3;
+      min-height: 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(10px, 1.2cqw, 16px);
+      align-items: stretch;
+    }
+    .dash .spec { display: flex; flex-direction: column; justify-content: center; }
+
+    /* ============================================================
+       SLIDE 4 — TO BE SUBMITTED (r1.jpg)
+       The four submission artifacts + the reviewer checklist,
+       rendered as status cards in the deck's visual language.
+       ============================================================ */
+    .s5 .head { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; }
+    .s5 h2 { font-weight: 200; font-size: clamp(28px, 5cqw, 52px); letter-spacing: -.01em; line-height: 1; margin-top: 10px; }
+    .s5 h2 span { color: var(--pink-500); font-weight: 300; }
+    .s5 .ctx { font-size: clamp(11px, 1.4cqw, 13px); color: var(--muted); letter-spacing: .04em; text-align: right; line-height: 1.7; }
+    .s5 .ctx b { color: var(--pink-300); font-weight: 500; }
+
+    .s5 .body {
+      flex: 1; min-height: 0;
+      display: grid;
+      grid-template-columns: 1.08fr 1fr;
+      grid-template-rows: minmax(0, 1.08fr) minmax(0, 1fr);
+      gap: clamp(12px, 1.8cqh, 20px);
+      margin-top: clamp(14px, 2cqh, 24px);
+    }
+
+    /* artifact cards — the four "fill:" items from r1.jpg */
+    .artifacts { grid-column: 1; grid-row: 1 / span 2; display: grid; grid-template-rows: repeat(4, minmax(0, 1fr)); gap: clamp(10px, 1.4cqh, 16px); min-height: 0; }
+    .art {
+      background: linear-gradient(180deg, var(--card), rgba(255,255,255,.008));
+      border: 1px solid var(--line-soft);
+      border-radius: 16px;
+      padding: clamp(12px, 1.5cqh, 18px) clamp(14px, 1.4cqw, 20px);
+      display: flex; align-items: center; gap: clamp(12px, 1.2cqw, 18px);
+      min-height: 0; position: relative; overflow: hidden;
+    }
+    .art::before {
+      content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+      background: linear-gradient(180deg, var(--pink-400), var(--pink-700)); opacity: .8;
+    }
+    .art .ai { flex: none; width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center;
+               background: rgba(var(--accent-rgb), .08); border: 1px solid rgba(var(--accent-rgb), .3); }
+    .art .ai svg { width: 18px; height: 18px; stroke: var(--pink-300); fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+    .art .amain { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+    .art .ak { font-size: clamp(9px, 1cqw, 10.5px); letter-spacing: .2em; text-transform: uppercase; color: var(--muted); }
+    .art .av { font-size: clamp(13px, 1.5cqw, 16px); font-weight: 400; color: var(--white); letter-spacing: .01em; line-height: 1.35; }
+    .art .av b { color: var(--pink-300); font-weight: 500; }
+    .art .av code { overflow-wrap: anywhere; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .92em; color: var(--pink-200); background: rgba(255,255,255,.05); padding: 1px 6px; border-radius: 6px; }
+    .art .av .sub { display: block; font-size: clamp(10px, 1.1cqw, 11.5px); color: var(--muted); letter-spacing: .03em; margin-top: 2px; }
+    .art .av a { text-decoration: none; color: inherit; }
+    .art .av a code { border: 1px solid rgba(var(--accent-rgb), .32); transition: background .2s ease, border-color .2s ease; }
+    .art .av a:hover code { background: rgba(var(--accent-rgb), .16); border-color: rgba(var(--accent-rgb), .6); }
+    .art .abadge { flex: none; display: inline-flex; align-items: center; gap: 7px; padding: 6px 12px; border-radius: 999px;
+                   font-size: clamp(9px, 1cqw, 10.5px); letter-spacing: .14em; text-transform: uppercase; font-weight: 500; }
+    .art .abadge::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; box-shadow: 0 0 8px currentColor; }
+    .art .abadge.ok  { color: var(--pink-300); background: rgba(var(--accent-rgb), .08); border: 1px solid rgba(var(--accent-rgb), .35); }
+    .art .abadge.part { color: var(--pink-200); background: rgba(var(--accent-rgb), .05); border: 1px solid rgba(var(--accent-rgb), .22); }
+    .art .abadge.todo { color: var(--muted); background: rgba(255,255,255,.03); border: 1px solid var(--line); }
+
+    /* reviewer checklist — the six items from r1.jpg */
+    .reviewer { grid-column: 2; grid-row: 1 / span 2; min-height: 0; display: flex; flex-direction: column; }
+    .reviewer .rlist { flex: 1; min-height: 0; display: flex; flex-direction: column; justify-content: space-evenly; }
+    .rrow {
+      display: flex; align-items: center; gap: clamp(10px, 1cqw, 14px);
+      padding: clamp(7px, 1cqh, 12px) clamp(12px, 1.2cqw, 16px);
+      background: var(--card); border: 1px solid var(--line-soft); border-radius: 12px;
+      min-height: 0;
+    }
+    .rrow .rn { flex: none; width: 26px; height: 26px; border-radius: 8px; display: grid; place-items: center;
+                font-size: 12px; font-weight: 500; color: var(--muted); background: rgba(255,255,255,.04);
+                border: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+    .rrow .rt { flex: 1; font-size: clamp(12px, 1.35cqw, 14.5px); color: var(--white); letter-spacing: .01em; line-height: 1.35; min-width: 0; }
+    .rrow .rt em { font-style: normal; display: block; margin-top: 3px; color: var(--muted); font-size: .88em; }
+    .rrow .rt em a { color: var(--muted); }
+    .rrow .rt em a:hover { color: var(--pink-300); }
+    .rrow .rt a { color: var(--pink-200); text-decoration: none; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .85em; }
+    .rrow .rt a:hover { color: var(--pink-300); text-decoration: underline; }
+    .rrow .rs { flex: none; display: inline-flex; align-items: center; gap: 6px; font-size: clamp(9px, .95cqw, 10.5px);
+                letter-spacing: .14em; text-transform: uppercase; font-weight: 500; color: var(--muted); }
+    .rrow .rs::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; box-shadow: 0 0 8px currentColor; }
+    .rrow.done .rn { color: var(--pink-300); border-color: rgba(var(--accent-rgb), .4); background: rgba(var(--accent-rgb), .07); }
+    .rrow.done .rs { color: var(--pink-300); }
+    .rrow.part .rs { color: var(--pink-200); }
+    .rrow.part .rs::before { opacity: .55; }
+
+    @media (max-height: 820px) {
+      .s4 .stage svg { max-height: 28cqh; }
+      .s4 .astat .sub { display: none; }
+      .s4 .astats { margin-top: 10px; }
+      .s2 .body { grid-template-rows: minmax(0, .8fr) minmax(0, 1fr) auto; }
+      .spec td { padding: 2px 0; line-height: 1.35; }
+      .spec td.k { padding-top: 4px; }
+      .spec .ct { margin-bottom: 4px; }
+    }
+
+    @media (max-width: 1180px) {
+      .cm-cell .lbl { white-space: nowrap; gap: 8px; letter-spacing: .1em; }
+      .art .av code { font-size: .8em; }
+    }
+
+    @media (max-width: 820px) {
+      .s5 .body { grid-template-columns: 1fr; grid-template-rows: auto auto; }
+      .artifacts { grid-column: 1; grid-row: 1; grid-template-rows: none; }
+      .reviewer { grid-column: 1; grid-row: 2; }
+    }
+
+    /* ---------- nav chrome ---------- */
+    .chrome { position: fixed; left: 0; bottom: 0; width: calc(100vw / var(--s, 1)); z-index: 5;
+              transform: scale(var(--s, 1)); transform-origin: 0 100%; display: flex; align-items: center; justify-content: space-between;
+              padding: 16px clamp(24px, 5cqw, 60px); pointer-events: none; }
+    .dots { display: flex; gap: 10px; }
+    .dots button { pointer-events: auto; width: 26px; height: 4px; border-radius: 999px; border: 0; cursor: pointer;
+                   background: rgba(255,255,255,.16); transition: background .3s ease, width .3s ease; }
+    .dots button.on { background: var(--pink-500); width: 40px; box-shadow: 0 0 12px var(--glow); }
+    .pageno { font-size: 12px; letter-spacing: .2em; color: var(--muted); font-variant-numeric: tabular-nums; }
+    .pageno b { color: var(--white); font-weight: 500; }
+    .hint { position: fixed; right: calc(clamp(24px, 5cqw, 60px) * var(--s, 1)); bottom: calc(40px * var(--s, 1)); z-index: 5; font-size: 11px; letter-spacing: .14em;
+            color: rgba(139,139,147,.55); text-transform: uppercase;
+            transform: scale(var(--s, 1)); transform-origin: 100% 100%; }
+
+    @media (max-width: 820px) {
+      .s2 .body { grid-template-columns: 1fr; grid-template-rows: auto auto auto auto; }
+      .chart-card { grid-column: 1; grid-row: 1; min-height: 320px; }
+      .cm-grid { grid-column: 1; grid-row: 2; }
+      .dashv { grid-column: 1; grid-row: 3; }
+      .dash { grid-column: 1; grid-row: 4; grid-template-columns: 1fr; }
+      .s4 .head { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; }
+    .s4 h2 { font-weight: 200; font-size: clamp(28px, 5cqw, 52px); letter-spacing: -.01em; line-height: 1; margin-top: 10px; }
+    .s4 h2 span { color: var(--pink-500); font-weight: 300; }
+    .s4 .ctx { font-size: clamp(11px, 1.4cqw, 13px); color: var(--muted); letter-spacing: .04em; text-align: right; line-height: 1.7; }
+    .s4 .ctx b { color: var(--pink-300); font-weight: 500; }
+    .s4 .panel { min-height: 0; }
+    .s4 .avstage { min-height: 200px; }
+    .s4 .astats { grid-template-columns: 1fr 1fr; }
+    .lb-imgwrap { max-height: 70cqh; }
+    .lb-imgwrap img { max-height: 70cqh; }
+    }
+  </style>
 </head>
+
 <body>
-<div class="wrap">
-  <p>Loading the presentation&hellip; <a href="presentation.html">open presentation.html</a></p>
-</div>
-<script>location.replace("presentation.html");</script>
+  <div class="deck">
+
+    <!-- ================= SLIDE 1 — HERO ================= -->
+    <section class="slide s1 active" data-i="0">
+      <div class="wordmark reveal d1">
+        <span class="tiny">tiny</span><span class="alexa">alexa</span><span class="dot"></span>
+      </div>
+
+      <div class="wave-wrap reveal d2"><canvas id="wave"></canvas></div>
+
+      <div class="tagline reveal d3">
+        a <b>fully on-device</b> voice assistant —<br/>
+        wake word <em>·</em> 230K-param TCN <em>·</em> browser UI, <b>zero cloud</b>
+      </div>
+
+      <div class="pill-row reveal d4">
+        <span class="pill">Raspberry Pi 4</span>
+        <span class="pill">onnxruntime · CPU</span>
+        <span class="pill">openWakeWord</span>
+        <span class="pill">0.9 MB model</span>
+      </div>
+    </section>
+
+<!-- ================= SLIDE 2 — TCN ARCHITECTURE ================= -->
+<section class="slide s4" data-i="1">
+  <div class="head reveal d1">
+    <div>
+      <h2>The <span>Architecture</span></h2>
+    </div>
+  </div>
+  <div class="panel arch reveal d2" style="flex:1; min-height:0;">
+    <div class="stage">
+      <svg viewBox="0 40 1420 272" role="img" aria-label="TCN architecture: a spoken command becomes a log-mel spectrogram, stem convolutions halve the frame rate, five dilated blocks widen the view to the whole command, pooling collapses time into one 64-d vector, and two heads jointly decode one of 31 commands">
+        <defs>
+          <marker id="ah" viewBox="0 0 8 8" refX="6" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M 0 0 L 8 4 L 0 8 Z" fill="#ff3d9e" opacity=".85"/>
+          </marker>
+        </defs>
+
+        <!-- flow: input → stem → blocks → pool → heads → output (single row) -->
+        <path class="flow" d="M 220 150 H 256" marker-end="url(#ah)" />
+        <path class="flow" d="M 422 150 H 458" marker-end="url(#ah)" />
+        <path class="flow" d="M 824 150 H 860" marker-end="url(#ah)" />
+        <path class="flow" d="M 1006 150 H 1042" marker-end="url(#ah)" />
+        <path class="flow" d="M 1228 150 H 1264" marker-end="url(#ah)" />
+
+        <!-- 1 input: spoken command -->
+        <g class="abox apart" data-stage="listen" data-part="listen">
+          <rect class="ab in" x="20" y="50" width="200" height="200" rx="12" />
+          <path class="wave" d="M 42 118 q 14 -28 28 0 t 28 0 t 28 0 t 28 0 t 28 0" />
+          <text class="at" x="120" y="170" text-anchor="middle">spoken command</text>
+          <text class="am" x="120" y="196" text-anchor="middle">“set an alarm for 6 AM”</text>
+          <text class="as" x="120" y="220" text-anchor="middle">16 kHz · ≤ 4.8 s</text>
+        </g>
+
+        <!-- 2 stem: spectrogram + compression -->
+        <g class="abox apart" data-stage="extract" data-part="extract"><g transform="translate(22 0)">
+          <rect class="ab" x="240" y="50" width="160" height="200" rx="12" />
+          <text class="at" x="320" y="92" text-anchor="middle">log-mel + stem</text>
+          <text class="am" x="320" y="128" text-anchor="middle">64 × 480 frames</text>
+          <text class="as" x="320" y="160" text-anchor="middle">480 → 240 → 120</text>
+          <text class="as" x="320" y="182" text-anchor="middle">ch 64 → 32 → 64</text>
+          </g>
+        </g>
+
+        <!-- 3 grouped dilated blocks -->
+        <g class="abox apart" data-stage="understand" data-part="understand"><g transform="translate(24 0)">
+          <rect class="ag" x="440" y="50" width="360" height="200" rx="14" />
+          <text class="agt" x="460" y="84">dilated blocks × 5</text>
+          <text class="am" x="460" y="110">64-dim · k = 5 · dilation ×2</text>
+          <text class="ags" x="460" y="132">2 convs each · skip connection</text>
+          <rect class="cell" data-b="0" x="456" y="152" width="58" height="52" rx="8" />
+          <rect class="cell" data-b="1" x="524" y="152" width="58" height="52" rx="8" />
+          <rect class="cell" data-b="2" x="592" y="152" width="58" height="52" rx="8" />
+          <rect class="cell" data-b="3" x="660" y="152" width="58" height="52" rx="8" />
+          <rect class="cell" data-b="4" x="728" y="152" width="58" height="52" rx="8" />
+          <text class="agt" x="485" y="184" text-anchor="middle">d1</text>
+          <text class="agt" x="553" y="184" text-anchor="middle">d2</text>
+          <text class="agt" x="621" y="184" text-anchor="middle">d4</text>
+          <text class="agt" x="689" y="184" text-anchor="middle">d8</text>
+          <text class="agt" x="757" y="184" text-anchor="middle">d16</text>
+          <path class="skip" data-b="0" d="M 470 207 V 213 Q 470 218 475 218 H 495 Q 500 218 500 213 V 207" />
+          <path class="skip" data-b="1" d="M 538 207 V 213 Q 538 218 543 218 H 563 Q 568 218 568 213 V 207" />
+          <path class="skip" data-b="2" d="M 606 207 V 213 Q 606 218 611 218 H 631 Q 636 218 636 213 V 207" />
+          <path class="skip" data-b="3" d="M 674 207 V 213 Q 674 218 679 218 H 699 Q 704 218 704 213 V 207" />
+          <path class="skip" data-b="4" d="M 742 207 V 213 Q 742 218 747 218 H 767 Q 772 218 772 213 V 207" />
+          </g>
+        </g>
+
+        <!-- 4a pool over time -->
+        <g class="abox apart" data-stage="decode" data-part="pool"><g transform="translate(26 0)">
+          <rect class="ab" x="840" y="50" width="140" height="200" rx="12" />
+          <text class="at" x="910" y="92" text-anchor="middle">pool over time</text>
+          <text class="am" x="910" y="130" text-anchor="middle">120 × 64</text>
+          <text class="as" x="910" y="156" text-anchor="middle">→ 64-d vector</text>
+          </g>
+        </g>
+
+        <!-- 4b two heads -->
+        <g class="abox apart" data-stage="decode" data-part="heads"><g transform="translate(-2 0)">
+          <rect class="ab" x="1050" y="50" width="180" height="200" rx="12" />
+          <text class="at" x="1140" y="92" text-anchor="middle">two heads</text>
+          <text class="am" x="1140" y="128" text-anchor="middle">intent · 19</text>
+          <text class="am" x="1140" y="152" text-anchor="middle">slot · 19</text>
+          <text class="as" x="1140" y="184" text-anchor="middle">31 valid pairs</text>
+          </g>
+        </g>
+
+        <!-- 4c output chip -->
+        <g class="abox apart" data-stage="decode" data-part="out">
+          <rect class="ab out" x="1270" y="115" width="130" height="70" rx="35" />
+          <text class="at" x="1335" y="157" text-anchor="middle">alarm · 6 AM</text>
+        </g>
+
+        <!-- progress rail: fills under whichever stage the inspector is playing -->
+        <g class="rail">
+          <line class="rail-bg" x1="20" y1="272" x2="1400" y2="272" />
+          <line class="rail-fill" id="railFill" x1="20" y1="272" x2="20" y2="272" />
+          <circle class="rail-tick" data-i="0" cx="20" cy="272" r="4.5" />
+          <circle class="rail-tick" data-i="1" cx="262" cy="272" r="4.5" />
+          <circle class="rail-tick" data-i="2" cx="464" cy="272" r="4.5" />
+          <circle class="rail-tick" data-i="3" cx="866" cy="272" r="4.5" />
+          <circle class="rail-tick" data-i="4" cx="1400" cy="272" r="4.5" />
+          <g class="rail-step" data-stage="listen"><rect x="14" y="282" width="236" height="26" fill="transparent" /><text x="20" y="300">01 · LISTEN</text></g>
+          <g class="rail-step" data-stage="extract"><rect x="256" y="282" width="196" height="26" fill="transparent" /><text x="262" y="300">02 · EXTRACT</text></g>
+          <g class="rail-step" data-stage="understand"><rect x="458" y="282" width="396" height="26" fill="transparent" /><text x="464" y="300">03 · UNDERSTAND</text></g>
+          <g class="rail-step" data-stage="decode"><rect x="860" y="282" width="540" height="26" fill="transparent" /><text x="866" y="300">04 · DECODE</text></g>
+          <circle class="rail-head" id="railHead" cx="20" cy="272" r="4" />
+        </g>
+      </svg>
+    </div>
+    <div class="archview">
+      <div class="avstage"><canvas id="archCanvas"></canvas></div>
+      <div class="avbar">
+        <button class="avbtn" id="avPlay" title="Pause / replay the walkthrough">❚❚</button>
+        <input class="avscrub" id="avScrub" type="range" min="0" max="1000" step="1" value="0" aria-label="Animation position" />
+        <span class="avtime" id="avTime">0.0 / 5.2 s</span>
+        <button class="avbtn" id="avSpeed" title="Playback speed">1×</button>
+        <button class="avbtn" id="avExpand" title="Expand animation">⤢</button>
+      </div>
+      <div class="avcap"><span class="avtag" id="avTag">01 · LISTEN</span><span class="avtext" id="avText"></span></div>
+    </div>
+  </div>
+
+  <!-- key model facts -->
+  <div class="astats">
+    <div class="astat reveal d3">
+      <div class="k">Parameters</div>
+      <div class="v num">229,958<small>0.23 M</small></div>
+      <div class="sub">0.9 MB · TCN.onnx</div>
+    </div>
+    <div class="astat reveal d4">
+      <div class="k">Dataset</div>
+      <div class="v num">17,851<small>utts</small></div>
+      <div class="sub">8.64 h · 100 voices</div>
+    </div>
+    <div class="astat reveal d5">
+      <div class="k">Training time</div>
+      <div class="v num">9<small>min 17 s</small></div>
+      <div class="sub">39 epochs · 8,697 steps</div>
+    </div>
+    <div class="astat reveal d6">
+      <div class="k">Inference · Pi</div>
+      <div class="v num">6.89<small>ms p95</small></div>
+      <div class="sub">RTF 696× faster than real-time</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SLIDE 3 — MODEL & PERFORMANCE ================= -->
+<section class="slide s2" data-i="2">
+      <div class="head reveal d1">
+        <div>
+          <h2>Model &amp; <span>Results</span></h2>
+        </div>
+      </div>
+
+      <div class="body">
+        <!-- training curves (progressive reveal) -->
+        <div class="panel chart-card reveal d2">
+          <div class="ptitle">Training — label accuracy &amp; validation loss</div>
+          <div class="chart-stage">
+            <img class="zoomable" src="results/accuracy_label.png" alt="training accuracy and validation loss curves" />
+            <div class="scan"></div>
+          </div>
+        </div>
+
+        <!-- Validation on RPi 4 — r2.jpg-format panel (from results/dashboard.md) -->
+        <div class="dashv">
+          <div class="spec reveal d4">
+            <div class="ct">Validation on Raspberry Pi 4</div>
+            <table>
+              <tr><td class="k">Hardware</td><td class="v">aarch64</td></tr>
+              <tr><td class="k">Wake word</td><td class="v">alexa_v0.1 (openWakeWord 0.4.0)</td></tr>
+              <tr><td class="k">Keyword / intent acc</td><td class="v"><b>100.00%</b> (202/202) / <b>86.14%</b> (174/202)</td></tr>
+              <tr><td class="k">False-accept rate</td><td class="v"><b>0.00%</b> (0/202)</td></tr>
+              <tr><td class="k">Latency p95 / RTF</td><td class="v">p95 <b>6.89 ms</b> / RTF <b>696.7×</b></td></tr>
+              <tr><td class="k">Runtime</td><td class="v">onnxruntime 1.31.0 · 1 thread · TCN.onnx 898 KB</td></tr>
+            </table>
+          </div>
+        </div>
+
+        <!-- confusion matrices -->
+        <div class="cm-grid reveal d3">
+          <div class="cm-cell">
+            <div class="lbl">Intent confusion <b>99.66%</b></div>
+            <div class="frame"><img class="zoomable" src="results/confusion_intent.png" alt="intent confusion matrix" /></div>
+          </div>
+          <div class="cm-cell">
+            <div class="lbl">Slot confusion <b>100%</b></div>
+            <div class="frame"><img class="zoomable" src="results/confusion_slot.png" alt="slot confusion matrix" /></div>
+          </div>
+        </div>
+      <div class="dash">
+        <!-- Dataset — r2.jpg-format panel (from results/dashboard.md) -->
+        <div class="spec reveal d5">
+          <div class="ct">Dataset</div>
+          <table>
+            <tr><td class="k">Source</td><td class="v">LibriSpeech + SilencioPH (Filipino-English) speakers</td></tr>
+            <tr><td class="k">Hours / utts</td><td class="v"><b>8.64 h / 17,851</b> (14,256 / 1,806 / 1,789 train·val·test)<br>8,927 clean + 8,924 noisy</td></tr>
+            <tr><td class="k">Speakers</td><td class="v"><b>100</b> (84 foreign + 16 Filipino-English) · 80 / 10 / 10 train·val·test</td></tr>
+            <tr><td class="k">Labels</td><td class="v"><span class="lexwrap" id="lexWrap"><span class="lex" id="lexTrigger" tabindex="0" role="button" aria-expanded="false" aria-label="Show the 19 intents and 18 slot values"><span class="n">19 intents</span><span class="sep">·</span><span class="n">18 slot values</span></span><span class="pin-dot"></span></span> · <b>31 command labels</b></td></tr>
+          </table>
+        </div>
+        <!-- Training — r2.jpg-format panel (from results/dashboard.md) -->
+        <div class="spec reveal d6">
+          <div class="ct">Training</div>
+          <table>
+            <tr><td class="k">Cluster</td><td class="v">Apple MPS</td></tr>
+            <tr><td class="k">Objective</td><td class="v">CE (intent) + CE (slot) · label smoothing 0.1<br>joint decode over 31 valid pairs</td></tr>
+            <tr><td class="k">Optimizer</td><td class="v">AdamW (lr 1e-3, wd 0.01) · 2-ep warmup → cosine to 1e-5 over 40 ep</td></tr>
+            <tr><td class="k">Steps / loss</td><td class="v"><b>8,697 steps</b> (39 ep × 223) · <b>9 min 17 s</b> · final loss 1.207</td></tr>
+          </table>
+        </div>
+      </div>
+      </div>
+    </section>
+
+<!-- ================= SLIDE 4 — TO BE SUBMITTED ================= -->
+<section class="slide s5" data-i="3">
+  <div class="head reveal d1">
+    <div>
+      <h2>To Be <span>Submitted</span></h2>
+    </div>
+  </div>
+
+  <div class="body">
+    <!-- the four fill-in artifacts -->
+    <div class="artifacts">
+      <div class="art reveal d2">
+        <div class="ai"><svg viewBox="0 0 24 24"><path d="M7 18a2 2 0 1 0 0-4 2 2 0 0 0 0 4zM17 18a2 2 0 1 0 0-4 2 2 0 0 0 0 4zM7 10h10M7 6h6"/></svg></div>
+        <div class="amain">
+          <div class="ak">GitHub repository</div>
+          <div class="av"><a href="https://github.com/charrienacor/tiny-alexa" target="_blank" rel="noopener"><code>github.com/charrienacor/tiny-alexa</code></a><span class="sub">public · one-command run: <b>./run.sh</b> → <b>http://localhost:8321</b></span></div>
+        </div>
+        <span class="abadge ok">ready</span>
+      </div>
+
+      <div class="art reveal d3">
+        <div class="ai"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></svg></div>
+        <div class="amain">
+          <div class="ak">Dataset location</div>
+          <div class="av"><a href="https://github.com/markandrian30/AI231/tree/main/MEX2/Data" target="_blank" rel="noopener"><code>github.com/markandrian30/AI231/MEX2/Data</code></a><span class="sub">17,851 utterances · 100 speakers · 19 intents · <code>manifest.csv</code> + <code>labels.json</code> + <code>slots.json</code></span></div>
+        </div>
+        <span class="abadge ok">ready</span>
+      </div>
+
+      <div class="art reveal d4">
+        <div class="ai"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M1 9h3M1 15h3M20 9h3M20 15h3"/></svg></div>
+        <div class="amain">
+          <div class="ak">A100 cluster</div>
+          <div class="av">not used — trained on <b>Apple Silicon (M-series)</b>, MPS/CPU<span class="sub">node ID · # GPUs · wall-clock <b>9 min 17 s</b> · seed <b>0</b></span></div>
+        </div>
+        <span class="abadge ok">ready</span>
+      </div>
+
+      <div class="art reveal d5">
+        <div class="ai"><svg viewBox="0 0 24 24"><path d="M12 3v12M8 11l4 4 4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg></div>
+        <div class="amain">
+          <div class="ak">Model weights</div>
+          <div class="av"><code>models/TCN.onnx</code> + <code>TCN.pt</code><span class="sub">898 KB · <b>MIT</b> · <code>LICENSE</code> + <code>models/README.md</code></span></div>
+        </div>
+        <span class="abadge ok">ready</span>
+      </div>
+    </div>
+
+    <!-- what the reviewer will look for -->
+    <div class="panel reviewer reveal d3">
+      <div class="ptitle">What the reviewer will look for</div>
+      <div class="rlist">
+        <div class="rrow done">
+          <div class="rn">1</div>
+          <div class="rt">Repo public, one-command reproduction <em>· ./run.sh → http://localhost:8321</em></div>
+          <span class="rs">done</span>
+        </div>
+        <div class="rrow done">
+          <div class="rn">2</div>
+          <div class="rt">Dataset licensed and citable <em>· <a href="https://github.com/markandrian30/AI231/tree/main/MEX2/Data" target="_blank" rel="noopener">github.com/markandrian30/AI231/MEX2/Data</a></em></div>
+          <span class="rs">done</span>
+        </div>
+        <div class="rrow done">
+          <div class="rn">3</div>
+          <div class="rt">Training logs + final checkpoint committed <em>· history.csv, train_config.json, TCN.pt</em></div>
+          <span class="rs">done</span>
+        </div>
+        <div class="rrow done">
+          <div class="rn">4</div>
+          <div class="rt">Pi 4 latency reproduced by the posted script <em>· python3 src/bench_pi.py → 6.89 ms p95</em></div>
+          <span class="rs">done</span>
+        </div>
+        <div class="rrow done">
+          <div class="rn">5</div>
+          <div class="rt">Held-out test set <em>· 202-clip VCM holdout (186 in-scope, 16 out-of-scope)</em></div>
+          <span class="rs">done</span>
+        </div>
+        <div class="rrow todo">
+          <div class="rn">6</div>
+          <div class="rt">Baseline of comparable size compared</div>
+          <span class="rs">todo</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+  </div>
+
+  <!-- centered popup lightbox for the charts (no zoom) -->
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Chart enlarged view">
+    <div class="lb-stage">
+      <div class="lb-imgwrap"><img id="lbImg" src="" alt="enlarged chart" /></div>
+      <div class="lb-cap"><span id="lbCap"></span><span class="tip">esc / click anywhere to close</span></div>
+    </div>
+  </div>
+
+  <!-- expanded stage inspector (popup) -->
+  <div class="avmodal" id="avModal" role="dialog" aria-modal="true" aria-label="Expanded stage animation">
+    <div class="avm-panel">
+      <div class="avm-head">
+        <span class="t" id="avTagBig">01 · LISTEN</span>
+        <button class="avbtn" id="avClose" title="Close (esc)">✕</button>
+      </div>
+      <div class="avm-body"><canvas id="archCanvasBig"></canvas></div>
+      <div class="avm-cap" id="avTextBig"></div>
+      <div class="avbar avm-bar">
+        <button class="avbtn" id="avPlayB" title="Pause / replay (space)">❚❚</button>
+        <input class="avscrub" id="avScrubB" type="range" min="0" max="1000" step="1" value="0" aria-label="Animation position" />
+        <span class="avtime" id="avTimeB">0.0 / 5.2 s</span>
+        <button class="avbtn" id="avSpeedB" title="Playback speed">1×</button>
+        <span class="avtime" style="margin-left:auto">space play/pause · ← → step · esc close</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- nav chrome -->
+  <div class="chrome">
+    <div class="dots" id="dots"></div>
+    <div class="pageno"><b id="cur">01</b> / 04</div>
+  </div>
+  <div class="hint">← → · space · click</div>
+
+  <script>
+    /* ============================================================
+       DECK NAV
+       ============================================================ */
+    let deckScale = 1;
+    function fitDeck() {
+      deckScale = Math.max(1, Math.min(innerWidth / 1440, innerHeight / 900));
+      document.documentElement.style.setProperty("--s", deckScale.toFixed(4));
+    }
+    fitDeck();
+    window.addEventListener("resize", fitDeck);
+
+    const slides = [...document.querySelectorAll(".slide")];
+    const dotsWrap = document.getElementById("dots");
+    const curEl = document.getElementById("cur");
+    let idx = 0;
+    let lbOpen = false; // lightbox state (declared early: keydown guard below reads it)
+    let avModalOpen = false; // stage-inspector popup state (same reason)
+    let lexHover = false, lexPinned = false; // vocabulary popover state (same reason)
+
+    slides.forEach((s, i) => {
+      const b = document.createElement("button");
+      b.setAttribute("aria-label", "slide " + (i + 1));
+      b.addEventListener("click", () => go(i));
+      dotsWrap.appendChild(b);
+    });
+    const dots = [...dotsWrap.children];
+
+    function go(n) {
+      n = Math.max(0, Math.min(slides.length - 1, n));
+      if (n === idx && slides[n].classList.contains("active")) return;
+      slides[idx].classList.remove("active");
+      dots[idx].classList.remove("on");
+      idx = n;
+      slides[idx].classList.add("active");
+      dots[idx].classList.add("on");
+      curEl.textContent = String(idx + 1).padStart(2, "0");
+      closeLex(true); // leaving the slide dismisses the vocabulary popover
+    }
+    dots[0].classList.add("on");
+
+    document.addEventListener("keydown", e => {
+      if (lbOpen || avModalOpen) return; // lightbox / stage popup own the keyboard while open
+      if (e.key === "ArrowRight" || e.key === " " || e.key === "PageDown" || e.key === "Enter") { e.preventDefault(); go(idx + 1); }
+      else if (e.key === "ArrowLeft" || e.key === "PageUp") { e.preventDefault(); go(idx - 1); }
+      else if (e.key === "Home") go(0);
+      else if (e.key === "End") go(slides.length - 1);
+    });
+    // click left/right thirds to navigate (ignore clicks on controls / lightbox)
+    document.querySelector(".deck").addEventListener("click", e => {
+      if (e.target.closest("button")) return;
+      if (e.target.closest(".lightbox")) return;
+      if (e.target.closest(".avmodal") || e.target.closest(".archview")) return; // inspector owns its area
+      const x = e.clientX / window.innerWidth;
+      go(x < 0.28 ? idx - 1 : idx + 1);
+    });
+
+    /* ============================================================
+       WAVEFORM  — the app's idle "breathing" wave, lifted verbatim
+       from tiny-alexa.html (idle branch of its draw loop).
+       ============================================================ */
+    const canvas = document.getElementById("wave"), ctx = canvas.getContext("2d");
+    const NBARS = 48;
+    const bars = new Float32Array(NBARS);
+    let W = 0, H = 0, DPR = 1, energy = 0;
+
+    const PINK300 = [255, 158, 203];
+    const PINK500 = [255, 61, 158];
+    const PINK600 = [240, 18, 138];
+    const rgbA = (c, a) => `rgba(${c[0] | 0},${c[1] | 0},${c[2] | 0},${a})`;
+
+    function resize() {
+      DPR = Math.min(window.devicePixelRatio || 1, 2);
+      const r = canvas.getBoundingClientRect();
+      W = r.width; H = r.height;
+      canvas.width = Math.round(W * DPR); canvas.height = Math.round(H * DPR);
+      ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    }
+    window.addEventListener("resize", resize);
+
+    function draw(t) {
+      requestAnimationFrame(draw);
+      if (!W) resize();
+
+      // idle: gentle breathing wave (same formula as the app)
+      const targets = new Float32Array(NBARS);
+      for (let i = 0; i < NBARS; i++) {
+        const c = i / (NBARS - 1);
+        const env = Math.sin(c * Math.PI);
+        const w1 = Math.sin(t * 0.0016 + i * 0.34);
+        const w2 = Math.sin(t * 0.0042 + i * 0.9 + 1.7);
+        targets[i] = (0.10 + 0.085 * w1 + 0.035 * w2) * (0.55 + 0.45 * env);
+      }
+
+      const alpha = 0.28;
+      for (let i = 0; i < NBARS; i++) bars[i] += (targets[i] - bars[i]) * alpha;
+
+      ctx.clearRect(0, 0, W, H);
+      const gap = 3;
+      const bw = (W - gap * (NBARS - 1)) / NBARS;
+      const base = H * 0.5;
+      const maxH = H * 0.46;
+
+      const topCol = rgbA(PINK300, 0.6);
+      const botCol = rgbA(PINK600, 0.5);
+      ctx.lineCap = "round";
+      for (let i = 0; i < NBARS; i++) {
+        const h = Math.max(2, bars[i] * maxH);
+        const x = i * (bw + gap) + bw / 2;
+        const g = ctx.createLinearGradient(0, base - h, 0, base + h);
+        g.addColorStop(0, topCol);
+        g.addColorStop(1, botCol);
+        ctx.strokeStyle = g;
+        ctx.lineWidth = bw;
+        ctx.shadowColor = rgbA(PINK500, 0.35);
+        ctx.shadowBlur = (6 + 18) * Math.min(1, bars[i] + 0.15);
+        ctx.beginPath();
+        ctx.moveTo(x, base - h);
+        ctx.lineTo(x, base + h);
+        ctx.stroke();
+      }
+      ctx.shadowBlur = 0;
+    }
+    requestAnimationFrame(draw);
+
+    /* ============================================================
+       LIGHTBOX — click any chart to open a centered popup (image fits, no zoom)
+       ============================================================ */
+    const lb = document.getElementById("lightbox");
+    const lbImg = document.getElementById("lbImg");
+    const lbCap = document.getElementById("lbCap");
+
+    function openLb(src, cap) {
+      lbImg.src = src;
+      lbCap.innerHTML = cap;
+      lb.classList.add("open");
+      lbOpen = true;
+    }
+    function closeLb() {
+      lb.classList.remove("open");
+      lbOpen = false;
+    }
+
+    const CHART_CAPS = {
+      "results/accuracy_label.png": "Training — label accuracy &amp; validation loss · <b>39 epochs</b>",
+      "results/confusion_intent.png": "Intent confusion — test split · <b>99.66%</b>",
+      "results/confusion_slot.png": "Slot confusion — test split · <b>100%</b>"
+    };
+    document.querySelectorAll("img.zoomable").forEach(img => {
+      img.addEventListener("click", e => {
+        e.stopPropagation();
+        const src = img.getAttribute("src");
+        openLb(src, CHART_CAPS[src] || "");
+      });
+    });
+    lb.addEventListener("click", closeLb);
+    document.addEventListener("keydown", e => {
+      if (e.key === "Escape") closeLb();
+      if (lbOpen && (e.key === "ArrowRight" || e.key === "ArrowLeft" || e.key === " " || e.key === "PageDown" || e.key === "PageUp" || e.key === "Enter")) {
+        e.preventDefault();
+        return; // swallow nav keys while the popup is open
+      }
+    });
+
+    /* ============================================================
+       VOCABULARY LEXICON — hover (or click to pin) "19 intents · 18
+       slot values" in the Dataset table to see the full vocab.
+       Lists come from the same sorted manifest vocab the deck already
+       carries (AV_INTENTS / AV_SLOTS, declared here and reused by the
+       stage inspector below); slot list drops NO_SLOT.
+       ============================================================ */
+    const AV_INTENTS = ["ALARM","BRIGHTNESS","CALL","COLOR","CREATE_REMINDER","LIGHT_OFF","LIGHT_ON","LIST_REMINDERS","MESSAGE","NEXT","PAUSE","PLAY_MUSIC","STOP","TEMPERATURE","TIME","TIMER","VOLUME_DOWN","VOLUME_UP","WEATHER"];
+    const AV_SLOTS = ["1 minute","10 seconds","100 percent","18 degrees","20 percent","22 degrees","26 degrees","30 seconds","6 AM","60 percent","8 AM","9 PM","blue","drink water","exercise","green","red","study","NO_SLOT"];
+    // 18 slot values grouped by the intent they belong to (kept together, not shuffled)
+    const SLOT_GROUPS = [
+      ["ALARM", ["6 AM","8 AM","9 PM"]],
+      ["TIMER", ["30 seconds","1 minute","10 seconds"]],
+      ["TEMPERATURE", ["18 degrees","22 degrees","26 degrees"]],
+      ["BRIGHTNESS", ["20 percent","60 percent","100 percent"]],
+      ["COLOR", ["red","blue","green"]],
+      ["CREATE_REMINDER", ["drink water","study","exercise"]]
+    ];
+    const lexWrap = document.getElementById("lexWrap");
+    const lexTrig = document.getElementById("lexTrigger");
+    const lexPop = document.createElement("div");
+    lexPop.className = "lexpop";
+    lexPop.setAttribute("role", "dialog");
+    lexPop.setAttribute("aria-label", "19 intents and 18 slot values");
+    lexPop.innerHTML =
+      `<h4>Intents <small>${AV_INTENTS.length} — intent head classes</small></h4>` +
+      `<div class="lexgrid">${AV_INTENTS.map(i => `<span class="lexchip"><span>${i}</span></span>`).join("")}</div>` +
+      `<h4>Slot values <small>${AV_SLOTS.length - 1} — slot head classes (minus NO_SLOT)</small></h4>` +
+      `<div class="lexgrid">${SLOT_GROUPS.flatMap(([grp, vals]) =>
+           vals.map(s => `<span class="lexchip slot"><span>${s}</span><em>${grp}</em></span>`)
+         ).join("")}</div>` +
+      `<div class="lexfoot"><b>31 command labels</b> = the joint-decode pairs of intent × slot that actually occur (see <code>data/labels.json</code>). Slot head is ${AV_SLOTS.length}-way: 18 values + NO_SLOT for slot-less intents.</div>`;
+    document.body.appendChild(lexPop);
+
+    function placeLex() {
+      const r = lexTrig.getBoundingClientRect(), pw = lexPop.offsetWidth, ph = lexPop.offsetHeight;
+      let left = Math.min(Math.max(12, r.left), window.innerWidth - pw - 12);
+      let top = r.bottom + 10;
+      if (top + ph > window.innerHeight - 12) top = Math.max(12, r.top - ph - 10);
+      lexPop.style.left = left + "px";
+      lexPop.style.top = top + "px";
+    }
+    function updateLex() {
+      const open = lexHover || lexPinned;
+      lexPop.classList.toggle("open", open);
+      lexWrap.classList.toggle("pin", lexPinned);
+      lexTrig.setAttribute("aria-expanded", String(lexPinned));
+      if (open) placeLex();
+    }
+    function closeLex(force) {
+      if (force) { lexHover = false; lexPinned = false; }
+      else lexPinned = false;
+      updateLex();
+    }
+    lexTrig.addEventListener("mouseenter", () => { lexHover = true; updateLex(); });
+    lexTrig.addEventListener("mouseleave", () => { lexHover = false; updateLex(); });
+    lexTrig.addEventListener("focus", () => { lexHover = true; updateLex(); });
+    lexTrig.addEventListener("blur", () => { lexHover = false; updateLex(); });
+    lexTrig.addEventListener("click", e => {
+      e.stopPropagation(); // don't let the deck treat it as a nav click
+      lexPinned = !lexPinned;
+      updateLex();
+    });
+    lexPop.addEventListener("mouseenter", () => { lexHover = true; });
+    lexPop.addEventListener("mouseleave", () => { lexHover = false; updateLex(); });
+    lexPop.addEventListener("click", e => e.stopPropagation());
+    document.addEventListener("click", () => { if (lexPinned) closeLex(); });
+    document.addEventListener("keydown", e => { if (e.key === "Escape") closeLex(); });
+    window.addEventListener("scroll", () => { if (lexHover || lexPinned) placeLex(); }, true);
+    window.addEventListener("resize", () => { if (lexHover || lexPinned) placeLex(); });
+
+    /* ============================================================
+       STAGE INSPECTOR — click a stage in the architecture diagram
+       to watch its actual processing on the canvas strip below.
+       Shapes & indices traced to src/model.py + src/features.py:
+       16 kHz, 25 ms win / 10 ms hop -> 480 frames, 64 mel bands;
+       ds1/ds2 stride-2 k5 (480->240->120); 5 dilated blocks
+       (k5, d=1..16, 2 convs each, residual); avg-pool -> 64-d;
+       heads 19 intents / 19 slots; "alarm 6 AM" = intent idx 0,
+       slot idx 8 (sorted vocab from data/manifest.csv).
+       ============================================================ */
+    const avCanvas = document.getElementById("archCanvas");
+    const avCtx = avCanvas.getContext("2d");
+    const avTag = document.getElementById("avTag");
+    const avText = document.getElementById("avText");
+
+    const AV_PINK = "255, 61, 158";
+    const AV_P300 = "255, 158, 203";
+    const AV_P100 = "255, 225, 239";
+    const AV_MUTED = "139, 139, 147";
+    const AV_WHITE = "246, 246, 248";
+    const avc = (rgb, a) => `rgba(${rgb},${a})`;
+    // canvas text uses the deck's typeface and grows with the canvas (avFS set per frame)
+    const AV_FONT = '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
+    let avFS = 1;
+    const avF = (px, w) => `${w ? w + " " : ""}${(px * avFS).toFixed(1)}px ${AV_FONT}`;
+
+    const AV_WIN_I = 0, AV_WIN_S = 8; // "alarm 6 AM"
+
+    // deterministic PRNG so every play looks identical
+    function avRand(seed) {
+      let s = seed >>> 0;
+      return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; };
+    }
+    const avEaseIO = p => p < .5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
+    const avClamp01 = p => Math.max(0, Math.min(1, p));
+
+    /* ---------- shared canvas helpers ---------- */
+    const avLerp = (a, b, t) => a + (b - a) * t;
+    function avTx(ctx, txt, x, y, px, rgb, a, w, align, maxW) {
+      ctx.font = avF(px, w);
+      if (maxW) { const m = ctx.measureText(txt).width; if (m > maxW) ctx.font = avF(px * maxW / m, w); }
+      ctx.fillStyle = avc(rgb, a);
+      ctx.textAlign = align || "left";
+      ctx.fillText(txt, x, y);
+      ctx.textAlign = "left";
+    }
+    // draw text shrunk (never grown) so it fits inside maxW
+    function avFitText(ctx, txt, x, y, maxW, px, weight) {
+      ctx.font = avF(px, weight);
+      const w = ctx.measureText(txt).width;
+      if (w > maxW) ctx.font = avF(px * maxW / w, weight);
+      ctx.fillText(txt, x, y);
+    }
+    function avRoundRect(ctx, x, y, w, h, r) {
+      r = Math.max(0, Math.min(r, w / 2, h / 2));
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.arcTo(x + w, y, x + w, y + h, r);
+      ctx.arcTo(x + w, y + h, x, y + h, r);
+      ctx.arcTo(x, y + h, x, y, r);
+      ctx.arcTo(x, y, x + w, y, r);
+      ctx.closePath();
+    }
+    function avArrow(ctx, x0, y0, x1, y1, a) {
+      const ang = Math.atan2(y1 - y0, x1 - x0), s = 6 * avFS;
+      ctx.strokeStyle = avc(AV_PINK, a == null ? .75 : a); ctx.lineWidth = 1.4;
+      ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1);
+      ctx.moveTo(x1, y1); ctx.lineTo(x1 - s * Math.cos(ang - .45), y1 - s * Math.sin(ang - .45));
+      ctx.moveTo(x1, y1); ctx.lineTo(x1 - s * Math.cos(ang + .45), y1 - s * Math.sin(ang + .45));
+      ctx.stroke();
+    }
+    // diagonal hatching = "padding / not real data"
+    function avHatch(ctx, x, y, w, h, a) {
+      if (w <= 0 || h <= 0) return;
+      ctx.save();
+      ctx.beginPath(); ctx.rect(x, y, w, h); ctx.clip();
+      ctx.strokeStyle = avc(AV_MUTED, a == null ? .22 : a); ctx.lineWidth = 1;
+      ctx.beginPath();
+      for (let k = -h; k < w; k += 6) { ctx.moveTo(x + k, y + h); ctx.lineTo(x + k + h, y); }
+      ctx.stroke();
+      ctx.restore();
+      ctx.strokeStyle = avc(AV_MUTED, .25); ctx.lineWidth = 1;
+      ctx.strokeRect(x + .5, y + .5, w - 1, h - 1);
+    }
+    function melColor(v) {
+      const a = Math.max(0, Math.min(1, v));
+      if (a < .05) return avc(AV_PINK, .04 + a);
+      const mix = Math.min(1, a * 1.25);
+      const gg = 61 + (225 - 61) * mix, b = 158 + (239 - 158) * mix;
+      return `rgba(255,${gg | 0},${b | 0},${.25 + .75 * a})`;
+    }
+    function avGridCanvas(rows, cols, val) {   // offscreen heat-map, 2 px per cell
+      const c = document.createElement("canvas");
+      c.width = cols * 2; c.height = rows * 2;
+      const g = c.getContext("2d");
+      for (let r = 0; r < rows; r++)
+        for (let t = 0; t < cols; t++) {
+          g.fillStyle = melColor(val(r, t));
+          g.fillRect(t * 2, (rows - 1 - r) * 2, 2, 2);   // low bands at the bottom
+        }
+      return c;
+    }
+
+    /* ============================================================
+       01 · LISTEN — what infer.py / server.py do before the model:
+       record 16 kHz mono after the wake word until the speaker goes
+       quiet → trim_silence (25 ms frames below −40 dB of the clip's
+       peak are cut, 100 ms kept each side) → remove DC offset → the
+       clip sits at the start of the fixed 4.8 s (480-frame) window.
+       ============================================================ */
+    const REC = 3.2, SP0 = .5, SPL = 2.1;      // recording length, speech start, speech length (s)
+    const LISTEN_WORDS = [
+      { s: .020, e: .145, amp: .80, f: 110 },  // "set"
+      { s: .185, e: .300, amp: .95, f: 135 },  // "an"
+      { s: .335, e: .585, amp: 1.00, f: 150 }, // "alarm"
+      { s: .620, e: .700, amp: .70, f: 100 },  // "for"
+      { s: .740, e: .860, amp: .90, f: 165 },  // "6"
+      { s: .895, e: .985, amp: .85, f: 120 }   // "AM"
+    ];
+    function listenEnv(u) {                    // u: 0..1 through the spoken command
+      let v = 0;
+      for (const w of LISTEN_WORDS) {
+        if (u >= w.s && u <= w.e) v = Math.max(v, w.amp * Math.pow(Math.sin((u - w.s) / (w.e - w.s) * Math.PI), .8));
+      }
+      return v;
+    }
+    const recNoise = (() => { const r = avRand(3); return Float32Array.from({ length: 4096 }, () => r()); })();
+    const NOISE_FLOOR = .006;                  // room noise ≈ −44 dB re. peak (below the −40 dB cut)
+    function recAmp(t) {
+      const env = listenEnv((t - SP0) / SPL);
+      const j = recNoise[Math.floor(t / REC * 4095) & 4095];
+      return NOISE_FLOOR * (.6 + .8 * j) + env * (.55 + .45 * j);
+    }
+    // trim_silence on the synthetic clip (same rule as features.py)
+    const TRIM = (() => {
+      const fr = .025, n = Math.floor(REC / fr), rms = [];
+      for (let i = 0; i < n; i++) {
+        let s = 0;
+        for (let k = 0; k < 8; k++) { const a = recAmp(i * fr + (k + .5) * fr / 8); s += a * a / 2; }
+        rms.push(Math.sqrt(s / 8));
+      }
+      const peak = Math.max(...rms), th = peak * Math.pow(10, -40 / 20);
+      const sp = rms.map((v, i) => v > th ? i : -1).filter(i => i >= 0);
+      const ts = Math.max(0, sp[0] * fr - .1), te = Math.min(REC, (sp[sp.length - 1] + 1) * fr + .1);
+      const samples = Math.round((te - ts) * 16000);
+      return { fr, rms, peak, ts, te, len: te - ts, samples, nReal: Math.min(480, Math.ceil(samples / 160)) };
+    })();
+    const TS = TRIM.ts, TE = TRIM.te, N_REAL = TRIM.nReal;
+
+    const avListen = {
+      tag: "01 · LISTEN",
+      dur: 9000,
+      cap: p => {
+        if (p < .42) return `Wake word heard → recording at <b>16 kHz</b> mono until the speaker goes quiet · ${(avClamp01(p / .42) * REC).toFixed(2)} s`;
+        if (p < .62) return `Trim silence: 25 ms frames quieter than <b>−40 dB</b> of the clip's peak are cut, keeping <b>100 ms</b> either side`;
+        if (p < .78) return `Remove the DC offset — subtract the mean so the waveform is centred on zero`;
+        return `Clip = <b>${TRIM.len.toFixed(2)} s · ${TRIM.samples.toLocaleString()} samples</b> at the start of the fixed <b>4.8 s</b> window; the rest becomes padding → on to features`;
+      },
+      draw(ctx, W, H, p) {
+        const L = 16 * avFS, R = W - 16 * avFS, Wd = R - L;
+        const top = H * .13, wfH = H * .44, mid = top + wfH / 2, amp = wfH * .47;
+        const pRec = avClamp01(p / .42), pTrim = avEaseIO(avClamp01((p - .44) / .16));
+        const pDC = avEaseIO(avClamp01((p - .64) / .12)), pPad = avEaseIO(avClamp01((p - .80) / .16));
+        const xRaw = t => L + t / REC * Wd, xFin = t => L + (t - TS) / 4.8 * Wd;
+        const dc = .3 * (1 - pDC);
+        // title row
+        avTx(ctx, pPad < .5 ? "microphone · 16 kHz mono · raw recording" : "model input window · 4.8 s = 480 frames × 10 ms",
+          L, top - 10 * avFS, 10, AV_MUTED, .9);
+        // padding zone (appears as the clip settles into the 4.8 s window)
+        if (pPad > 0) {
+          ctx.globalAlpha *= pPad;
+          avHatch(ctx, xFin(TE), top, xFin(TS + 4.8) - xFin(TE), wfH);
+          avTx(ctx, `padding · ${480 - N_REAL} frames`, (xFin(TE) + xFin(TS + 4.8)) / 2, mid + 4 * avFS, 11, AV_MUTED, .95, 500, "center");
+          ctx.globalAlpha /= pPad;
+        }
+        // zero line + (while present) the DC-offset mean line
+        ctx.setLineDash([4, 4]); ctx.strokeStyle = avc(AV_MUTED, .35); ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(L, mid); ctx.lineTo(R, mid); ctx.stroke(); ctx.setLineDash([]);
+        avTx(ctx, "0", L - 10 * avFS, mid + 3 * avFS, 9, AV_MUTED, .8);
+        if (dc > .004 && p > .6) {
+          const ym = mid - dc * amp;
+          ctx.strokeStyle = avc(AV_P300, .8); ctx.beginPath(); ctx.moveTo(L, ym); ctx.lineTo(R, ym); ctx.stroke();
+          avTx(ctx, "mean ≠ 0 (DC offset)", R, ym - 5 * avFS, 10, AV_P300, .95, 500, "right");
+        }
+        // waveform as min/max columns
+        const tEnd = pRec * REC, step = REC / (Wd / 2);
+        ctx.lineWidth = Math.max(1, 1.3 * avFS / 1.2);
+        for (let t = 0; t <= tEnd; t += step) {
+          const inside = t >= TS && t <= TE;
+          let a = 1, x;
+          if (inside) x = avLerp(xRaw(t), xFin(t), pPad);
+          else { a = (1 - .8 * pTrim) * (1 - pPad); x = xRaw(t); }
+          if (a <= .01) continue;
+          const v = recAmp(t), c = mid - dc * amp;
+          ctx.strokeStyle = inside || pTrim === 0 ? avc(AV_PINK, .9 * a) : avc(AV_MUTED, .8 * a);
+          ctx.beginPath(); ctx.moveTo(x, c - v * amp); ctx.lineTo(x, c + v * amp + .5); ctx.stroke();
+        }
+        // recording playhead
+        if (pRec < 1) {
+          const xh = xRaw(tEnd);
+          ctx.strokeStyle = avc(AV_P300, .9); ctx.lineWidth = 1.2;
+          ctx.beginPath(); ctx.moveTo(xh, top); ctx.lineTo(xh, top + wfH); ctx.stroke();
+          ctx.fillStyle = avc(AV_PINK, .95); ctx.beginPath(); ctx.arc(L + 8 * avFS, top + 8 * avFS, 4 * avFS * (.75 + .25 * Math.sin(p * 60)), 0, 7); ctx.fill();
+          avTx(ctx, "REC", L + 16 * avFS, top + 11 * avFS, 9, AV_PINK, .95, 600);
+        }
+        // level meter: RMS of each 25 ms frame in dB re. peak, with the −40 dB cut
+        const mTop = top + wfH + 18 * avFS, mH = H * .86 - mTop, meterA = 1 - pPad;
+        if (meterA > .01 && mH > 12) {
+          ctx.globalAlpha *= meterA;
+          const dbY = db => mTop + mH * (1 - (db + 60) / 60);
+          TRIM.rms.forEach((r, i) => {
+            const t0 = i * TRIM.fr;
+            if (t0 > tEnd) return;
+            const db = Math.max(-60, 20 * Math.log10(r / TRIM.peak + 1e-9));
+            const above = db > -40;
+            ctx.fillStyle = above ? avc(AV_PINK, .75) : avc(AV_MUTED, .45);
+            const x0 = xRaw(t0), w = Math.max(1, xRaw(t0 + TRIM.fr) - x0 - 1);
+            ctx.fillRect(x0, dbY(db), w, mTop + mH - dbY(db));
+          });
+          ctx.setLineDash([3, 3]); ctx.strokeStyle = avc(AV_P300, .85); ctx.lineWidth = 1;
+          ctx.beginPath(); ctx.moveTo(L, dbY(-40)); ctx.lineTo(R, dbY(-40)); ctx.stroke(); ctx.setLineDash([]);
+          avTx(ctx, "−40 dB re. peak", R, dbY(-40) - 4 * avFS, 9, AV_P300, .95, 0, "right");
+          avTx(ctx, "frame RMS (25 ms)", L, mTop - 4 * avFS, 9, AV_MUTED, .85);
+          ctx.globalAlpha /= meterA;
+        }
+        // trim brackets close in on the speech (+100 ms margin)
+        if (pTrim > 0) {
+          const b0 = avLerp(L, avLerp(xRaw(TS), xFin(TS), pPad), pTrim);
+          const b1 = avLerp(R, avLerp(xRaw(TE), xFin(TE), pPad), pTrim);
+          ctx.strokeStyle = avc(AV_PINK, .95); ctx.lineWidth = 2;
+          const br = (x, dir) => { ctx.beginPath(); ctx.moveTo(x + dir * 7, top - 3); ctx.lineTo(x, top - 3); ctx.lineTo(x, top + wfH + 3); ctx.lineTo(x + dir * 7, top + wfH + 3); ctx.stroke(); };
+          br(b0, 1); br(b1, -1);
+          if (pPad < .5) avTx(ctx, `keep ${TRIM.len.toFixed(2)} s`, (b0 + b1) / 2, top + wfH + 13 * avFS, 10, AV_P100, .95 * pTrim, 600, "center");
+        }
+        // time ruler (raw seconds → 4.8 s window)
+        const ry = H - 8 * avFS;
+        ctx.fillStyle = avc(AV_MUTED, .6);
+        for (let s = 0; s <= 4.8 + 1e-6; s += .4) {
+          const xr = xRaw(s), xf = L + s / 4.8 * Wd;
+          const x = avLerp(xr, xf, pPad);
+          if (x > R + 1) continue;
+          ctx.fillRect(x, ry - 8 * avFS, 1, 4 * avFS);
+          if (Math.abs(s - Math.round(s)) < 1e-6 || (pPad > .5 && Math.abs(s - 4.8) < 1e-6))
+            avTx(ctx, `${+s.toFixed(1)} s`, x + 3, ry, 9, AV_MUTED, .75);
+        }
+      }
+    };
+
+    /* ============================================================
+       02 · EXTRACT — features.log_mel + the stem of model.py:
+       25 ms Hann window (400 samples), 10 ms hop → |FFT|² (201 bins)
+       → 64 mel filters → log; per-band mean removed, ÷ one std;
+       padding frames := each band's quietest real value → 64 × 480.
+       Stem: ds1 conv k5 stride 2 (64 → 32 ch, 480 → 240) + BN + ReLU,
+             ds2 conv k5 stride 2 (32 → 64 ch, 240 → 120) + BN + ReLU.
+       ============================================================ */
+    const MEL_N = 64, MEL_T = 480;
+    const MEL = (() => {
+      const r = avRand(7);
+      const raw = new Float32Array(MEL_N * MEL_T), norm = new Float32Array(MEL_N * MEL_T);
+      for (let m = 0; m < MEL_N; m++) {
+        const lowBias = .25 + .45 * Math.exp(-m / 14);          // raw log-mel: low bands louder
+        for (let t = 0; t < N_REAL; t++) {
+          const u = (TS + t * .01 - SP0) / SPL;
+          let v = lowBias * (.55 + .25 * r());
+          for (const w of LISTEN_WORDS) {
+            if (u >= w.s && u <= w.e) {
+              const env = Math.pow(Math.sin((u - w.s) / (w.e - w.s) * Math.PI), .7);
+              const f1 = 5 + 12 * (w.f / 165), f2 = f1 + 16 + 6 * (w.f / 165);
+              const band = Math.exp(-Math.pow((m - f1) / 4.5, 2)) + .7 * Math.exp(-Math.pow((m - f2) / 6, 2)) + .25 * Math.exp(-Math.pow((m - 44) / 10, 2));
+              v += w.amp * env * band * (.7 + .3 * r());
+            }
+          }
+          raw[m * MEL_T + t] = Math.min(1, v);
+        }
+      }
+      // per-band mean over real frames, one global std
+      let ss = 0;
+      const means = new Float32Array(MEL_N);
+      for (let m = 0; m < MEL_N; m++) {
+        let s = 0; for (let t = 0; t < N_REAL; t++) s += raw[m * MEL_T + t];
+        means[m] = s / N_REAL;
+        for (let t = 0; t < N_REAL; t++) ss += (raw[m * MEL_T + t] - means[m]) ** 2;
+      }
+      const sd = Math.sqrt(ss / (MEL_N * N_REAL)) + 1e-5;
+      for (let m = 0; m < MEL_N; m++) {
+        let mn = 1;
+        for (let t = 0; t < N_REAL; t++) {
+          const z = (raw[m * MEL_T + t] - means[m]) / sd;
+          const d = avClamp01(.42 + .2 * z);
+          norm[m * MEL_T + t] = d; mn = Math.min(mn, d);
+        }
+        for (let t = N_REAL; t < MEL_T; t++) norm[m * MEL_T + t] = mn;   // padding := band minimum
+      }
+      // stem outputs (illustrative mixes of the real input, same shapes as the model)
+      const g1 = new Float32Array(32 * 240), g2 = new Float32Array(64 * 120);
+      for (let c = 0; c < 32; c++) for (let o = 0; o < 240; o++) {
+        let s = 0, n = 0;
+        for (let m of [2 * c, 2 * c + 1, (c * 7 + 11) % 64]) for (let k = -2; k <= 2; k++) {
+          const t = 2 * o + k; if (t < 0 || t >= MEL_T) continue; s += norm[m * MEL_T + t]; n++;
+        }
+        g1[c * 240 + o] = avClamp01((s / n - .3) * 2.1);               // ReLU-ish
+      }
+      for (let c = 0; c < 64; c++) for (let o = 0; o < 120; o++) {
+        let s = 0, n = 0;
+        for (let m of [c >> 1, (c * 5 + 3) % 32]) for (let k = -2; k <= 2; k++) {
+          const t = 2 * o + k; if (t < 0 || t >= 240) continue; s += g1[m * 240 + t]; n++;
+        }
+        g2[c * 120 + o] = avClamp01((s / n - .12) * 1.9);
+      }
+      return { raw, norm, g1, g2 };
+    })();
+    let melOffRaw = null, melOffNorm = null, stemOff1 = null, stemOff2 = null;
+    function melOffs() {
+      if (!melOffRaw) {
+        melOffRaw = avGridCanvas(MEL_N, MEL_T, (m, t) => t < N_REAL ? MEL.raw[m * MEL_T + t] : 0);
+        melOffNorm = avGridCanvas(MEL_N, MEL_T, (m, t) => MEL.norm[m * MEL_T + t]);
+        stemOff1 = avGridCanvas(32, 240, (c, t) => MEL.g1[c * 240 + t]);
+        stemOff2 = avGridCanvas(64, 120, (c, t) => MEL.g2[c * 120 + t]);
+      }
+    }
+    // mel filter centres (bins of the 201-point power spectrum), as features.py builds them
+    const MEL_EDGES = (() => {
+      const hz2mel = f => 2595 * Math.log10(1 + f / 700), mel2hz = m => 700 * (Math.pow(10, m / 2595) - 1);
+      const mx = hz2mel(8000), out = [];
+      for (let i = 0; i < MEL_N + 2; i++) out.push(Math.floor(mel2hz(mx * i / (MEL_N + 1)) / 16000 * 400));
+      return out;
+    })();
+
+    const avExtract = {
+      tag: "02 · EXTRACT",
+      dur: 14000,
+      cap: p => {
+        if (p < .40) {
+          const f = Math.min(N_REAL, Math.max(1, Math.round(p / .40 * N_REAL)));
+          return `Frame ${f} / ${N_REAL}: 25 ms Hann window (<b>400 samples</b>), hop 10 ms → |FFT|² → <b>64 mel filters</b> → log`;
+        }
+        if (p < .52) return `Normalise: subtract each band's mean, divide by one std · the <b>${480 - N_REAL} padding frames</b> get each band's quietest value → <b>64 × 480</b>`;
+        if (p < .76) return `Stem conv 1 — kernel 5, <b>stride 2</b>, 64 → 32 channels, then BN + ReLU → <b>480 → 240 frames</b>`;
+        if (p < .97) return `Stem conv 2 — kernel 5, stride 2, 32 → 64 channels, then BN + ReLU → <b>240 → 120 frames</b>`;
+        return `Stem done — <b>64 channels × 120 frames</b>, one frame per 40 ms of audio → on to the dilated blocks`;
+      },
+      draw(ctx, W, H, p) {
+        melOffs();
+        const L = 16 * avFS, R = W - 16 * avFS;
+        ctx.imageSmoothingEnabled = false;
+        if (p < .52) this.drawMel(ctx, W, H, p, L, R);
+        else this.drawStem(ctx, W, H, p, L, R);
+      },
+      drawMel(ctx, W, H, p, L, R) {
+        const pA = avClamp01(p / .40), pB = avEaseIO(avClamp01((p - .40) / .10));
+        const gw = (R - L) * .60, wy = H * .10, wh = H * .14, gy = wy + wh + 14 * avFS, gh = H - gy - 18 * avFS;
+        const fx = t => L + t / MEL_T * gw;
+        const f = Math.min(N_REAL - 1, Math.floor(pA * N_REAL));
+        // waveform strip on the same 4.8 s axis
+        avTx(ctx, "trimmed clip on the 4.8 s axis", L, wy - 6 * avFS, 9, AV_MUTED, .85);
+        ctx.strokeStyle = avc(AV_PINK, .55); ctx.lineWidth = 1;
+        for (let x = 0; x <= fx(N_REAL) - L; x += 2) {
+          const t = TS + x / gw * 4.8, v = recAmp(t) * wh * .48;
+          ctx.beginPath(); ctx.moveTo(L + x, wy + wh / 2 - v); ctx.lineTo(L + x, wy + wh / 2 + v + .5); ctx.stroke();
+        }
+        avHatch(ctx, fx(N_REAL), wy, fx(MEL_T) - fx(N_REAL), wh, .12);
+        // spectrogram: raw columns appear frame by frame, then crossfade to the normalised version
+        ctx.save(); ctx.beginPath(); ctx.rect(L, gy, fx(Math.max(f + 1, 1)) - L + (pA >= 1 ? gw : 0), gh); ctx.clip();
+        ctx.globalAlpha *= (1 - pB); ctx.drawImage(melOffRaw, L, gy, gw, gh);
+        ctx.restore();
+        if (pB > 0) { ctx.save(); ctx.globalAlpha *= pB; ctx.drawImage(melOffNorm, L, gy, gw, gh); ctx.restore(); }
+        if (pB < 1) avHatch(ctx, fx(N_REAL), gy, fx(MEL_T) - fx(N_REAL), gh, .14 * (1 - pB));
+        avTx(ctx, pB < .5 ? "log-mel · 64 bands (low → high) × frames" : "normalised log-mel · 64 × 480", L, gy - 5 * avFS, 9, AV_MUTED, .85);
+        avTx(ctx, pB < .5 ? `padding (${480 - N_REAL} frames)` : "padding = band minimum",
+          (fx(N_REAL) + fx(MEL_T)) / 2, gy + gh / 2, 10, pB < .5 ? AV_MUTED : AV_P100, .9, 500, "center");
+        // current analysis window
+        if (pA < 1) {
+          const x = fx(f);
+          ctx.strokeStyle = avc(AV_P300, .95); ctx.lineWidth = 1.2;
+          ctx.strokeRect(x - 1, wy - 2, Math.max(3, fx(2.5) - L), wh + 4);
+          ctx.fillStyle = avc(AV_P300, .9); ctx.fillRect(x, gy, Math.max(2, gw / MEL_T), gh);
+        }
+        // right: one frame through the front end
+        const px = L + gw + 26 * avFS, pw = R - px, rows = 4, rh = (H - wy - 18 * avFS) / rows;
+        if (pw < 60) return;
+        const panelA = pA < 1 ? 1 : Math.max(0, 1 - pB * 3);
+        if (panelA > .02) {
+          ctx.save(); ctx.globalAlpha *= panelA;
+          const col = []; for (let m = 0; m < MEL_N; m++) col.push(MEL.raw[m * MEL_T + f]);
+          const env = recAmp(TS + f * .01), wf = LISTEN_WORDS.reduce((a, w) => {
+            const u = (TS + f * .01 - SP0) / SPL; return u >= w.s && u <= w.e ? w.f : a; }, 120);
+          const box = (i, title) => {
+            const y = wy + i * rh;
+            avTx(ctx, title, px, y + 9 * avFS, 9, AV_MUTED, .9);
+            return { x: px, y: y + 14 * avFS, w: pw, h: rh - 22 * avFS };
+          };
+          // 1 · windowed frame
+          let b = box(0, "① 400 samples × Hann window");
+          ctx.strokeStyle = avc(AV_MUTED, .5); ctx.setLineDash([3, 3]); ctx.beginPath();
+          for (let i = 0; i <= 60; i++) { const x = b.x + i / 60 * b.w, h = .5 - .5 * Math.cos(2 * Math.PI * i / 60); i ? ctx.lineTo(x, b.y + b.h * (1 - h)) : ctx.moveTo(x, b.y + b.h); }
+          ctx.stroke(); ctx.setLineDash([]);
+          ctx.strokeStyle = avc(AV_PINK, .9); ctx.lineWidth = 1.2; ctx.beginPath();
+          for (let i = 0; i <= 200; i++) {
+            const s = i / 200, h = .5 - .5 * Math.cos(2 * Math.PI * s);
+            const y = (Math.sin(s * wf * .5 + f) * .6 + Math.sin(s * wf * 1.3 + 2 * f) * .4) * h * Math.min(1, env * 1.6 + .2);
+            const X = b.x + s * b.w, Y = b.y + b.h / 2 - y * b.h * .48; i ? ctx.lineTo(X, Y) : ctx.moveTo(X, Y);
+          }
+          ctx.stroke();
+          // 2 · power spectrum (201 bins) + 3 · mel triangles
+          b = box(1, "② |FFT|² → 201 bins (0 – 8 kHz)");
+          const cmax = Math.max(...col) || 1;
+          const binVal = k => { let m = 0; while (m < MEL_N - 1 && MEL_EDGES[m + 1] < k) m++; return col[m] / cmax; };
+          ctx.strokeStyle = avc(AV_P300, .95); ctx.lineWidth = 1.4; ctx.beginPath();
+          for (let k = 0; k <= 200; k++) { const X = b.x + k / 200 * b.w, Y = b.y + b.h * (1 - binVal(k) * .95); k ? ctx.lineTo(X, Y) : ctx.moveTo(X, Y); }
+          ctx.stroke();
+          b = box(2, "③ 64 triangular mel filters (narrow at low freq)");
+          ctx.strokeStyle = avc(AV_PINK, .55); ctx.lineWidth = 1;
+          for (let m = 0; m < MEL_N; m += 2) {
+            const [a0, a1, a2] = [MEL_EDGES[m], MEL_EDGES[m + 1], MEL_EDGES[m + 2]].map(k => b.x + k / 200 * b.w);
+            ctx.beginPath(); ctx.moveTo(a0, b.y + b.h); ctx.lineTo(a1, b.y + b.h * .1); ctx.lineTo(a2, b.y + b.h); ctx.stroke();
+          }
+          // 4 · log → one 64-value column
+          b = box(3, "④ log → this frame's column of 64 values");
+          const cw = b.w / MEL_N;
+          for (let m = 0; m < MEL_N; m++) { ctx.fillStyle = melColor(col[m]); ctx.fillRect(b.x + m * cw, b.y, Math.max(1, cw - .5), b.h * .7); }
+          ctx.restore();
+        }
+        if (pB > 0) {
+          ctx.save(); ctx.globalAlpha *= pB;
+          const y0 = wy + rh * .6;
+          avTx(ctx, "per-utterance normalisation", px, y0, 11, AV_P100, .95, 600);
+          avTx(ctx, "x − mean(band)   for each of 64 bands", px, y0 + 22 * avFS, 10, AV_P300, .95);
+          avTx(ctx, "÷ std (one value, whole clip)", px, y0 + 40 * avFS, 10, AV_P300, .95);
+          avTx(ctx, "padding := band's quietest value", px, y0 + 58 * avFS, 10, AV_P300, .95);
+          avTx(ctx, "→ cancels mic gain & frequency response", px, y0 + 82 * avFS, 9, AV_MUTED, .9);
+          ctx.restore();
+        }
+      },
+      drawStem(ctx, W, H, p, L, R) {
+        const pass = p < .76 ? 0 : 1;
+        const pp = pass === 0 ? avClamp01((p - .52) / .22) : avClamp01((p - .76) / .21);
+        const done1 = pass === 1 ? 1 : pp, done2 = pass === 1 ? pp : 0;
+        const gap = 34 * avFS, w0 = (R - L - 2 * gap) / 1.75, h0 = H * .30, y0 = H * .10;
+        const g = [
+          { x: L, w: w0, h: h0, img: melOffNorm, lbl: "64 ch × 480" },
+          { x: L + w0 + gap, w: w0 / 2, h: h0 / 2, img: stemOff1, lbl: "32 ch × 240" },
+          { x: L + w0 * 1.5 + gap * 2, w: w0 / 4, h: h0, img: stemOff2, lbl: "64 ch × 120" }
+        ];
+        g.forEach((b, i) => {
+          b.y = y0 + (h0 - b.h) / 2;
+          const reveal = i === 0 ? 1 : i === 1 ? done1 : done2;
+          ctx.strokeStyle = avc(AV_MUTED, .25); ctx.lineWidth = 1; ctx.strokeRect(b.x - .5, b.y - .5, b.w + 1, b.h + 1);
+          ctx.save(); ctx.beginPath(); ctx.rect(b.x, b.y, b.w * reveal, b.h); ctx.clip();
+          ctx.drawImage(b.img, b.x, b.y, b.w, b.h); ctx.restore();
+          avTx(ctx, b.lbl, b.x, b.y + b.h + 13 * avFS, 10, i === pass + 1 ? AV_P100 : AV_MUTED, .95, i === pass + 1 ? 600 : 0);
+          if (i < 2) avArrow(ctx, b.x + b.w + 6, y0 + h0 / 2, b.x + b.w + gap - 6, y0 + h0 / 2, i === pass ? .9 : .35);
+        });
+        avTx(ctx, "stride-2 convs over time (each kernel spans all input channels)", L, y0 - 6 * avFS, 9, AV_MUTED, .85);
+        // kernel on the source grid + output column on the target grid
+        const src = g[pass], dst = g[pass + 1], nIn = pass === 0 ? 480 : 240, nOut = nIn / 2;
+        if (pp > 0 && pp < 1) {
+          const o = Math.floor(pp * nOut), cx = src.x + (2 * o + .5) / nIn * src.w;
+          const kw = Math.max(4, 5 / nIn * src.w);
+          ctx.strokeStyle = avc(AV_PINK, .95); ctx.lineWidth = 1.4; ctx.strokeRect(cx - kw / 2, src.y - 3, kw, src.h + 6);
+          const ox = dst.x + (o + .5) / nOut * dst.w;
+          ctx.fillStyle = avc(AV_P100, .95); ctx.fillRect(ox - 1, dst.y, 2, dst.h);
+          ctx.strokeStyle = avc(AV_P300, .35); ctx.lineWidth = 1;
+          ctx.beginPath(); ctx.moveTo(cx, src.y + src.h); ctx.quadraticCurveTo((cx + ox) / 2, src.y + src.h + 22 * avFS, ox, dst.y + dst.h); ctx.stroke();
+        }
+        // zoom: frames as column vectors, kernel 5 / stride 2 / padding 2
+        const zy = H * .60, zh = H * .26, nShow = 15, zw = R - L, cell = zw / (nShow + 1.5);
+        avTx(ctx, pass === 0 ? "zoom · conv k5 · stride 2 · pad 2 · 64 → 32 ch · BN + ReLU"
+                               : "zoom · conv k5 · stride 2 · pad 2 · 32 → 64 ch · BN + ReLU", L, zy - 6 * avFS, 9, AV_MUTED, .9);
+        const inH = zh * .52, outY = zy + inH + zh * .2, outH = zh * .28;
+        const k = Math.min(6, Math.floor(pp * 7));     // output frame being computed in the zoom
+        for (let i = 0; i < nShow; i++) {
+          const fi = i - 2, x = L + i * cell + 1;
+          if (fi < 0) { avHatch(ctx, x, zy, cell - 2, inH, .25); continue; }
+          for (let r = 0; r < 8; r++) {
+            const v = pass === 0 ? MEL.norm[(r * 8 + 3) * MEL_T + fi + 40] : MEL.g1[(r * 4 + 1) * 240 + fi + 20];
+            ctx.fillStyle = melColor(v); ctx.fillRect(x, zy + r * inH / 8, cell - 2, inH / 8 - 1);
+          }
+          if (i === 2 || i % 2 === 0) avTx(ctx, String(fi), x + cell / 2, zy + inH + 10 * avFS, 8, AV_MUTED, .7, 0, "center");
+        }
+        avTx(ctx, "pad", L + cell, zy + inH + 10 * avFS, 8, AV_MUTED, .7, 0, "center");
+        for (let o = 0; o < 7; o++) {
+          const x = L + (2 * o + 2) * cell - cell / 2 + 1;
+          const lit = o < k || (o === k && pp >= 1);
+          ctx.fillStyle = o === k && pp < 1 ? avc(AV_P100, .95) : lit ? avc(AV_P300, .75) : avc(AV_PINK, .12);
+          ctx.fillRect(x, outY, cell * 2 - 2, outH);
+          avTx(ctx, `out ${o}`, x + cell, outY + outH + 10 * avFS, 8, AV_MUTED, .7, 0, "center");
+        }
+        if (pp < 1) {
+          const kx = L + 2 * k * cell;   // taps 2k−2 … 2k+2 (cells 2k … 2k+4)
+          ctx.strokeStyle = avc(AV_PINK, .95); ctx.lineWidth = 1.6; ctx.strokeRect(kx - 1, zy - 3, cell * 5, inH + 6);
+          ctx.strokeStyle = avc(AV_P300, .4); ctx.lineWidth = 1;
+          for (let j = 0; j < 5; j++) { ctx.beginPath(); ctx.moveTo(kx + (j + .5) * cell, zy + inH + 2); ctx.lineTo(L + (2 * k + 2) * cell + cell / 2, outY); ctx.stroke(); }
+          if (k + 1 < 7) { ctx.setLineDash([3, 3]); ctx.strokeStyle = avc(AV_MUTED, .45); ctx.strokeRect(kx + 2 * cell - 1, zy - 5, cell * 5, inH + 10); ctx.setLineDash([]); }
+          avTx(ctx, "next: +2 frames", Math.min(kx + 7 * cell + 4, R - 70 * avFS), zy - 6 * avFS, 9, AV_P300, .9);
+        }
+      }
+    };
+
+    /* ============================================================
+       03 · UNDERSTAND — the 5 DilatedBlocks of model.py:
+       y = ReLU( BN(conv₂( ReLU(BN(conv₁ x)) )) + x ),  k = 5,
+       dilation d = 1, 2, 4, 8, 16, symmetric padding 2d (zeros).
+       One output frame t reads h at t ± d, t ± 2d; each of those reads x
+       at ± d, ± 2d → x frames t − 4d … t + 4d. Receptive field after
+       each block (orig 10 ms frames): 45, 109, 237, 493, 1005.
+       ============================================================ */
+    const DIL = [1, 2, 4, 8, 16], RF_B = [45, 109, 237, 493, 1005];
+    const UND_STRIPS = DIL.map((d, b) => {
+      const r = avRand(33 + b * 7), x = [], h = [], y = [];
+      for (let i = 0; i < 120; i++) x.push(.2 + .8 * r());
+      for (let i = 0; i < 120; i++) h.push(avClamp01(.15 + .85 * r()));
+      for (let i = 0; i < 120; i++) y.push(avClamp01(.5 * x[i] + .5 * h[i] + .15 * r()));
+      return { x, h, y };
+    });
+    const avUnderstand = {
+      tag: "03 · UNDERSTAND",
+      dur: 16000,
+      focus(bp) { return Math.round(avLerp(6, 113, avEaseIO(avClamp01((bp - .12) / .72)))); },
+      cap(p) {
+        const b = Math.min(4, Math.floor(p * 5)), d = DIL[b], t = this.focus(avClamp01(p * 5 - b));
+        if (p > .985) return `Five blocks deep: receptive field <b>1,005 orig frames (10 s) &gt; 480</b> — every output frame has seen the whole command. Residual adds keep the signal flowing.`;
+        return `Block ${b + 1}/5 · <b>d = ${d}</b>: output frame ${t} ← conv₂ reads h at t ±${d}, ±${2 * d} ← conv₁ reads x → frames <b>${t - 4 * d} … ${t + 4 * d}</b>${t - 4 * d < 0 || t + 4 * d > 119 ? " (outside 0…119 = zero padding)" : ""} · then <b>+ x</b> and ReLU`;
+      },
+      draw(ctx, W, H, p) {
+        const b = Math.min(4, Math.floor(p * 5)), bp = avClamp01(p * 5 - b), d = DIL[b], S = UND_STRIPS[b];
+        const t = this.focus(bp), appear = avEaseIO(avClamp01(bp / .1));
+        const L = 18 * avFS, lw = (W - L - 16 * avFS) * (W < 1000 ? .56 : .62);
+        const PAD = 32, N = 120 + 2 * PAD, fw = lw / N;
+        const fx = i => L + (i + PAD) * fw;                 // frame index → x (padding drawn either side)
+        const sh = H * .12, rows = [H * .17, H * .44, H * .71];
+        const names = ["x · block input · 64 ch × 120 frames", `h = ReLU(BN(conv₁ x))   k5 · d=${d}`, `y = ReLU(BN(conv₂ h) + x)   k5 · d=${d}`];
+        // block dots
+        for (let i = 0; i < 5; i++) {
+          ctx.fillStyle = i < b ? avc(AV_PINK, .95) : i === b ? avc(AV_P100, .95) : avc(AV_MUTED, .3);
+          ctx.beginPath(); ctx.arc(L + 4 + i * 44 * avFS, H * .055, 3.5 * avFS, 0, 7); ctx.fill();
+          avTx(ctx, "d" + DIL[i], L + 11 * avFS + i * 44 * avFS, H * .055 + 3.5 * avFS, 9, i === b ? AV_P100 : AV_MUTED, .85, i === b ? 600 : 0);
+        }
+        ctx.save(); ctx.globalAlpha *= appear;
+        rows.forEach((y, ri) => {
+          avHatch(ctx, fx(-PAD), y, PAD * fw, sh, .16);
+          avHatch(ctx, fx(120), y, PAD * fw, sh, .16);
+          const vals = ri === 0 ? S.x : ri === 1 ? S.h : S.y;
+          for (let i = 0; i < 120; i++) {
+            const computed = ri === 0 || i <= t || bp > .86;
+            ctx.fillStyle = computed ? avc(ri === 2 ? AV_P300 : AV_PINK, .1 + .4 * vals[i]) : avc(AV_PINK, .05);
+            ctx.fillRect(fx(i) + .3, y, Math.max(.6, fw - .6), sh);
+          }
+          avTx(ctx, names[ri], fx(0), y - 5 * avFS, 9, ri === 0 ? AV_MUTED : AV_P300, .9, ri === 0 ? 0 : 500);
+        });
+        avTx(ctx, "zeros", fx(-PAD / 2), rows[0] + sh + 11 * avFS, 8, AV_MUTED, .75, 0, "center");
+        avTx(ctx, "zeros", fx(120 + PAD / 2), rows[0] + sh + 11 * avFS, 8, AV_MUTED, .75, 0, "center");
+        // receptive cone: y[t] ← h[t + j·d] ← x[t + j·d + i·d]
+        const inRange = i => i >= -PAD && i < 120 + PAD;
+        const taps1 = [-2, -1, 0, 1, 2].map(j => t + j * d);
+        const xHit = new Set();
+        taps1.forEach(u => [-2, -1, 0, 1, 2].forEach(i => xHit.add(u + i * d)));
+        ctx.lineWidth = 1;
+        taps1.forEach(u => {
+          if (!inRange(u)) return;
+          [-2, -1, 0, 1, 2].forEach(i => {
+            const v = u + i * d; if (!inRange(v)) return;
+            ctx.strokeStyle = avc(AV_P300, v < 0 || v > 119 ? .12 : .22);
+            ctx.beginPath(); ctx.moveTo(fx(u) + fw / 2, rows[1]); ctx.lineTo(fx(v) + fw / 2, rows[0] + sh); ctx.stroke();
+          });
+          ctx.strokeStyle = avc(AV_PINK, .7); ctx.lineWidth = 1.2;
+          ctx.beginPath(); ctx.moveTo(fx(t) + fw / 2, rows[2]); ctx.lineTo(fx(u) + fw / 2, rows[1] + sh); ctx.stroke(); ctx.lineWidth = 1;
+        });
+        const mark = (i, y, strong) => {
+          if (!inRange(i)) return;
+          const pad = i < 0 || i > 119;
+          ctx.fillStyle = pad ? avc(AV_MUTED, .55) : strong ? avc(AV_P100, .95) : avc(AV_P300, .85);
+          ctx.fillRect(fx(i), y - 4 * avFS, Math.max(2, fw), 3 * avFS);
+        };
+        xHit.forEach(i => mark(i, rows[0], false));
+        taps1.forEach(u => mark(u, rows[1], false));
+        mark(t, rows[2], true);
+        ctx.save(); ctx.shadowColor = avc(AV_PINK, .9); ctx.shadowBlur = 8;
+        ctx.fillStyle = avc(AV_P100, 1); ctx.fillRect(fx(t), rows[2], Math.max(2, fw), sh); ctx.restore();
+        // residual: whole tensor x is added back before the last ReLU
+        const rx = fx(120 + PAD) + 12 * avFS;
+        ctx.setLineDash([4, 4]); ctx.strokeStyle = avc(AV_P300, .75); ctx.lineWidth = 1.2;
+        ctx.beginPath(); ctx.moveTo(fx(120 + PAD), rows[0] + sh / 2); ctx.lineTo(rx, rows[0] + sh / 2); ctx.lineTo(rx, rows[2] + sh / 2 - 7 * avFS); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.strokeStyle = avc(AV_P300, .95); ctx.beginPath(); ctx.arc(rx, rows[2] + sh / 2, 7 * avFS, 0, 7); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(rx - 4 * avFS, rows[2] + sh / 2); ctx.lineTo(rx + 4 * avFS, rows[2] + sh / 2);
+        ctx.moveTo(rx, rows[2] + sh / 2 - 4 * avFS); ctx.lineTo(rx, rows[2] + sh / 2 + 4 * avFS); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(rx - 7 * avFS, rows[2] + sh / 2); ctx.lineTo(fx(120 + PAD) + 2, rows[2] + sh / 2); ctx.stroke();
+        avTx(ctx, "+ x (skip)", rx, rows[2] + sh + 14 * avFS, 9, AV_P300, .9, 0, "center");
+        ctx.restore();
+        // right panel: span + receptive field
+        const px = L + lw + 46 * avFS, pw = W - 16 * avFS - px;
+        if (pw < 80) return;
+        const yy = f => H * f;
+        avTx(ctx, `block ${b + 1} / 5`, px, yy(.12), 11, AV_MUTED, .9, 600);
+        avTx(ctx, `dilation d = ${d}`, px, yy(.25), 17, AV_P100, .98, 600, 0, pw);
+        avTx(ctx, `taps at t, ±${d}, ±${2 * d}  →  one conv spans ${4 * d + 1} frames`, px, yy(.39), 10, AV_P300, .95, 0, 0, pw);
+        avTx(ctx, `two convs  →  block spans ${8 * d + 1} frames ≈ ${(8 * d * .04).toFixed(2)} s`, px, yy(.48), 10, AV_P300, .95, 0, 0, pw);
+        avTx(ctx, "1 frame = 40 ms after the stem · padding is zeros", px, yy(.56), 9, AV_MUTED, .85, 0, 0, pw);
+        // cumulative receptive field vs the 480-frame input
+        const y = yy(.74), bw = pw, bh = 10 * avFS, grow = avEaseIO(avClamp01((bp - .05) / .4));
+        const rf = Math.round(avLerp(b ? RF_B[b - 1] : 13, RF_B[b], grow)), sx = v => px + v / 1005 * bw;
+        if (pw > 230 * avFS) avTx(ctx, "receptive field", px, y - 7 * avFS, 9, AV_MUTED, .9);
+        avTx(ctx, `${rf.toLocaleString()} frames = ${(rf / 100).toFixed(2)} s`, px + bw, y - 7 * avFS, 11, rf >= 480 ? AV_P100 : AV_P300, .98, 600, "right");
+        ctx.strokeStyle = avc(AV_MUTED, .35); ctx.lineWidth = 1; ctx.strokeRect(px, y, bw, bh);
+        ctx.save(); ctx.shadowColor = avc(AV_PINK, .7); ctx.shadowBlur = 8;
+        ctx.fillStyle = avc(AV_PINK, .85); ctx.fillRect(px, y, sx(rf) - px, bh); ctx.restore();
+        RF_B.forEach((v, i) => { ctx.fillStyle = i <= b ? avc(AV_P100, .9) : avc(AV_MUTED, .45); ctx.fillRect(sx(v) - .5, y + bh, 1, 4 * avFS); });
+        ctx.strokeStyle = avc(AV_WHITE, .9); ctx.lineWidth = 1.4;
+        ctx.beginPath(); ctx.moveTo(sx(480), y - 4 * avFS); ctx.lineTo(sx(480), y + bh + 4 * avFS); ctx.stroke();
+        avTx(ctx, pw > 260 * avFS ? "input = 480 (4.8 s)" : "input 480", sx(480), y + bh + 15 * avFS, 9, AV_WHITE, .9, 500, "center");
+        if (rf >= 480 && pw > 200 * avFS) avTx(ctx, "✓ sees it all", px + bw, y + bh + 15 * avFS, 9, AV_P100, .95, 600, "right");
+      }
+    };
+
+    /* ============================================================
+       04 · DECODE — model.py + infer.py:
+       AdaptiveAvgPool1d(1) → 64-d vector → intent_head (64→19) and
+       slot_head (64→19) → log_softmax each → score of each of the
+       31 valid labels = log p(intent) + log p(slot) → argmax →
+       confidence = softmax over the 31 scores; < 0.40 → "unclear".
+       ============================================================ */
+    const SLOT_OF = { ALARM: ["6 AM", "8 AM", "9 PM"], BRIGHTNESS: ["100 percent", "20 percent", "60 percent"],
+      COLOR: ["blue", "green", "red"], CREATE_REMINDER: ["drink water", "exercise", "study"],
+      TEMPERATURE: ["18 degrees", "22 degrees", "26 degrees"], TIMER: ["10 seconds", "1 minute", "30 seconds"] };
+    const SHORT = { BRIGHTNESS: "BRIGHT", CREATE_REMINDER: "REMIND", LIST_REMINDERS: "LIST_REM", PLAY_MUSIC: "PLAY_MUSIC",
+      TEMPERATURE: "TEMP", VOLUME_DOWN: "VOL_DOWN", VOLUME_UP: "VOL_UP" };
+    const DEC = (() => {
+      const pairs = [];
+      AV_INTENTS.forEach((it, i) => {
+        if (SLOT_OF[it]) SLOT_OF[it].forEach(s => pairs.push({ i, s: AV_SLOTS.indexOf(s), txt: `${SHORT[it] || it} · ${s.replace(" percent", "%").replace(" degrees", "°").replace(" seconds", " s").replace(" minute", " min")}` }));
+        else pairs.push({ i, s: AV_SLOTS.length - 1, txt: SHORT[it] || it });
+      });
+      const r = avRand(55);
+      const li = AV_INTENTS.map((_, k) => k === AV_WIN_I ? 7.2 : -1 + 3.2 * r());
+      li[AV_INTENTS.indexOf("TIMER")] = 3.6;
+      const ls = AV_SLOTS.map((_, k) => k === AV_WIN_S ? 6.6 : -1 + 3.0 * r());
+      ls[AV_SLOTS.indexOf("8 AM")] = 3.9;
+      const lsm = v => { const m = Math.max(...v), z = Math.log(v.reduce((a, x) => a + Math.exp(x - m), 0)) + m; return v.map(x => x - z); };
+      const lpi = lsm(li), lps = lsm(ls);
+      const score = pairs.map(q => lpi[q.i] + lps[q.s]);
+      const lp = lsm(score), prob = lp.map(Math.exp);
+      const win = prob.indexOf(Math.max(...prob));
+      return { pairs, li, ls, pi: lpi.map(Math.exp), ps: lps.map(Math.exp), prob, win, conf: prob[win] };
+    })();
+    const POOL_C = 64, HEAD_N = 19;
+    const avDecode = {
+      tag: "04 · DECODE",
+      dur: 15000,
+      cap: p => {
+        if (p < .25) return `Global average pool: each of the <b>64 channels</b> is averaged over all <b>120 frames</b> → one 64-d vector (frame order no longer matters)`;
+        if (p < .40) return `Two linear heads read the same vector: <b>64 → 19 intent logits</b> and <b>64 → 19 slot logits</b> (18 values + NO_SLOT)`;
+        if (p < .55) return `Softmax per head: intent <b>ALARM ${(DEC.pi[AV_WIN_I] * 100).toFixed(0)}%</b> · slot <b>6 AM ${(DEC.ps[AV_WIN_S] * 100).toFixed(0)}%</b>`;
+        if (p < .85) return `Joint decode: each of the <b>31 valid labels</b> scores log p(intent) + log p(slot) — impossible pairs like ALARM · red are never considered`;
+        return `Best label <b>ALARM · 6 AM</b>, confidence <b>${(DEC.conf * 100).toFixed(1)}%</b> ≥ 0.40 → accepted (below 0.40 the assistant says it didn't catch that) · ~7 ms on the Pi`;
+      },
+      draw(ctx, W, H, p) {
+        const L = 14 * avFS, gy = H * .15, gh = H * .66;
+        // ---- 1 · pool over time ----
+        const sweep = avEaseIO(avClamp01(p / .22)), pw = (W - L) * (W < 1000 ? .12 : .15), cols = 30, rows = 16;
+        const ccw = pw / cols, rch = gh / rows, r4 = avRand(77);
+        avTx(ctx, "120 frames × 64 ch", L, gy - 6 * avFS, 9, AV_MUTED, .85);
+        for (let c = 0; c < cols; c++) {
+          const done = (c + .5) / cols < sweep;
+          for (let rr = 0; rr < rows; rr++) {
+            const v = .2 + .8 * r4();
+            ctx.fillStyle = done ? avc(AV_PINK, .15 + .45 * v) : avc(AV_PINK, .06 + .12 * v);
+            ctx.fillRect(L + c * ccw, gy + rr * rch, ccw - .6, rch - .6);
+          }
+        }
+        if (sweep > 0 && sweep < 1) {
+          ctx.save(); ctx.shadowColor = avc(AV_PINK, .8); ctx.shadowBlur = 10;
+          ctx.fillStyle = avc(AV_P300, .95); ctx.fillRect(L + sweep * pw, gy, 2, gh); ctx.restore();
+        }
+        const vx = L + pw + 30 * avFS, vw = 11 * avFS;
+        avArrow(ctx, L + pw + 6, gy + gh / 2, vx - 6, gy + gh / 2, .7);
+        avTx(ctx, "mean", (L + pw + vx) / 2, gy + gh / 2 - 7 * avFS, 9, AV_P300, .9, 0, "center");
+        const r5 = avRand(91), vec = [];
+        for (let i = 0; i < POOL_C; i++) {
+          const v = .3 + .7 * r5(); vec.push(v);
+          ctx.fillStyle = sweep <= 0 ? avc(AV_MUTED, .15) : avc(AV_P300, .15 + .75 * v * sweep);
+          ctx.fillRect(vx, gy + i * (gh / POOL_C), vw, gh / POOL_C - 1);
+        }
+        avTx(ctx, "64-d", vx + vw / 2, gy - 6 * avFS, 9, AV_MUTED, .85, 0, "center");
+        // ---- 2 · two linear heads: logits → softmax ----
+        const hp = avClamp01((p - .25) / .15), sp = avEaseIO(avClamp01((p - .40) / .12));
+        ctx.font = avF(10, 600);
+        const hgap = ctx.measureText("ALARM 95%").width + 18 * avFS, hw = (W - L) * (W < 1000 ? .08 : .10), h1x = vx + vw + Math.min(40 * avFS, W * .04), h2x = h1x + hw + hgap, chh = gh / HEAD_N;
+        const head = (hx, logits, probs, win, names, label) => {
+          avTx(ctx, label, hx, gy - 6 * avFS, 9, AV_MUTED, .85);
+          if (hp <= 0) return;
+          const mx = Math.max(...logits.map(Math.abs));
+          logits.forEach((lg, i) => {
+            const lit = avClamp01(hp * (HEAD_N + 4) - i), isWin = i === win;
+            const wLog = Math.abs(lg) / mx * hw * .5, wP = probs[i] * hw;
+            const xL = lg >= 0 ? hx + hw * .25 : hx + hw * .25 - wLog;   // logits around an axis
+            const x = avLerp(xL, hx, sp), w = Math.max(1.5, avLerp(wLog, wP, sp));
+            const y = gy + i * chh;
+            if (isWin && sp > .5) {
+              ctx.save(); ctx.shadowColor = avc(AV_PINK, .8); ctx.shadowBlur = 8;
+              ctx.fillStyle = avc(AV_P100, .95); ctx.fillRect(x, y, w, chh - 1.5); ctx.restore();
+            } else {
+              ctx.fillStyle = isWin ? avc(AV_P300, .5 + .45 * lit) : avc(AV_PINK, (.12 + .35 * lit) * (1 - .5 * sp));
+              ctx.fillRect(x, y, w, chh - 1.5);
+            }
+          });
+          if (sp < 1) { ctx.strokeStyle = avc(AV_MUTED, .4 * (1 - sp)); ctx.beginPath(); ctx.moveTo(hx + hw * .25, gy); ctx.lineTo(hx + hw * .25, gy + gh); ctx.stroke(); }
+          avTx(ctx, sp < .5 ? "logits" : "softmax p", hx, gy + gh + 13 * avFS, 9, AV_MUTED, .85);
+          if (sp > .5) {   // winner label: inside its bar when it fits, else just after it
+            const lbl = `${names[win]} ${(probs[win] * 100).toFixed(0)}%`, bw = probs[win] * hw, ly = gy + (win + .5) * chh + 3.5 * avFS;
+            ctx.font = avF(10, 600);
+            if (ctx.measureText(lbl).width + 8 < bw && chh > 11 * avFS) avTx(ctx, lbl, hx + 4, ly, 10, "20, 8, 16", sp, 600);
+            else avTx(ctx, lbl, hx + bw + 6, ly, 10, AV_P100, sp, 600);
+          }
+        };
+        if (hp > 0) {   // weights: every one of the 64 inputs connects to every output
+          ctx.strokeStyle = avc(AV_P300, .06 * Math.min(1, hp * 3)); ctx.lineWidth = 1;
+          ctx.beginPath();
+          for (let i = 0; i < POOL_C; i += 3) for (let o = 0; o < HEAD_N; o += 3) {
+            ctx.moveTo(vx + vw, gy + (i + .5) * gh / POOL_C); ctx.lineTo(h1x, gy + (o + .5) * chh);
+            ctx.moveTo(vx + vw, gy + (i + .5) * gh / POOL_C); ctx.lineTo(h2x, gy + (o + .5) * chh);
+          }
+          ctx.stroke();
+        }
+        head(h1x, DEC.li, DEC.pi, AV_WIN_I, AV_INTENTS, "intent head · 64→19");
+        head(h2x, DEC.ls, DEC.ps, AV_WIN_S, AV_SLOTS, "slot head · 64→19");
+        // ---- 3 · joint decode over the 31 valid labels ----
+        const gx0 = h2x + hw + hgap, gw = W - 14 * avFS - gx0;
+        if (p > .55 && gw > 80) {
+          const dp = avClamp01((p - .55) / .25), fin = avEaseIO(avClamp01((p - .85) / .1));
+          avTx(ctx, "31 valid labels · log p(intent) + log p(slot)", gx0, gy - 6 * avFS, 9, AV_MUTED, .85, 0, 0, gw);
+          const gridH = gh - 12 * avFS, rowsFit = Math.max(4, Math.floor(gridH / (15 * avFS)));      // rows that stay legible
+          const colsN = Math.max(2, Math.min(5, Math.ceil(DEC.pairs.length / rowsFit), Math.floor(gw / 90))), rowsN = Math.ceil(DEC.pairs.length / colsN);
+          const cw = (gw - (colsN - 1) * 6) / colsN, ch2 = Math.min(22 * avFS, (gridH - 4) / rowsN - 3);
+          ctx.font = avF(9);   // one size for every label: fit the longest one
+          const longest = Math.max(...DEC.pairs.map(q => ctx.measureText(q.txt).width));
+          const fpx = Math.min(9, ch2 * .62 / avFS, 9 * (cw - 12) / longest);
+          const maxP = DEC.prob[DEC.win];
+          DEC.pairs.forEach((q, k) => {
+            const ci = Math.floor(k / rowsN), ri = k % rowsN;       // column-major keeps labels sorted top→bottom
+            const x = gx0 + ci * (cw + 6), y = gy + ri * (ch2 + 3);
+            const lit = avClamp01(dp * (DEC.pairs.length + 6) - k), isWin = k === DEC.win;
+            const bar = Math.max(.02, Math.pow(DEC.prob[k] / maxP, .35)) * lit;  // compressed so small scores stay visible
+            ctx.fillStyle = avc(AV_PINK, .06); avRoundRect(ctx, x, y, cw, ch2, 4); ctx.fill();
+            ctx.fillStyle = isWin ? avc(AV_PINK, .55 + .4 * fin) : avc(AV_PINK, .25);
+            avRoundRect(ctx, x, y, Math.max(3, cw * bar), ch2, 4); ctx.fill();
+            if (isWin && fin > 0) { ctx.save(); ctx.shadowColor = avc(AV_PINK, .9); ctx.shadowBlur = 10 * fin; ctx.strokeStyle = avc(AV_P100, fin); ctx.lineWidth = 1.4; avRoundRect(ctx, x, y, cw, ch2, 4); ctx.stroke(); ctx.restore(); }
+            ctx.fillStyle = isWin ? avc(AV_WHITE, 1) : avc(AV_WHITE, .45 + .4 * lit);
+            avFitText(ctx, q.txt, x + 6, y + ch2 / 2 + fpx * .38 * avFS, cw - 10, fpx, isWin ? 600 : 0);
+          });
+          // ---- 4 · confidence vs the 0.40 threshold ----
+          if (fin > 0) {
+            const by = gy + gh + 8 * avFS, bh = 8 * avFS, bw = gw;
+            ctx.globalAlpha *= fin;
+            ctx.strokeStyle = avc(AV_MUTED, .4); ctx.strokeRect(gx0, by, bw, bh);
+            ctx.save(); ctx.shadowColor = avc(AV_PINK, .8); ctx.shadowBlur = 8;
+            ctx.fillStyle = avc(AV_PINK, .9); ctx.fillRect(gx0, by, bw * DEC.conf * fin, bh); ctx.restore();
+            ctx.fillStyle = avc(AV_WHITE, .95); ctx.fillRect(gx0 + bw * .4 - .5, by - 3 * avFS, 1.5, bh + 6 * avFS);
+            avTx(ctx, "threshold 0.40", gx0 + bw * .4, by - 5 * avFS, 9, AV_WHITE, .9, 0, "center");
+            avTx(ctx, `confidence ${(DEC.conf * 100).toFixed(1)}% ✓`, gx0 + bw, by + bh + 12 * avFS, 10, AV_P100, .98, 600, "right");
+            ctx.globalAlpha /= fin;
+          }
+        }
+      }
+    };
+
+    const AV_STAGES = { listen: avListen, extract: avExtract, understand: avUnderstand, decode: avDecode };
+    const AV_ORDER = ["listen", "extract", "understand", "decode"];
+    // x-range of each stage in the SVG (viewBox units) — the progress rail fills across these
+    const AV_SPAN = { listen: [20, 262], extract: [262, 464], understand: [464, 866], decode: [866, 1400] };
+    const AV_FADE = 380;     // ms crossfade when the canvas switches stage
+    const AV_GAP = 900;      // ms pause on a finished stage before the walkthrough moves on
+    let avStage = "listen";
+    let avStageT0 = 0;       // when the current stage was entered (for the crossfade)
+    let avDoneT = 0;         // when the current stage reached the end (for auto-advance)
+    let avP = 0;            // master progress 0..1 (scrubbable)
+    let avPlaying = true;
+    let avSpeed = 1;
+    let avHold = true;      // playing state remembered while scrubbing
+    let avWasActive = false;
+    let avLastT = performance.now();
+
+    const avCanvasBig = document.getElementById("archCanvasBig");
+    const avCtxBig = avCanvasBig.getContext("2d");
+    const avModal = document.getElementById("avModal");
+    const avTagBig = document.getElementById("avTagBig");
+    const avTextBig = document.getElementById("avTextBig");
+
+    const avUI = [
+      { play: document.getElementById("avPlay"), scrub: document.getElementById("avScrub"), time: document.getElementById("avTime"), speed: document.getElementById("avSpeed"), expand: document.getElementById("avExpand") },
+      { play: document.getElementById("avPlayB"), scrub: document.getElementById("avScrubB"), time: document.getElementById("avTimeB"), speed: document.getElementById("avSpeedB"), expand: null }
+    ];
+
+    function avResize() {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      [[avCanvas, avCtx], [avCanvasBig, avCtxBig]].forEach(([cv, cx]) => {
+        const r = cv.getBoundingClientRect();
+        cv.width = Math.max(1, Math.round(r.width * dpr));
+        cv.height = Math.max(1, Math.round(r.height * dpr));
+        cx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      });
+    }
+    window.addEventListener("resize", avResize);
+
+    function syncPlay() {
+      avUI.forEach(u => { if (u.play) u.play.textContent = avPlaying ? "❚❚" : "▶"; });
+    }
+    function toggleAvPlay() {
+      if (!avPlaying && avP >= 1) {           // finished: replay (whole walkthrough if we're at the end)
+        if (avStage === AV_ORDER[AV_ORDER.length - 1]) avSelect(AV_ORDER[0]);
+        else avP = 0;
+        avPlaying = true; syncPlay();
+        return;
+      }
+      avPlaying = !avPlaying;
+      syncPlay();
+    }
+    function cycleAvSpeed() {
+      avSpeed = avSpeed === 1 ? 2 : avSpeed === 2 ? .5 : 1;
+      avUI.forEach(u => { if (u.speed) u.speed.textContent = avSpeed + "×"; });
+    }
+    function avSelect(key) {
+      document.querySelectorAll(".abox.sel").forEach(x => x.classList.remove("sel"));
+      document.querySelectorAll(`.abox[data-stage="${key}"]`).forEach(x => x.classList.add("sel"));
+      avStage = key;
+      avStageT0 = performance.now(); avDoneT = 0;
+      avP = 0; avPlaying = true; syncPlay();
+      document.querySelectorAll(".rail-step").forEach(x => x.classList.toggle("live", x.dataset.stage === key));
+    }
+    document.querySelectorAll(".abox[data-stage], .rail-step").forEach(el => {
+      el.addEventListener("click", e => {
+        e.stopPropagation(); // don't trigger deck navigation
+        avSelect(el.dataset.stage);
+      });
+    });
+    avSelect("listen");
+
+    // transport wiring (slide + modal share one state)
+    avUI.forEach(u => {
+      if (!u.play) return;
+      u.play.addEventListener("click", e => { e.stopPropagation(); toggleAvPlay(); });
+      u.speed.addEventListener("click", e => { e.stopPropagation(); cycleAvSpeed(); });
+      u.scrub.addEventListener("pointerdown", () => { avHold = avPlaying; avPlaying = false; syncPlay(); });
+      u.scrub.addEventListener("input", () => { avP = u.scrub.value / 1000; });
+      ["pointerup", "pointercancel"].forEach(ev =>
+        u.scrub.addEventListener(ev, () => { avPlaying = avHold; syncPlay(); }));
+      if (u.expand) u.expand.addEventListener("click", e => { e.stopPropagation(); openAvModal(); });
+    });
+
+    // popup — the expanded inspector
+    function openAvModal() {
+      avModalOpen = true;
+      avModal.classList.add("open");
+      avResize();
+    }
+    function closeAvModal() {
+      avModalOpen = false;
+      avModal.classList.remove("open");
+    }
+    document.getElementById("avClose").addEventListener("click", closeAvModal);
+    avModal.addEventListener("click", e => { if (e.target === avModal) closeAvModal(); });
+    document.addEventListener("keydown", e => {
+      if (!avModalOpen) return;
+      if (e.key === "Escape" || e.key === "Enter") { e.preventDefault(); closeAvModal(); }
+      else if (e.key === " ") { e.preventDefault(); toggleAvPlay(); }
+      else if (e.key === "ArrowRight") { e.preventDefault(); avP = Math.min(1, avP + .02); }
+      else if (e.key === "ArrowLeft") { e.preventDefault(); avP = Math.max(0, avP - .02); }
+    });
+
+    /* mirror the inspector onto the diagram: rail fill, live box / sub-part, live dilated cell */
+    const railFill = document.getElementById("railFill"), railHead = document.getElementById("railHead");
+    const avParts = [...document.querySelectorAll(".apart")];
+    const avCells = [...document.querySelectorAll(".cell[data-b], .skip[data-b]")];
+    const avTicks = [...document.querySelectorAll(".rail-tick")];
+    function avSyncDiagram() {
+      const si = AV_ORDER.indexOf(avStage);
+      const [x0, x1] = AV_SPAN[avStage];
+      const x = x0 + (x1 - x0) * avP;
+      railFill.setAttribute("x2", x.toFixed(1));
+      railHead.setAttribute("cx", x.toFixed(1));
+      avTicks.forEach((t, i) => t.classList.toggle("done", i < si || (i === si && avP > 0) || (i === si + 1 && avP >= 1)));
+      // which sub-part is live: decode splits into pool → heads → output chip
+      const livePart = avStage !== "decode" ? avStage : avP < .25 ? "pool" : avP < .85 ? "heads" : "out";
+      const order = ["listen", "extract", "understand", "pool", "heads", "out"];
+      const li = order.indexOf(livePart);
+      avParts.forEach(g => {
+        const pi = order.indexOf(g.dataset.part);
+        g.classList.toggle("live", pi === li);
+        g.classList.toggle("done", pi < li);
+      });
+      // dilated cells follow the block currently on the canvas
+      const b = avStage === "understand" ? Math.min(4, Math.floor(avP * 5)) : si > 2 ? 5 : -1;
+      avCells.forEach(c => {
+        const ci = +c.dataset.b;
+        c.classList.toggle("live", ci === b);
+        c.classList.toggle("done", ci < b);
+      });
+    }
+
+    (function avLoop(tms) {
+      requestAnimationFrame(avLoop);
+      const dt = Math.min(100, tms - avLastT);
+      avLastT = tms;
+      const active = slides[1].classList.contains("active");
+      if (!active && !avModalOpen) { avWasActive = false; return; } // park while off-slide
+      if (!avWasActive) {
+        avWasActive = true;
+        avSelect(AV_ORDER[0]); // entering the slide starts the walkthrough from the top
+      }
+      let st = AV_STAGES[avStage];
+      if (avPlaying && avP < 1) avP = Math.min(1, avP + dt * avSpeed / st.dur);
+      if (avP < 1) avDoneT = 0;
+      else if (avPlaying && !avDoneT) avDoneT = tms;  // also catches a scrub dropped at the end
+      // walkthrough: after a short hold, move on to the next stage
+      const si = AV_ORDER.indexOf(avStage);
+      if (avPlaying && avP >= 1 && si < AV_ORDER.length - 1 && avDoneT && tms - avDoneT > AV_GAP / avSpeed) {
+        avSelect(AV_ORDER[si + 1]);
+        st = AV_STAGES[avStage];
+      }
+      if (avPlaying && avP >= 1 && si === AV_ORDER.length - 1) { avPlaying = false; syncPlay(); }
+      const big = avModalOpen;
+      const cv = big ? avCanvasBig : avCanvas, cx = big ? avCtxBig : avCtx;
+      const r = cv.getBoundingClientRect();
+      if (r.width) {
+        const W = r.width, H = r.height;
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)) avResize();
+        const sc = big ? 1 : deckScale;
+        avFS = Math.max(1, Math.min(1.5, H / sc / 170)) * sc;
+        cx.clearRect(0, 0, W, H);
+        cx.save();
+        cx.globalAlpha = Math.min(1, Math.max(0, performance.now() - avStageT0) / AV_FADE);
+        st.draw(cx, W, H, avP, tms);
+        cx.restore();
+      }
+      avSyncDiagram();
+      const cap = st.cap(avP);
+      avTag.textContent = st.tag; avText.innerHTML = cap;
+      avTagBig.textContent = st.tag; avTextBig.innerHTML = cap;
+      const tLabel = `${(avP * st.dur / 1000).toFixed(1)} / ${(st.dur / 1000).toFixed(1)} s`;
+      avUI.forEach(u => {
+        if (u.scrub && document.activeElement !== u.scrub) u.scrub.value = Math.round(avP * 1000);
+        if (u.time) u.time.textContent = tLabel;
+      });
+    })(performance.now());
+  </script>
 </body>
 </html>
