@@ -31,6 +31,12 @@ is no speech-to-text, no LLM and no cloud: everything runs on the device.
 [7. Limitations](#7-limitations) ·
 [8. Project layout](#8-project-layout)
 
+> **Run it in one command** — `./run.sh`
+> Sets up a virtualenv, installs the runtime dependencies (**no torch**) and
+> starts the browser voice-control server → open <http://localhost:8321> and
+> click to start. First run takes ~30–60 s; later runs start instantly.
+> See [6. Running it](#6-running-it).
+>
 > **Just want to see it?** Open `tiny-alexa.html` in a browser, add `?demo` to
 > the end of the address and click. It plays a scripted conversation through
 > every scene, with no mic, server or Pi needed.
@@ -342,23 +348,35 @@ python src/dashboard.py              # merge both → results/dashboard.md
 
 ## 6. Running it
 
-### Option A: demo only (any computer, 10 seconds)
-
-Open `tiny-alexa.html` in Chrome, Edge or Safari, add `?demo` to the end of
-the address (`…/tiny-alexa.html?demo`), press Enter and click anywhere. Add
-`&debug` to also show the model-latency chip.
-
-### Option B: real voice control on your laptop
+### One command (recommended)
 
 ```bash
-python -m venv .venv && source .venv/bin/activate
+./run.sh
+```
+
+That's it. `run.sh` creates a virtualenv (once), installs the minimal runtime
+dependencies — **no torch, no training deps** — and starts the browser
+voice-control server. Open <http://localhost:8321> and click to start. First
+run takes ~30–60 s to install; later runs start instantly. Pass any server flag
+straight through: `./run.sh --debug`.
+
+Manual equivalent, if you'd rather not use the script:
+
+```bash
+python3 -m venv .venv && source .venv/bin/activate
 pip install numpy soundfile onnxruntime openwakeword==0.4.0 "aiohttp>=3.9"
 python src/server.py                 # then open http://localhost:8321 and click to start
 ```
 
 On macOS the replies use the built-in `say` voice automatically.
 
-### Option C: Raspberry Pi 4
+### Demo only (any computer, 10 seconds, no install)
+
+Open `tiny-alexa.html` in Chrome, Edge or Safari, add `?demo` to the end of
+the address (`…/tiny-alexa.html?demo`), press Enter and click anywhere. Add
+`&debug` to also show the model-latency chip.
+
+### Raspberry Pi 4
 
 1. **Copy to the Pi:** `src/`, `data/labels.json`, `data/manifest.csv`,
    `models/TCN.onnx` and `tiny-alexa.html`. The Pi doesn't need torch.

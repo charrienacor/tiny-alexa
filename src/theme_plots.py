@@ -8,6 +8,8 @@ black / hot-pink theme of tiny-alexa.html:
     results/accuracy_label.png     train/val accuracy + val loss curves
     results/confusion_intent.png   intent confusion matrix
     results/confusion_slot.png     slot confusion matrix
+    results/class_metrics_intent.png  per-class P/R/F1 bars
+    results/class_metrics_slot.png    per-class P/R/F1 bars
 
 and dumps results/deck_data.json (history + confusion matrices + class
 names) so presentation.html can animate the same data natively.
@@ -151,6 +153,55 @@ def confusion_chart(cm, classes, acc, title, path):
     plt.close(fig)
 
 
+def class_metrics_chart(cm, classes, title, path):
+    """Per-class precision/recall/F1 grouped bars in the tiny-alexa theme."""
+    n = len(classes)
+    tp = np.diag(cm).astype(float)
+    pred_sum = cm.sum(axis=0).astype(float)
+    true_sum = cm.sum(axis=1).astype(float)
+    precision = np.divide(tp, pred_sum, out=np.zeros(n), where=pred_sum > 0)
+    recall = np.divide(tp, true_sum, out=np.zeros(n), where=true_sum > 0)
+    f1 = np.divide(2 * precision * recall, precision + recall,
+                   out=np.zeros(n), where=(precision + recall) > 0)
+    macro_f1 = f1.mean() * 100
+    acc = tp.sum() / cm.sum() * 100
+
+    x = np.arange(n)
+    w = 0.27
+    fig, ax = plt.subplots(figsize=(max(10, n * 0.68), 4.8), dpi=200)
+    series = [
+        (x - w, precision * 100, PINK_300, "precision"),
+        (x,     recall * 100,    PINK_500, "recall"),
+        (x + w, f1 * 100,        PINK_100, "F1"),
+    ]
+    for xi, vals, color, lab in series:
+        bars = ax.bar(xi, vals, w, color=color, label=lab,
+                      edgecolor="none", alpha=0.92)
+        ax.bar_label(bars, fmt="%.0f", fontsize=5 if n > 20 else 6,
+                     padding=1, color=WHITE, alpha=0.85)
+    ax.axhline(macro_f1, color=PINK_400, ls="--", lw=1, alpha=0.85,
+               label=f"macro F1 {macro_f1:.1f}")
+    ax.set_ylim(0, 120)
+    ax.set_yticks(range(0, 101, 20))
+    ax.set_ylabel("%")
+    ax.set_xticks(x)
+    ax.set_xticklabels(classes, rotation=45, ha="right",
+                       rotation_mode="anchor", fontsize=6 if n > 20 else 8)
+    ax.set_xlim(-0.8, n - 0.2)
+    ax.set_title(
+        f"{title}\n"
+        f"macro P/R/F1 = {precision.mean() * 100:.1f}/"
+        f"{recall.mean() * 100:.1f}/{macro_f1:.1f}"
+        f"   micro P/R/F1 = {acc:.1f}/{acc:.1f}/{acc:.1f}",
+        color=WHITE, fontsize=11, loc="left", pad=14)
+    ax.legend(loc="upper right", ncol=4, fontsize=8, framealpha=0.35,
+              facecolor=PANEL, edgecolor="none")
+    _style_ax(ax)
+    fig.tight_layout()
+    fig.savefig(path)
+    plt.close(fig)
+
+
 def main():
     data = ROOT / "data"
     device = ("cuda" if torch.cuda.is_available()
@@ -173,8 +224,8 @@ def main():
                                      map_location=device))
     it, ip, st, sp, lt, lp = predict_all(model, test_ds, device, combo)
 
-    cm_i, _, _, _, acc_i = compute_metrics(it, ip, len(intents))
-    cm_s, _, _, _, acc_s = compute_metrics(st, sp, len(slots))
+    cm_i, pr_i, rc_i, f1_i, acc_i = compute_metrics(it, ip, len(intents))
+    cm_s, pr_s, rc_s, f1_s, acc_s = compute_metrics(st, sp, len(slots))
     print(f"intent acc {acc_i * 100:.2f}%   slot acc {acc_s * 100:.2f}%")
 
     # training history
@@ -193,6 +244,10 @@ def main():
                     results / "confusion_intent.png")
     confusion_chart(cm_s, slots, acc_s, "slot confusion",
                     results / "confusion_slot.png")
+    class_metrics_chart(cm_i, intents, "intent class metrics",
+                        results / "class_metrics_intent.png")
+    class_metrics_chart(cm_s, slots, "slot class metrics",
+                        results / "class_metrics_slot.png")
 
     # native data for presentation.html
     deck = {
@@ -204,6 +259,16 @@ def main():
         "cm_slot": cm_s.tolist(),
         "acc_intent": round(acc_i * 100, 2),
         "acc_slot": round(acc_s * 100, 2),
+        "prf_intent": {
+            "precision": [round(v * 100, 2) for v in pr_i],
+            "recall": [round(v * 100, 2) for v in rc_i],
+            "f1": [round(v * 100, 2) for v in f1_i],
+        },
+        "prf_slot": {
+            "precision": [round(v * 100, 2) for v in pr_s],
+            "recall": [round(v * 100, 2) for v in rc_s],
+            "f1": [round(v * 100, 2) for v in f1_s],
+        },
     }
     (results / "deck_data.json").write_text(json.dumps(deck))
     print("wrote accuracy_label.png, confusion_intent.png, "
